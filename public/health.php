@@ -8,6 +8,19 @@ header('Content-Type: text/plain; charset=utf-8');
 
 require __DIR__ . '/db.php';
 
+// --- Ideiglenes diagnosztika (jelszót NEM írunk ki, csak a hosszát) ---
+$cfgFile = __DIR__ . '/config.php';
+echo 'config.php letezik: ' . (is_file($cfgFile) ? 'igen' : 'nem') . "\n";
+if (is_file($cfgFile)) {
+    $cfg = require $cfgFile;
+    $d = $cfg['db'] ?? [];
+    echo 'host: ' . ($d['host'] ?? '(nincs)') . "\n";
+    echo 'name: ' . ($d['name'] ?? '(nincs)') . "\n";
+    echo 'user: ' . ($d['user'] ?? '(nincs)') . "\n";
+    echo 'pass_length: ' . strlen((string) ($d['pass'] ?? '')) . "\n";
+}
+echo "---\n";
+
 try {
     $pdo = db();
     $pdo->query('SELECT 1');
