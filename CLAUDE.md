@@ -76,6 +76,12 @@ A weboldal címe: **holborozzak.hu**
 ## Projekt szerkezet
 
 - `public/` — **a deployolt weboldal** (csak ez kerül a webszerverre). PHP + HTML/CSS.
+  - `db.php` — PDO MySQL kapcsolat (`db()` függvény, singleton). A configot a
+    `config.php`-ból olvassa.
+  - `config.php` — **generált**, NEM gitben: éles környezetben a CI hozza létre a
+    `DB_PASSWORD` secretből; lokálisan a `config.example.php`-ból másolod.
+  - `health.php` — ideiglenes DB-egészség ellenőrző (élesítés előtt törölni/védeni).
+  - `version.php` — generált verziófájl (CI).
 - `db/` — adatbázis séma (`schema.sql`), migrációk. NEM kerül a webszerverre.
 - `docs/` — tervdokumentumok (pl. `adatmodell.md`). NEM kerül a webszerverre.
 - `.github/workflows/` — CI/CD (deploy).

@@ -8,8 +8,9 @@ node_modules/
 dist/
 build/
 
-# Deploy során generált verziófájl (a CI hozza létre)
+# Deploy során generált fájlok (a CI hozza létre)
 public/version.php
+public/config.php
 
 # OS / editor
 .DS_Store
