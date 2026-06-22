@@ -23,14 +23,24 @@ try {
     error_log('index.php DB hiba: ' . $e->getMessage());
 }
 
-$featured = array_values(array_filter($events, static fn($e) => (int) $e['is_featured'] === 1));
+// Aktív nézet (tab) és a szerinti szűrés
+$view = normalizeView($_GET['nezet'] ?? null);
+$displayEvents = filterEvents($events, $view);
 
-// Az összes közelgő esemény hónapokra bontva (a teljes lista)
+// Kiemelt blokk csak az alap (Közelgő) nézeten jelenik meg
+$showFeatured = ($view === 'kozelgo');
+$featured = $showFeatured
+    ? array_values(array_filter($events, static fn($e) => (int) $e['is_featured'] === 1))
+    : [];
+
+// A megjelenített (szűrt) események hónapokra bontva
 $byMonth = [];
-foreach ($events as $e) {
+foreach ($displayEvents as $e) {
     $byMonth[monthKey($e['start_datetime'])][] = $e;
 }
 ksort($byMonth);
+
+$listHeading = ($view === 'kozelgo') ? 'Közelgő események' : EVENT_VIEWS[$view];
 
 // --- Strukturált adat: ItemList az eseményekről (SEO / AI-kereső) ---
 $itemList = [];
@@ -104,6 +114,12 @@ require __DIR__ . '/partials/header.php';
     <p class="section-intro">Hamarosan kerülnek fel az események. 🍷</p>
 <?php else: ?>
 
+    <nav class="tabs" aria-label="Esemény szűrők">
+      <?php foreach (EVENT_VIEWS as $key => $label): ?>
+        <a href="?nezet=<?= h($key) ?>"<?= $view === $key ? ' aria-current="page"' : '' ?>><?= h($label) ?></a>
+      <?php endforeach; ?>
+    </nav>
+
   <?php if ($featured): ?>
     <section class="events-section">
       <div class="events-section__head"><h2>Kiemelt események</h2></div>
@@ -133,7 +149,10 @@ require __DIR__ . '/partials/header.php';
   <?php endif; ?>
 
     <section class="events-section">
-      <div class="events-section__head"><h2>Közelgő események</h2></div>
+      <div class="events-section__head"><h2><?= h($listHeading) ?></h2></div>
+      <?php if (!$byMonth): ?>
+        <p class="section-intro">Nincs a szűrőnek megfelelő esemény. <a href="?nezet=kozelgo">Összes közelgő →</a></p>
+      <?php else: ?>
       <div class="events-list">
         <?php foreach ($byMonth as $key => $monthEvents): ?>
           <div class="events-list__month">
@@ -165,6 +184,7 @@ require __DIR__ . '/partials/header.php';
           <?php endforeach; ?>
         <?php endforeach; ?>
       </div>
+      <?php endif; ?>
     </section>
 
 <?php endif; ?>

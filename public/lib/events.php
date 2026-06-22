@@ -16,6 +16,61 @@ const HU_MONTHS_SHORT = [
     7 => 'júl.', 8 => 'aug.', 9 => 'szept.', 10 => 'okt.', 11 => 'nov.', 12 => 'dec.',
 ];
 
+/** Engedélyezett nézetek (tabok): kulcs => felirat. */
+const EVENT_VIEWS = [
+    'kozelgo'  => 'Közelgő',
+    'het-vege' => 'E hétvégén',
+    'ho'       => 'E hónapban',
+    'ingyenes' => 'Ingyenes',
+];
+
+/** A nézet-kulcs ellenőrzése (ismeretlen → alapértelmezett). */
+function normalizeView(?string $v): string
+{
+    return isset(EVENT_VIEWS[$v]) ? $v : 'kozelgo';
+}
+
+/** A közelgő hétvége (szombat 00:00 – vasárnap 23:59). */
+function weekendRange(DateTimeImmutable $now): array
+{
+    $dow = (int) $now->format('N');           // 1=hétfő .. 7=vasárnap
+    $daysToSat = (6 - $dow + 7) % 7;          // hány nap a szombatig
+    $satStart = $now->modify("+{$daysToSat} days")->setTime(0, 0, 0);
+    $sunEnd   = $satStart->modify('+1 day')->setTime(23, 59, 59);
+    return [$satStart, $sunEnd];
+}
+
+/** Az aktuális hónap eleje–vége. */
+function monthRange(DateTimeImmutable $now): array
+{
+    return [
+        $now->modify('first day of this month')->setTime(0, 0, 0),
+        $now->modify('last day of this month')->setTime(23, 59, 59),
+    ];
+}
+
+/** Átfedés-vizsgálat: az esemény beleér-e a [rs, re] időszakba. */
+function eventOverlaps(array $e, DateTimeImmutable $rs, DateTimeImmutable $re): bool
+{
+    $s = new DateTimeImmutable($e['start_datetime']);
+    $end = !empty($e['end_datetime']) ? new DateTimeImmutable($e['end_datetime']) : $s;
+    return $s <= $re && $end >= $rs;
+}
+
+/** A nézet szerinti szűrés (a már betöltött közelgő eseményeken). */
+function filterEvents(array $events, string $view): array
+{
+    if ($view === 'ingyenes') {
+        return array_values(array_filter($events, static fn($e) => (int) $e['is_free'] === 1));
+    }
+    if ($view === 'het-vege' || $view === 'ho') {
+        $now = new DateTimeImmutable('now');
+        [$rs, $re] = $view === 'het-vege' ? weekendRange($now) : monthRange($now);
+        return array_values(array_filter($events, static fn($e) => eventOverlaps($e, $rs, $re)));
+    }
+    return $events; // kozelgo
+}
+
 /** Az összes közelgő/most zajló, közzétett esemény, címkékkel és borvidékkel. */
 function fetchUpcomingEvents(PDO $pdo): array
 {
