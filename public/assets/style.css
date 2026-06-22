@@ -598,14 +598,14 @@ main { flex: 1 0 auto; }
 }
 .leaflet-control-zoom a,
 .locate-control a {
-  width: 80px;
-  height: 80px;
-  line-height: 80px;
+  width: 80px !important;
+  height: 80px !important;
+  line-height: 80px !important;
   color: var(--wine-700);
   background: #fff;
   display: grid;
   place-items: center;
-  font-size: 2.8rem;
+  font-size: 2.8rem !important;
 }
 .leaflet-control-zoom a:hover,
 .locate-control a:hover { background: #f3e7d0; color: var(--wine-900); }
