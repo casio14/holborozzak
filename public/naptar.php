@@ -83,10 +83,10 @@ require __DIR__ . '/partials/header.php';
 ?>
   <div class="container container--wide">
 
-    <section class="cal-hero">
+    <div class="page-head">
       <h1>Eseménynaptár</h1>
-      <p class="cal-hero__sub">Böngészd Magyarország borrendezvényeit dátum szerint, hónapról hónapra.</p>
-    </section>
+      <p class="page-head__sub">Böngészd Magyarország borrendezvényeit dátum szerint, hónapról hónapra.</p>
+    </div>
 
     <form class="facets" method="get" action="naptar.php" aria-label="Naptár szűrők">
       <input type="hidden" name="ev" value="<?= $year ?>">
