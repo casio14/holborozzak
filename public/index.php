@@ -26,9 +26,9 @@ try {
 
 // Aktív nézet (tab) + fazetta-szűrők (borvidék, kategória)
 $view = normalizeView($_GET['nezet'] ?? null);
-$regionFilter = trim((string) ($_GET['borvidek'] ?? ''));
-$catFilter    = trim((string) ($_GET['kategoria'] ?? ''));
-$sort         = normalizeSort($_GET['rendezes'] ?? null);
+$regionFilters = array_values(array_filter(array_map('strval', (array) ($_GET['borvidek'] ?? [])), 'strlen'));
+$catFilters    = array_values(array_filter(array_map('strval', (array) ($_GET['kategoria'] ?? [])), 'strlen'));
+$sort          = normalizeSort($_GET['rendezes'] ?? null);
 
 // Szűrő legördülők opciói a közelgő eseményekből (csak releváns értékek)
 $regionOptions = [];
@@ -44,8 +44,8 @@ foreach ($events as $e) {
 asort($regionOptions);
 asort($catOptions);
 
-$displayEvents = applyFacets(filterEvents($events, $view), $regionFilter, $catFilter);
-$hasFacets = ($regionFilter !== '' || $catFilter !== '');
+$displayEvents = applyFacets(filterEvents($events, $view), $regionFilters, $catFilters);
+$hasFacets = (!empty($regionFilters) || !empty($catFilters));
 
 // Kiemelt blokk csak a tiszta alap nézeten (nincs aktív szűrő)
 $showFeatured = ($view === 'kozelgo' && !$hasFacets);
@@ -92,33 +92,58 @@ require __DIR__ . '/partials/header.php';
     <div id="esemenyek-region">
     <nav class="tabs" aria-label="Esemény nézetek">
       <?php foreach (EVENT_VIEWS as $key => $label): ?>
-        <a href="<?= h(listUrl($key, $regionFilter, $catFilter, $sort)) ?>"<?= $view === $key ? ' aria-current="page"' : '' ?>><?= h($label) ?></a>
+        <a href="<?= h(listUrl($key, $regionFilters, $catFilters, $sort)) ?>"<?= $view === $key ? ' aria-current="page"' : '' ?>><?= h($label) ?></a>
       <?php endforeach; ?>
     </nav>
 
-    <form class="facets" method="get" action="" aria-label="Szűrők">
+    <form class="facets" method="get" action="" aria-label="Szűrők és rendezés">
       <?php if ($view !== 'kozelgo'): ?><input type="hidden" name="nezet" value="<?= h($view) ?>"><?php endif; ?>
-      <select class="facet-select" name="borvidek" aria-label="Borvidék">
-        <option value="">Összes borvidék</option>
-        <?php foreach ($regionOptions as $slug => $name): ?>
-          <option value="<?= h($slug) ?>"<?= $regionFilter === $slug ? ' selected' : '' ?>><?= h($name) ?></option>
-        <?php endforeach; ?>
-      </select>
-      <select class="facet-select" name="kategoria" aria-label="Kategória">
-        <option value="">Összes kategória</option>
-        <?php foreach ($catOptions as $slug => $name): ?>
-          <option value="<?= h($slug) ?>"<?= $catFilter === $slug ? ' selected' : '' ?>><?= h($name) ?></option>
-        <?php endforeach; ?>
-      </select>
-      <select class="facet-select facet-select--sort" name="rendezes" aria-label="Rendezés">
-        <?php foreach (EVENT_SORTS as $sortKey => $sortLabel): ?>
-          <option value="<?= h($sortKey) ?>"<?= $sort === $sortKey ? ' selected' : '' ?>><?= h($sortLabel) ?></option>
-        <?php endforeach; ?>
-      </select>
-      <button type="submit" class="facets__btn">Szűrés</button>
-      <?php if ($hasFacets): ?>
-        <a class="facets__clear" href="<?= h(listUrl($view, '', '', $sort)) ?>">Szűrők törlése</a>
-      <?php endif; ?>
+
+      <div class="facets__filters">
+        <details class="facet" data-facet>
+          <summary class="facet__toggle">
+            <span>Borvidék</span><?php if ($regionFilters): ?> <span class="facet__count"><?= count($regionFilters) ?></span><?php endif; ?>
+            <svg class="facet__chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+          </summary>
+          <div class="facet__panel">
+            <?php foreach ($regionOptions as $slug => $name): ?>
+              <label class="facet__opt">
+                <input type="checkbox" name="borvidek[]" value="<?= h($slug) ?>"<?= in_array($slug, $regionFilters, true) ? ' checked' : '' ?>>
+                <span><?= h($name) ?></span>
+              </label>
+            <?php endforeach; ?>
+          </div>
+        </details>
+
+        <details class="facet" data-facet>
+          <summary class="facet__toggle">
+            <span>Kategória</span><?php if ($catFilters): ?> <span class="facet__count"><?= count($catFilters) ?></span><?php endif; ?>
+            <svg class="facet__chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+          </summary>
+          <div class="facet__panel">
+            <?php foreach ($catOptions as $slug => $name): ?>
+              <label class="facet__opt">
+                <input type="checkbox" name="kategoria[]" value="<?= h($slug) ?>"<?= in_array($slug, $catFilters, true) ? ' checked' : '' ?>>
+                <span><?= h($name) ?></span>
+              </label>
+            <?php endforeach; ?>
+          </div>
+        </details>
+
+        <button type="submit" class="facets__btn">Szűrés</button>
+        <?php if ($hasFacets): ?>
+          <a class="facets__clear" href="<?= h(listUrl($view, [], [], $sort)) ?>">Szűrők törlése</a>
+        <?php endif; ?>
+      </div>
+
+      <div class="facets__sort">
+        <label class="facets__sort-label" for="rendezes-select">Rendezés:</label>
+        <select class="facet-select facet-select--sort" id="rendezes-select" name="rendezes" aria-label="Rendezés">
+          <?php foreach (EVENT_SORTS as $sortKey => $sortLabel): ?>
+            <option value="<?= h($sortKey) ?>"<?= $sort === $sortKey ? ' selected' : '' ?>><?= h($sortLabel) ?></option>
+          <?php endforeach; ?>
+        </select>
+      </div>
     </form>
 
   <?php if ($featured): ?>
@@ -152,7 +177,7 @@ require __DIR__ . '/partials/header.php';
     <section class="events-section">
       <div class="events-section__head"><h2><?= h($listHeading) ?></h2></div>
       <?php if (!$groups): ?>
-        <p class="section-intro">Nincs a szűrőnek megfelelő esemény. <a href="<?= h(listUrl('kozelgo', '', '')) ?>">Összes közelgő →</a></p>
+        <p class="section-intro">Nincs a szűrőnek megfelelő esemény. <a href="<?= h(listUrl('kozelgo', [], [])) ?>">Összes közelgő →</a></p>
       <?php else: ?>
       <div class="events-list">
         <?php foreach ($groups as $group): ?>

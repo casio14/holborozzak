@@ -245,9 +245,83 @@ main { flex: 1 0 auto; }
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: .6rem;
+  gap: .8rem;
   margin: 0 0 1.75rem;
 }
+.facets__filters { display: flex; flex-wrap: wrap; align-items: center; gap: .6rem; }
+.facets__sort { margin-left: auto; display: flex; align-items: center; gap: .5rem; }
+.facets__sort-label { color: var(--muted); font-weight: 600; font-size: .9rem; white-space: nowrap; }
+
+/* Multiselect szűrő legördülő (details + checkbox) */
+.facet { position: relative; }
+.facet__toggle {
+  list-style: none;
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  padding: .55rem 1rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--paper);
+  color: var(--wine-700);
+  font-weight: 600;
+  font-size: .95rem;
+  cursor: pointer;
+  user-select: none;
+}
+.facet__toggle::-webkit-details-marker { display: none; }
+.facet__toggle:hover { border-color: var(--gold); }
+.facet[open] .facet__toggle {
+  border-color: var(--wine-700);
+  box-shadow: 0 0 0 3px rgba(114, 47, 55, .12);
+}
+.facet__chev { width: 14px; height: 14px; transition: transform .15s ease; }
+.facet[open] .facet__chev { transform: rotate(180deg); }
+.facet__count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  background: var(--wine-700);
+  color: #fff;
+  border-radius: 999px;
+  font-size: .72rem;
+  font-weight: 700;
+}
+.facet__panel {
+  position: absolute;
+  z-index: 20;
+  top: calc(100% + 6px);
+  left: 0;
+  min-width: 220px;
+  max-height: 290px;
+  overflow-y: auto;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(74, 14, 28, .16);
+  padding: .4rem;
+}
+.facet__opt {
+  display: flex;
+  align-items: center;
+  gap: .55rem;
+  padding: .5rem .6rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: .95rem;
+  color: var(--ink);
+}
+.facet__opt:hover { background: #f7f1e7; }
+.facet__opt input {
+  width: 17px;
+  height: 17px;
+  accent-color: var(--wine-700);
+  cursor: pointer;
+  flex: none;
+}
+
 .facet-select {
   appearance: none;
   -webkit-appearance: none;

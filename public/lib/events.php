@@ -113,16 +113,19 @@ function fetchUpcomingEvents(PDO $pdo): array
     return $rows;
 }
 
-/** Borvidék + kategória (fazetta) szűrés a slug alapján. */
-function applyFacets(array $events, string $regionSlug, string $catSlug): array
+/** Borvidék + kategória (fazetta) szűrés — több érték is megadható (OR a fazettán belül). */
+function applyFacets(array $events, array $regionSlugs, array $catSlugs): array
 {
-    return array_values(array_filter($events, static function ($e) use ($regionSlug, $catSlug) {
-        if ($regionSlug !== '' && ($e['region_slug'] ?? '') !== $regionSlug) {
+    if (!$regionSlugs && !$catSlugs) {
+        return $events;
+    }
+    return array_values(array_filter($events, static function ($e) use ($regionSlugs, $catSlugs) {
+        if ($regionSlugs && !in_array($e['region_slug'] ?? '', $regionSlugs, true)) {
             return false;
         }
-        if ($catSlug !== '') {
+        if ($catSlugs) {
             $slugs = array_map(static fn($c) => $c['slug'], $e['categories']);
-            if (!in_array($catSlug, $slugs, true)) {
+            if (!array_intersect($catSlugs, $slugs)) {
                 return false;
             }
         }
@@ -137,12 +140,12 @@ function categoryNames(array $e): array
 }
 
 /** Lista-URL építése a nézet + fazetták megőrzésével. */
-function listUrl(string $view, string $region, string $cat, string $sort = 'datum'): string
+function listUrl(string $view, array $regions = [], array $cats = [], string $sort = 'datum'): string
 {
     $p = [];
     if ($view !== 'kozelgo') { $p['nezet'] = $view; }
-    if ($region !== '')      { $p['borvidek'] = $region; }
-    if ($cat !== '')         { $p['kategoria'] = $cat; }
+    if ($regions)            { $p['borvidek'] = array_values($regions); }
+    if ($cats)               { $p['kategoria'] = array_values($cats); }
     if ($sort !== 'datum')   { $p['rendezes'] = $sort; }
     return $p ? ('?' . http_build_query($p)) : './';
 }
