@@ -335,11 +335,20 @@ main { flex: 1 0 auto; }
   background: var(--cream);
   border-bottom: 1px solid var(--line);
 }
+.cal-toolbar__title { display: inline-flex; align-items: center; gap: .6rem; flex-wrap: wrap; }
 .cal-toolbar__month {
   font-family: Georgia, "Times New Roman", serif;
   font-weight: 700;
   font-size: 1.2rem;
   color: var(--wine-900);
+}
+.cal-toolbar__count {
+  background: #f0e7d8;
+  color: var(--wine-700);
+  font-size: .78rem;
+  font-weight: 700;
+  padding: .18rem .6rem;
+  border-radius: 999px;
 }
 .cal__dow {
   display: grid;

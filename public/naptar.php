@@ -85,7 +85,7 @@ require __DIR__ . '/partials/header.php';
 
     <section class="cal-hero">
       <h1>Eseménynaptár</h1>
-      <p class="cal-hero__sub"><?= $eventCount ?> esemény ebben a hónapban</p>
+      <p class="cal-hero__sub">Böngészd Magyarország borrendezvényeit dátum szerint, hónapról hónapra.</p>
     </section>
 
     <form class="facets" method="get" action="naptar.php" aria-label="Naptár szűrők">
@@ -141,7 +141,10 @@ require __DIR__ . '/partials/header.php';
 
     <div class="cal">
       <div class="cal-toolbar">
-        <span class="cal-toolbar__month"><?= h($monthTitle) ?></span>
+        <span class="cal-toolbar__title">
+          <span class="cal-toolbar__month"><?= h($monthTitle) ?></span>
+          <span class="cal-toolbar__count"><?= $eventCount ?> esemény</span>
+        </span>
         <div class="cal-nav">
           <a class="cal-nav__btn" href="<?= h($prevUrl) ?>" aria-label="Előző hónap">‹</a>
           <a class="cal-nav__btn" href="<?= h($nextUrl) ?>" aria-label="Következő hónap">›</a>
