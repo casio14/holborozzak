@@ -326,6 +326,21 @@ main { flex: 1 0 auto; }
 .cal-nav__today:hover { color: var(--gold); }
 
 .cal { background: var(--paper); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; box-shadow: var(--shadow); }
+.cal-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: .85rem 1rem;
+  background: var(--cream);
+  border-bottom: 1px solid var(--line);
+}
+.cal-toolbar__month {
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: 700;
+  font-size: 1.2rem;
+  color: var(--wine-900);
+}
 .cal__dow {
   display: grid;
   grid-template-columns: repeat(7, 1fr);

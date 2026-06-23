@@ -84,15 +84,8 @@ require __DIR__ . '/partials/header.php';
   <div class="container container--wide">
 
     <section class="cal-hero">
-      <div>
-        <h1>Eseménynaptár</h1>
-        <p class="cal-hero__sub"><?= h($monthTitle) ?> · <?= $eventCount ?> esemény</p>
-      </div>
-      <div class="cal-nav">
-        <a class="cal-nav__btn" href="<?= h($prevUrl) ?>" aria-label="Előző hónap">‹</a>
-        <a class="cal-nav__btn" href="<?= h($nextUrl) ?>" aria-label="Következő hónap">›</a>
-        <a class="cal-nav__today" href="<?= h($todayUrl) ?>">Ma</a>
-      </div>
+      <h1>Eseménynaptár</h1>
+      <p class="cal-hero__sub"><?= $eventCount ?> esemény ebben a hónapban</p>
     </section>
 
     <form class="facets" method="get" action="naptar.php" aria-label="Naptár szűrők">
@@ -147,6 +140,14 @@ require __DIR__ . '/partials/header.php';
     <?php endif; ?>
 
     <div class="cal">
+      <div class="cal-toolbar">
+        <span class="cal-toolbar__month"><?= h($monthTitle) ?></span>
+        <div class="cal-nav">
+          <a class="cal-nav__btn" href="<?= h($prevUrl) ?>" aria-label="Előző hónap">‹</a>
+          <a class="cal-nav__btn" href="<?= h($nextUrl) ?>" aria-label="Következő hónap">›</a>
+          <a class="cal-nav__today" href="<?= h($todayUrl) ?>">Ma</a>
+        </div>
+      </div>
       <div class="cal__dow"><span>Hét</span><span>Kedd</span><span>Sze</span><span>Csüt</span><span>Pén</span><span>Szo</span><span>Vas</span></div>
       <div class="cal__grid">
         <?php
