@@ -134,18 +134,31 @@ require __DIR__ . '/partials/header.php';
       <div class="events-section__head"><h2>Böngéssz másképp</h2></div>
       <div class="browse-grid">
         <a class="browse-tile" href="esemenyek.php">
-          <span class="browse-tile__icon">🍇</span>
-          <h3 class="browse-tile__title">Összes esemény</h3>
+          <span class="browse-tile__icon browse-tile__icon--wine">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/>
+              <circle cx="3.6" cy="6" r="1.3" fill="currentColor" stroke="none"/><circle cx="3.6" cy="12" r="1.3" fill="currentColor" stroke="none"/><circle cx="3.6" cy="18" r="1.3" fill="currentColor" stroke="none"/>
+            </svg>
+          </span>
+          <h3 class="browse-tile__title">Összes esemény <span class="browse-tile__arrow">→</span></h3>
           <p class="browse-tile__desc">A teljes lista — szűrés borvidék, kategória és időpont szerint.</p>
         </a>
         <a class="browse-tile" href="terkep.php">
-          <span class="browse-tile__icon">🗺️</span>
-          <h3 class="browse-tile__title">Térkép</h3>
+          <span class="browse-tile__icon browse-tile__icon--green">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polygon points="3 6.5 9 3.5 15 6.5 21 3.5 21 17.5 15 20.5 9 17.5 3 20.5"/><line x1="9" y1="3.5" x2="9" y2="17.5"/><line x1="15" y1="6.5" x2="15" y2="20.5"/>
+            </svg>
+          </span>
+          <h3 class="browse-tile__title">Térkép <span class="browse-tile__arrow">→</span></h3>
           <p class="browse-tile__desc">Nézd meg, milyen rendezvények vannak a közeledben.</p>
         </a>
         <a class="browse-tile" href="naptar.php">
-          <span class="browse-tile__icon">📅</span>
-          <h3 class="browse-tile__title">Naptár</h3>
+          <span class="browse-tile__icon browse-tile__icon--gold">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="3" y="4.5" width="18" height="16" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="8" y1="2.5" x2="8" y2="6"/><line x1="16" y1="2.5" x2="16" y2="6"/>
+            </svg>
+          </span>
+          <h3 class="browse-tile__title">Naptár <span class="browse-tile__arrow">→</span></h3>
           <p class="browse-tile__desc">Böngészés dátum szerint, naptáros nézetben.</p>
         </a>
       </div>

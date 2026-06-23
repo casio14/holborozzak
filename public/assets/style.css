@@ -224,7 +224,7 @@ main { flex: 1 0 auto; }
 /* ---------- Böngésző-csempék (nyitóoldal) ---------- */
 .browse-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: 1.25rem;
 }
 .browse-tile {
@@ -233,29 +233,41 @@ main { flex: 1 0 auto; }
   color: inherit;
   background: var(--paper);
   border: 1px solid var(--line);
-  border-radius: 14px;
-  padding: 1.5rem;
+  border-radius: 16px;
+  padding: 1.6rem;
   box-shadow: var(--shadow);
-  transition: transform .15s ease, box-shadow .15s ease;
+  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
 }
-.browse-tile:hover { transform: translateY(-3px); box-shadow: 0 14px 32px rgba(74, 14, 28, .14); }
-.browse-tile__icon { font-size: 1.9rem; }
-.browse-tile__title { margin: .6rem 0 .3rem; color: var(--wine-900); font-family: Georgia, "Times New Roman", serif; font-size: 1.2rem; }
-.browse-tile__desc { margin: 0; color: var(--muted); font-size: .92rem; }
-.browse-tile__soon {
-  display: inline-block;
-  vertical-align: middle;
-  margin-left: .3rem;
-  background: var(--gold);
+.browse-tile:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 36px rgba(74, 14, 28, .16);
+  border-color: var(--gold);
+}
+.browse-tile__icon {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  color: #fff;
+  margin-bottom: 1rem;
+}
+.browse-tile__icon svg { width: 26px; height: 26px; }
+.browse-tile__icon--wine  { background: linear-gradient(135deg, var(--wine-700), var(--wine-900)); }
+.browse-tile__icon--green { background: linear-gradient(135deg, #6b7d47, #4a5a30); }
+.browse-tile__icon--gold  { background: linear-gradient(135deg, #d2ab57, #b5862f); }
+.browse-tile__title {
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+  margin: 0 0 .35rem;
   color: var(--wine-900);
-  font-size: .62rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: .04em;
-  padding: .15rem .4rem;
-  border-radius: 999px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.2rem;
 }
-.browse-tile--soon { opacity: .9; }
+.browse-tile__arrow { color: var(--gold); transition: transform .18s ease; }
+.browse-tile:hover .browse-tile__arrow { transform: translateX(4px); }
+.browse-tile__desc { margin: 0; color: var(--muted); font-size: .92rem; line-height: 1.5; }
 
 
 /* ---------- Borvidék chipek ---------- */
