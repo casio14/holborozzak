@@ -27,14 +27,17 @@ $points = [];
 foreach ($events as $e) {
     if (!empty($e['latitude']) && !empty($e['longitude'])) {
         $points[] = [
-            'title' => $e['title'],
-            'lat'   => (float) $e['latitude'],
-            'lng'   => (float) $e['longitude'],
-            'date'  => formatDateRange($e['start_datetime'], $e['end_datetime']),
-            'city'  => $e['city'],
-            'venue' => $e['venue_name'],
-            'free'  => (int) $e['is_free'] === 1,
-            'url'   => eventUrl($e),
+            'title'  => $e['title'],
+            'lat'    => (float) $e['latitude'],
+            'lng'    => (float) $e['longitude'],
+            'date'   => formatDateRange($e['start_datetime'], $e['end_datetime']),
+            'city'   => $e['city'],
+            'venue'  => $e['venue_name'],
+            'free'   => (int) $e['is_free'] === 1,
+            'url'    => eventUrl($e),
+            'img'    => $e['image_url'] ?: '',
+            'status' => eventStatus($e['start_datetime'], $e['end_datetime']),
+            'cats'   => categoryNames($e),
         ];
     }
 }
@@ -100,14 +103,33 @@ require __DIR__ . '/partials/header.php';
       iconCreateFunction: function (c) { return clusterIcon(c.getChildCount()); }
     });
 
+    function popupHtml(p) {
+      var h = '<div class="map-card">';
+      if (p.img) {
+        h += '<a class="map-card__media" href="' + esc(p.url) + '"><img src="' + esc(p.img) + '" alt=""></a>';
+      }
+      h += '<div class="map-card__body">';
+      h += '<a class="map-card__title" href="' + esc(p.url) + '">' + esc(p.title) + '</a>';
+      h += '<div class="map-card__date">' + esc(p.date);
+      if (p.status) { h += ' <span class="status ' + esc(p.status.class) + '">' + esc(p.status.label) + '</span>'; }
+      h += '</div>';
+      var loc = (p.venue ? p.venue + ', ' : '') + (p.city || '');
+      if (loc) { h += '<div class="map-card__loc">📍 ' + esc(loc) + '</div>'; }
+      var tags = '';
+      (p.cats || []).forEach(function (c) { tags += '<span class="tag">' + esc(c) + '</span>'; });
+      if (p.free) { tags += '<span class="tag tag--free">Ingyenes</span>'; }
+      if (tags) { h += '<div class="map-card__tags">' + tags + '</div>'; }
+      h += '<a class="btn btn--primary map-card__btn" href="' + esc(p.url) + '">Részletek &rarr;</a>';
+      h += '</div></div>';
+      return h;
+    }
+
     var bounds = [];
     pts.forEach(function (p) {
-      var loc = (p.venue ? p.venue + ', ' : '') + (p.city || '');
-      var html = '<div class="map-popup"><strong>' + esc(p.title) + '</strong><br>'
-        + esc(p.date) + '<br>' + esc(loc)
-        + (p.free ? '<br><span class="map-popup__free">Ingyenes</span>' : '')
-        + '<br><a class="map-popup__link" href="' + esc(p.url) + '">Részletek &rarr;</a></div>';
-      cluster.addLayer(L.marker([p.lat, p.lng], { icon: dotIcon }).bindPopup(html));
+      cluster.addLayer(
+        L.marker([p.lat, p.lng], { icon: dotIcon })
+          .bindPopup(popupHtml(p), { maxWidth: 260, minWidth: 260, className: 'event-popup' })
+      );
       bounds.push([p.lat, p.lng]);
     });
     map.addLayer(cluster);
