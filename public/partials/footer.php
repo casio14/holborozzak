@@ -45,7 +45,7 @@ if (is_file($versionFile)) {
           <a href="esemenyek.php?borvidek%5B%5D=soproni">Soproni</a>
         </nav>
 
-        <nav class="site-footer__col" aria-label="Jogi információk">
+        <nav class="site-footer__col site-footer__col--legal" aria-label="Jogi információk">
           <h3>Jogi</h3>
           <a href="impresszum.php">Impresszum</a>
           <a href="aszf.php">ÁSZF</a>

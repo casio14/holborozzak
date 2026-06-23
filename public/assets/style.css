@@ -921,8 +921,25 @@ main { flex: 1 0 auto; }
   .site-footer__top { grid-template-columns: 1fr 1fr; }
   .site-footer__brand { grid-column: 1 / -1; }
 }
-@media (max-width: 520px) {
-  .site-footer__top { grid-template-columns: 1fr; }
+/* Mobilon csak a jogi linkek (tömören), a többi oszlop és a leírás rejtve */
+@media (max-width: 640px) {
+  .site-footer__inner { padding: 1.5rem 1.25rem; }
+  .site-footer__top { display: block; }
+  .site-footer__brand,
+  .site-footer__col:not(.site-footer__col--legal) { display: none; }
+  .site-footer__col--legal {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1.25rem;
+  }
+  .site-footer__col--legal h3 { display: none; }
+  .site-footer__bottom {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    margin-top: 1.25rem;
+  }
 }
 
 /* ---------- Jogi oldalak ---------- */
