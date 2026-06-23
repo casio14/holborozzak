@@ -109,10 +109,9 @@ require __DIR__ . '/partials/header.php';
         h += '<a class="map-card__media" href="' + esc(p.url) + '"><img src="' + esc(p.img) + '" alt=""></a>';
       }
       h += '<div class="map-card__body">';
+      if (p.status) { h += '<div class="map-card__status"><span class="status ' + esc(p.status.class) + '">' + esc(p.status.label) + '</span></div>'; }
       h += '<a class="map-card__title" href="' + esc(p.url) + '">' + esc(p.title) + '</a>';
-      h += '<div class="map-card__date">' + esc(p.date);
-      if (p.status) { h += ' <span class="status ' + esc(p.status.class) + '">' + esc(p.status.label) + '</span>'; }
-      h += '</div>';
+      h += '<div class="map-card__date">' + esc(p.date) + '</div>';
       var loc = (p.venue ? p.venue + ', ' : '') + (p.city || '');
       if (loc) { h += '<div class="map-card__loc">📍 ' + esc(loc) + '</div>'; }
       var tags = '';
