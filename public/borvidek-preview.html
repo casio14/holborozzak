@@ -116,6 +116,37 @@
     .vD-tile__grape {
       position: absolute; right: -10px; bottom: -14px; font-size: 3.4rem; opacity: .14; transform: rotate(-10deg);
     }
+
+    /* ---------- E / F. HOMÁLYOSÍTOTT FOTÓ HÁTTÉRREL ---------- */
+    .vph-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1rem; }
+    .vph-tile {
+      position: relative; overflow: hidden; border-radius: 16px; min-height: 160px;
+      display: flex; flex-direction: column; justify-content: flex-end;
+      padding: 1.2rem 1.2rem 1.05rem; text-decoration: none; color: #fff;
+      box-shadow: var(--shadow); isolation: isolate;
+      transition: transform .15s ease, box-shadow .15s ease;
+    }
+    .vph-tile:hover { transform: translateY(-4px); box-shadow: 0 16px 34px rgba(74,14,28,.3); }
+    /* a fotó külön rétegen, hogy a blur ne homályosítsa a szöveget */
+    .vph-tile__bg {
+      position: absolute; inset: 0; z-index: -2;
+      background-size: cover; background-position: center;
+      transform: scale(1.12); /* nagyítás, hogy a blur széle ne lógjon ki */
+    }
+    /* sötét bor-overlay az olvashatóságért */
+    .vph-tile__bg::after {
+      content: ""; position: absolute; inset: 0;
+      background: linear-gradient(180deg, rgba(74,14,28,.25) 0%, rgba(74,14,28,.82) 100%);
+    }
+    .vph-tile:hover .vph-tile__bg { transform: scale(1.18); }
+    .vph-tile__pin { font-size: 1.3rem; }
+    .vph-tile__name { display: block; margin: .3rem 0 .12rem; font-weight: 800; font-size: 1.18rem; text-shadow: 0 2px 10px rgba(0,0,0,.4); }
+    .vph-tile__n { color: var(--gold-200); font-weight: 700; font-size: .85rem; text-shadow: 0 1px 6px rgba(0,0,0,.4); }
+
+    /* E: közepes homály */
+    .vE .vph-tile__bg { filter: blur(3px) saturate(1.05) brightness(.95); }
+    /* F: erősebb homály (lágyabb, „hangulat") */
+    .vF .vph-tile__bg { filter: blur(6px) saturate(1.1) brightness(.9); }
   </style>
 </head>
 <body>
@@ -208,6 +239,40 @@
         <a class="vD-tile" href="#"><span class="vD-tile__pin">📍</span><span class="vD-tile__name">Etyek-Buda</span><span class="vD-tile__n">2 esemény</span><span class="vD-tile__grape">🍇</span></a>
         <a class="vD-tile" href="#"><span class="vD-tile__pin">📍</span><span class="vD-tile__name">Somló</span><span class="vD-tile__n">2 esemény</span><span class="vD-tile__grape">🍇</span></a>
         <a class="vD-tile" href="#"><span class="vD-tile__pin">📍</span><span class="vD-tile__name">Badacsony</span><span class="vD-tile__n">1 esemény</span><span class="vD-tile__grape">🍇</span></a>
+      </div>
+    </section>
+
+    <!-- E. HOMÁLYOSÍTOTT FOTÓ — KÖZEPES BLUR -->
+    <section class="variant vE">
+      <span class="variant__label">E · Fotó háttér (közepes homály)</span>
+      <p class="variant__note">A D csempe, de háttérben a borvidék homályosított fotója, fölötte sötét bor-overlay az olvashatóságért. A képek itt placeholderek (Picsum) — élesben minden borvidékhez saját, gyönyörű szőlőskert-fotó kerülne (az adatbázisból).</p>
+      <div class="section-head"><h2>Böngéssz borvidék szerint</h2></div>
+      <div class="vph-grid">
+        <a class="vph-tile" href="#"><span class="vph-tile__bg" style="background-image:url('https://picsum.photos/seed/tokaj-vineyard/600/400')"></span><span class="vph-tile__pin">📍</span><span class="vph-tile__name">Tokaj</span><span class="vph-tile__n">8 esemény</span></a>
+        <a class="vph-tile" href="#"><span class="vph-tile__bg" style="background-image:url('https://picsum.photos/seed/eger-hills/600/400')"></span><span class="vph-tile__pin">📍</span><span class="vph-tile__name">Eger</span><span class="vph-tile__n">6 esemény</span></a>
+        <a class="vph-tile" href="#"><span class="vph-tile__bg" style="background-image:url('https://picsum.photos/seed/villany-wine/600/400')"></span><span class="vph-tile__pin">📍</span><span class="vph-tile__name">Villány</span><span class="vph-tile__n">5 esemény</span></a>
+        <a class="vph-tile" href="#"><span class="vph-tile__bg" style="background-image:url('https://picsum.photos/seed/balaton-lake/600/400')"></span><span class="vph-tile__pin">📍</span><span class="vph-tile__name">Balaton-felvidék</span><span class="vph-tile__n">4 esemény</span></a>
+        <a class="vph-tile" href="#"><span class="vph-tile__bg" style="background-image:url('https://picsum.photos/seed/szekszard-grape/600/400')"></span><span class="vph-tile__pin">📍</span><span class="vph-tile__name">Szekszárd</span><span class="vph-tile__n">3 esemény</span></a>
+        <a class="vph-tile" href="#"><span class="vph-tile__bg" style="background-image:url('https://picsum.photos/seed/etyek-cellar/600/400')"></span><span class="vph-tile__pin">📍</span><span class="vph-tile__name">Etyek-Buda</span><span class="vph-tile__n">2 esemény</span></a>
+        <a class="vph-tile" href="#"><span class="vph-tile__bg" style="background-image:url('https://picsum.photos/seed/somlo-hill/600/400')"></span><span class="vph-tile__pin">📍</span><span class="vph-tile__name">Somló</span><span class="vph-tile__n">2 esemény</span></a>
+        <a class="vph-tile" href="#"><span class="vph-tile__bg" style="background-image:url('https://picsum.photos/seed/badacsony-sunset/600/400')"></span><span class="vph-tile__pin">📍</span><span class="vph-tile__name">Badacsony</span><span class="vph-tile__n">1 esemény</span></a>
+      </div>
+    </section>
+
+    <!-- F. HOMÁLYOSÍTOTT FOTÓ — ERŐSEBB BLUR -->
+    <section class="variant vF">
+      <span class="variant__label">F · Fotó háttér (erősebb homály)</span>
+      <p class="variant__note">Ugyanaz, de lágyabb, erősebb homállyal — „hangulat" jellegű, a szöveg dominál, a fotó csak textúra. Hasonlítsd össze az E-vel, melyik tetszik jobban.</p>
+      <div class="section-head"><h2>Böngéssz borvidék szerint</h2></div>
+      <div class="vph-grid">
+        <a class="vph-tile" href="#"><span class="vph-tile__bg" style="background-image:url('https://picsum.photos/seed/tokaj-vineyard/600/400')"></span><span class="vph-tile__pin">📍</span><span class="vph-tile__name">Tokaj</span><span class="vph-tile__n">8 esemény</span></a>
+        <a class="vph-tile" href="#"><span class="vph-tile__bg" style="background-image:url('https://picsum.photos/seed/eger-hills/600/400')"></span><span class="vph-tile__pin">📍</span><span class="vph-tile__name">Eger</span><span class="vph-tile__n">6 esemény</span></a>
+        <a class="vph-tile" href="#"><span class="vph-tile__bg" style="background-image:url('https://picsum.photos/seed/villany-wine/600/400')"></span><span class="vph-tile__pin">📍</span><span class="vph-tile__name">Villány</span><span class="vph-tile__n">5 esemény</span></a>
+        <a class="vph-tile" href="#"><span class="vph-tile__bg" style="background-image:url('https://picsum.photos/seed/balaton-lake/600/400')"></span><span class="vph-tile__pin">📍</span><span class="vph-tile__name">Balaton-felvidék</span><span class="vph-tile__n">4 esemény</span></a>
+        <a class="vph-tile" href="#"><span class="vph-tile__bg" style="background-image:url('https://picsum.photos/seed/szekszard-grape/600/400')"></span><span class="vph-tile__pin">📍</span><span class="vph-tile__name">Szekszárd</span><span class="vph-tile__n">3 esemény</span></a>
+        <a class="vph-tile" href="#"><span class="vph-tile__bg" style="background-image:url('https://picsum.photos/seed/etyek-cellar/600/400')"></span><span class="vph-tile__pin">📍</span><span class="vph-tile__name">Etyek-Buda</span><span class="vph-tile__n">2 esemény</span></a>
+        <a class="vph-tile" href="#"><span class="vph-tile__bg" style="background-image:url('https://picsum.photos/seed/somlo-hill/600/400')"></span><span class="vph-tile__pin">📍</span><span class="vph-tile__name">Somló</span><span class="vph-tile__n">2 esemény</span></a>
+        <a class="vph-tile" href="#"><span class="vph-tile__bg" style="background-image:url('https://picsum.photos/seed/badacsony-sunset/600/400')"></span><span class="vph-tile__pin">📍</span><span class="vph-tile__name">Badacsony</span><span class="vph-tile__n">1 esemény</span></a>
       </div>
     </section>
 
