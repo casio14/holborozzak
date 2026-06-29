@@ -68,11 +68,11 @@ a { color: var(--wine-700); }
 }
 .brand__icon { color: var(--wine-700); flex: none; width: 44px; height: 44px; }
 .brand__text { display: flex; flex-direction: column; line-height: 1.1; }
-.brand__name { font-size: clamp(1.25rem, 3vw, 1.55rem); font-weight: 800; }
+.brand__name { font-size: clamp(1.45rem, 3.2vw, 1.8rem); font-weight: 800; }
 .brand__accent { color: var(--wine-900); }
 .brand__tag {
   margin-top: .15rem;
-  font-size: .68rem;
+  font-size: .76rem;
   font-weight: 600;
   letter-spacing: .12em;
   text-transform: uppercase;
