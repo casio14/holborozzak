@@ -192,6 +192,7 @@ $cssVer = @filemtime(__DIR__ . '/../assets/style.css') ?: time();
               <td><?= h(trim(($r['venue_name'] ? $r['venue_name'] . ', ' : '') . ($r['city'] ?? ''))) ?: '—' ?></td>
               <td><?php if (!empty($r['source_url'])): ?><a href="<?= h($r['source_url']) ?>" target="_blank" rel="noopener noreferrer">forrás ↗</a><?php else: ?>—<?php endif; ?></td>
               <td class="admin-actions-cell">
+                <a class="admin-link" href="jelolt-preview.php?id=<?= $id ?>" target="_blank" rel="noopener">Előnézet ↗</a>
                 <form method="post" action="jeloltek.php" class="admin-actform">
                   <input type="hidden" name="csrf" value="<?= h($csrf) ?>">
                   <input type="hidden" name="action" value="approve">
