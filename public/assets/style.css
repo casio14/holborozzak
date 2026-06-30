@@ -249,9 +249,11 @@ main { flex: 1 0 auto; }
   transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
 }
 .browse-tile:hover { transform: translateY(-4px); box-shadow: 0 18px 40px rgba(74, 14, 28, .12); border-color: #e0d3bf; }
+.browse-tile__head { display: flex; align-items: center; gap: .85rem; margin-bottom: .65rem; }
 .browse-tile__icon {
-  width: 48px;
-  height: 48px;
+  flex: none;
+  width: 46px;
+  height: 46px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -260,13 +262,13 @@ main { flex: 1 0 auto; }
   color: var(--wine-700);
   border: 1px solid var(--line);
 }
-.browse-tile__icon svg { width: 24px; height: 24px; }
-.browse-tile__title { margin: 1rem 0 .35rem; color: var(--wine-900); font-family: Georgia, "Times New Roman", serif; font-size: 1.25rem; }
+.browse-tile__icon svg { width: 23px; height: 23px; }
+.browse-tile__title { margin: 0; color: var(--wine-900); font-family: Georgia, "Times New Roman", serif; font-size: 1.2rem; }
 .browse-tile__desc { margin: 0; color: var(--muted); font-size: .92rem; }
 .browse-tile__arrow {
   position: absolute;
-  top: 1.7rem;
-  right: 1.6rem;
+  top: 1.5rem;
+  right: 1.5rem;
   color: var(--gold);
   font-weight: 700;
   opacity: 0;
@@ -371,6 +373,21 @@ main { flex: 1 0 auto; }
 .cta-band h2 { margin: 0 0 .5rem; color: #fff; font-size: clamp(1.6rem, 4vw, 2.3rem); }
 .cta-band p { margin: 0 auto 1.6rem; color: var(--gold-200); max-width: 52ch; }
 .cta-band__actions { display: flex; gap: .75rem; justify-content: center; flex-wrap: wrap; }
+/* Kompakt, vízszintes CTA-csík (szöveg balra, gombok jobbra) */
+.cta-band--compact {
+  text-align: left;
+  padding: 1.6rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+.cta-band--compact .cta-band__txt { flex: 1; min-width: 260px; }
+.cta-band--compact .cta-band__eyebrow { margin: 0 0 .2rem; }
+.cta-band--compact h2 { margin: 0 0 .15rem; font-size: 1.4rem; }
+.cta-band--compact p { margin: 0; max-width: 52ch; }
+.cta-band--compact .cta-band__actions { justify-content: flex-start; }
 .btn--gold { background: var(--gold); color: var(--wine-900); }
 .btn--gold:hover { background: #b8923f; }
 .btn--ghost-light { background: transparent; color: #fff; border: 1px solid rgba(255, 255, 255, .5); }
