@@ -109,7 +109,7 @@ a { color: var(--wine-700); }
 .site-cta {
   display: inline-block;
   padding: .55rem 1.05rem;
-  border-radius: 999px;
+  border-radius: 8px;
   background: var(--gold);
   color: var(--wine-900);
   font-weight: 700;
