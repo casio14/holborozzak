@@ -481,6 +481,21 @@ function shortMonthUpper(string $start): string
     return mb_strtoupper(rtrim(HU_MONTHS_SHORT[$m], '.'), 'UTF-8');
 }
 
+/** Schema.org BreadcrumbList (SEO/AI morzsamenü). $items: [név => URL, …]. */
+function breadcrumbJsonLd(array $items): array
+{
+    $list = [];
+    $pos = 1;
+    foreach ($items as $name => $url) {
+        $entry = ['@type' => 'ListItem', 'position' => $pos++, 'name' => $name];
+        if ($url !== null && $url !== '') {
+            $entry['item'] = $url;
+        }
+        $list[] = $entry;
+    }
+    return ['@context' => 'https://schema.org', '@type' => 'BreadcrumbList', 'itemListElement' => $list];
+}
+
 /** A megjelenítendő kép: esemény képe → borvidék képe → generikus hero. */
 function eventImage(array $e): string
 {

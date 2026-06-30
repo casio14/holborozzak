@@ -23,6 +23,9 @@ $ogType  = $ogType  ?? 'website';
 $robots  = $robots  ?? 'index,follow';
 $activeNav = $activeNav ?? ''; // melyik menüpont aktív: esemenyek | naptar | terkep
 
+// Alapértelmezett megosztókép (oldalanként felülírható az oldal $ogImage-ével)
+$ogImage = $ogImage ?? ($baseUrl . rtrim(dirname($_SERVER['SCRIPT_NAME'] ?? '/'), '/') . '/assets/hero.jpg');
+
 // --- Strukturált adat: alap WebSite + Organization minden oldalon ---
 $defaultJsonLd = [
     [

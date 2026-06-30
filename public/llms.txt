@@ -1,0 +1,24 @@
+# holborozzak.hu
+
+> Magyarország borhoz köthető eseményei egy helyen — borfesztiválok, bornapok,
+> szüreti rendezvények, kóstolók és pincelátogatások Tokajtól Villányig.
+> Magyar nyelvű, szerveroldali oldal; az eseményadatok napra készek.
+
+A holborozzak.hu összegyűjti és listázza a magyarországi borrendezvényeket. A
+felhasználók időpont, borvidék és kategória szerint böngészhetnek, térképen és
+naptárban is megnézhetik az eseményeket, és minden eseményhez tartozik egy
+részletoldal pontos időponttal, helyszínnel és linkekkel.
+
+## Fő oldalak
+- [Összes esemény](/esemenyek.php): teljes, szűrhető lista (borvidék, kategória, időpont).
+- [Eseménynaptár](/naptar.php): havi naptárnézet az eseményekkel.
+- [Eseménytérkép](/terkep.php): interaktív térkép a rendezvények helyszíneivel.
+- [Esemény beküldése](/esemeny-bekuldes.php): szervezők ingyenesen feltüntethetik a rendezvényüket.
+- [sitemap](/sitemap.php): az összes közzétett esemény és oldal.
+
+## Kategóriák
+Borfesztivál, Szüreti rendezvény, Kóstoló, Gasztronómia, Koncert, Családi program, Borvidéki program.
+
+## Borvidékek
+Magyarország 22 hivatalos borvidéke, többek között: Tokaji, Egri, Villányi,
+Badacsonyi, Szekszárdi, Balaton-felvidéki, Soproni, Etyek-Budai, Nagy-Somlói.

@@ -46,6 +46,12 @@ $locText = trim((string) (($cand['venue_name'] ? $cand['venue_name'] . ', ' : ''
 $priceText = (int) $cand['is_free'] === 1 ? 'Ingyenes' : (!empty($cand['price_info']) ? $cand['price_info'] : '');
 $st = $cand['start_datetime'] ? eventStatus($cand['start_datetime'], $cand['end_datetime']) : null;
 $cssVer = @filemtime(__DIR__ . '/../assets/style.css') ?: time();
+
+/** Admin (/admin/) alól a relatív kép-utakat egy szinttel feljebbre igazítjuk. */
+function pimg(string $src): string
+{
+    return preg_match('#^https?://#i', $src) ? $src : '../' . ltrim($src, '/');
+}
 ?>
 <!DOCTYPE html>
 <html lang="hu">
@@ -66,7 +72,7 @@ $cssVer = @filemtime(__DIR__ . '/../assets/style.css') ?: time();
     <article class="event-detail event-detail--hero">
       <div class="ed-hero">
         <div class="ed-hero__img">
-          <img src="<?= h(eventImage($ev)) ?>" alt="<?= h($cand['title']) ?>">
+          <img src="<?= h(pimg(eventImage($ev))) ?>" alt="<?= h($cand['title']) ?>">
         </div>
         <div class="ed-hero__band">
           <h1><?= h($cand['title']) ?></h1>

@@ -45,6 +45,12 @@ $mapsLink = $hasGeo
 
 $STATUS_LABEL = ['draft' => 'Beérkezett (draft)', 'published' => 'Közzétett', 'cancelled' => 'Lemondott'];
 $cssVer = @filemtime(__DIR__ . '/../assets/style.css') ?: time();
+
+/** Admin (/admin/) alól a relatív kép-utakat egy szinttel feljebbre igazítjuk. */
+function pimg(string $src): string
+{
+    return preg_match('#^https?://#i', $src) ? $src : '../' . ltrim($src, '/');
+}
 ?>
 <!DOCTYPE html>
 <html lang="hu">
@@ -68,7 +74,7 @@ $cssVer = @filemtime(__DIR__ . '/../assets/style.css') ?: time();
     <article class="event-detail event-detail--hero">
       <div class="ed-hero">
         <div class="ed-hero__img">
-          <img src="<?= h(eventImage($event)) ?>" alt="<?= h($event['image_alt'] ?: $event['title']) ?>">
+          <img src="<?= h(pimg(eventImage($event))) ?>" alt="<?= h($event['image_alt'] ?: $event['title']) ?>">
           <?php if ((int) $event['is_featured'] === 1): ?><span class="ed-hero__badge">Kiemelt</span><?php endif; ?>
         </div>
         <div class="ed-hero__band">

@@ -55,9 +55,10 @@ $listHeading = $q !== ''
     : (($view === 'kozelgo') ? 'Közelgő események' : EVENT_VIEWS[$view]);
 
 $ld = eventsItemListJsonLd($events, $base, $dir);
-if ($ld) {
-    $jsonLd = $ld;
-}
+$jsonLd = array_merge($ld ?? [], [breadcrumbJsonLd([
+    'Főoldal'   => $base . $dir . '/',
+    'Események' => $base . $dir . '/esemenyek.php',
+])]);
 
 require __DIR__ . '/partials/header.php';
 ?>

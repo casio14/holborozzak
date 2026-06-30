@@ -53,7 +53,11 @@ $activeNav = 'esemenyek';
 
 $ev = eventJsonLd($event, $base, $dir, $canonicalUrl);
 $ev['@context'] = 'https://schema.org';
-$jsonLd = [$ev];
+$jsonLd = [$ev, breadcrumbJsonLd([
+    'Főoldal'   => $base . $dir . '/',
+    'Események' => $base . $dir . '/esemenyek.php',
+    $event['title'] => $canonicalUrl,
+])];
 
 $st = eventStatus($event['start_datetime'], $event['end_datetime']);
 

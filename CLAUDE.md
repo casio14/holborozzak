@@ -79,8 +79,9 @@ Erős keresőoptimalizálás **és** AI-ajánlás-barátság (ChatGPT, Perplexit
 Overviews) kiemelt projektcél. Minden új oldalnál tartsd be a `docs/seo-geo.md`
 checklistet: szerveroldali HTML, szemantikus markup (`<time datetime>`), oldalankénti
 egyedi title/description/canonical, slug-URL-ek, **Schema.org JSON-LD** (eseménynél
-`Event`, listán `ItemList`), Open Graph/Twitter, `sitemap.xml`, és AI-crawlereket
-engedő `robots.txt`. A `partials/header.php` már tartalmazza a meta/canonical/OG/
+`Event`, listán `ItemList`, + `BreadcrumbList`), Open Graph/Twitter (alap `og:image` a hero),
+**dinamikus `sitemap.php`** (DB-ből, csak published; a `robots.txt` ide hivatkozik), `llms.txt`
+(GEO áttekintés), egyedi **`404.php`** (`.htaccess` ErrorDocument), és AI-crawlereket engedő `robots.txt`. A `partials/header.php` már tartalmazza a meta/canonical/OG/
 JSON-LD vázat (alap `WebSite`+`Organization`); `$jsonLd`-vel bővíthető oldalanként.
 
 ## Projekt szerkezet
