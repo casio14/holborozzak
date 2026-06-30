@@ -143,12 +143,6 @@ $jsVer  = @filemtime(__DIR__ . '/../assets/app.js') ?: time();
       </nav>
 
       <div class="site-header__actions">
-        <a class="site-nav__search" href="esemenyek.php#kereso" aria-label="Keresés">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-            <circle cx="11" cy="11" r="7"/>
-            <line x1="21" y1="21" x2="16.5" y2="16.5"/>
-          </svg>
-        </a>
         <label class="nav-burger" for="nav-toggle" aria-label="Menü">
           <svg class="nav-burger__open" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
             <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>

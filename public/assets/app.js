@@ -159,12 +159,6 @@
     if (e.key === 'Escape') { closeSheet(); }
   });
 
-  // Fejléc kereső ikon → az események keresőjére érkezve a mező fókuszba kerül
-  if (window.location.hash === '#kereso') {
-    var kInput = document.getElementById('kereso');
-    if (kInput) { try { kInput.focus(); } catch (e) {} }
-  }
-
   // Vissza/előre gomb
   window.addEventListener('popstate', function () { lastUrl = null; load(window.location.href, false); });
 })();

@@ -102,18 +102,8 @@ a { color: var(--wine-700); }
 .site-nav a.is-active { background: #f3e7d0; color: var(--wine-900); }
 .site-nav a.is-active:hover { color: var(--wine-900); }
 
-/* Jobb oldali műveletek (kereső) */
+/* Jobb oldali műveletek (mobil hamburger) */
 .site-header__actions { justify-self: end; display: flex; align-items: center; gap: .6rem; }
-.site-nav__search {
-  display: inline-grid;
-  place-items: center;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: #efe6d6;
-  color: var(--wine-700);
-}
-.site-nav__search:hover { background: #e6d8c1; }
 
 /* Hamburger (mobil) — alapból rejtve, csak ≤760px-en jelenik meg */
 .nav-toggle { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
@@ -723,8 +713,6 @@ main { flex: 1 0 auto; }
   padding: 0 .9rem;
 }
 .facets__search:focus-within { border-color: var(--wine-700); box-shadow: 0 0 0 3px rgba(114, 47, 55, .12); }
-/* A fejléc kereső-ikonjáról ide ugorva a sticky fejléc ne takarja el */
-#kereso { scroll-margin-top: 5.5rem; }
 .facets__search-icon { width: 18px; height: 18px; color: var(--muted); flex: none; }
 .facets__search input {
   flex: 1;

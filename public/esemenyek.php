@@ -83,7 +83,7 @@ require __DIR__ . '/partials/header.php';
 
       <label class="facets__search">
         <svg class="facets__search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg>
-        <input type="search" id="kereso" name="q" value="<?= h($q) ?>" placeholder="Keresés név, helyszín, borvidék szerint…" aria-label="Keresés">
+        <input type="search" name="q" value="<?= h($q) ?>" placeholder="Keresés név, helyszín, borvidék szerint…" aria-label="Keresés">
         <?php if ($q !== ''): ?><a class="facets__search-clear" href="<?= h(listUrl($view, $regionFilters, $catFilters, $sort)) ?>" aria-label="Keresés törlése">&times;</a><?php endif; ?>
       </label>
 
