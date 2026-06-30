@@ -336,6 +336,26 @@ function fetchEventBySlug(PDO $pdo, string $slug): ?array
     return $r;
 }
 
+/** Egy esemény id alapján (BÁRMILYEN státusz), kategória-slug listával — adminhoz. */
+function fetchEventByIdAdmin(PDO $pdo, int $id): ?array
+{
+    $sql = "SELECT e.*, GROUP_CONCAT(DISTINCT c.slug) AS cat_slugs
+            FROM events e
+            LEFT JOIN event_categories ec ON ec.event_id = e.id
+            LEFT JOIN categories c ON c.id = ec.category_id
+            WHERE e.id = :id
+            GROUP BY e.id
+            LIMIT 1";
+    $st = $pdo->prepare($sql);
+    $st->execute([':id' => $id]);
+    $r = $st->fetch();
+    if (!$r) {
+        return null;
+    }
+    $r['cat_slugs'] = !empty($r['cat_slugs']) ? explode(',', (string) $r['cat_slugs']) : [];
+    return $r;
+}
+
 /** Státusz-pirula a dátumokból: Most zajlik / Utolsó napok / Hamarosan, vagy null. */
 function eventStatus(string $start, ?string $end): ?array
 {

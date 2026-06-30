@@ -5,20 +5,42 @@ require __DIR__ . '/auth.php';
 require __DIR__ . '/../lib/events.php';
 require_admin();
 
-// Beküldött (jóváhagyásra váró) események + állapot-számlálók
-$drafts = [];
+$TABS = ['draft' => 'Beérkezett', 'published' => 'Közzétett', 'cancelled' => 'Lemondott'];
+$tab = (string) ($_GET['tab'] ?? 'draft');
+if (!isset($TABS[$tab])) {
+    $tab = 'draft';
+}
+$msg = (string) ($_GET['msg'] ?? '');
+$csrf = admin_csrf_token();
+
+$rows = [];
 $counts = ['draft' => 0, 'published' => 0, 'cancelled' => 0];
 try {
     $pdo = db();
-    $drafts = $pdo->query(
-        "SELECT id, title, city, start_datetime, submitter_name, submitter_email, created_at
-         FROM events WHERE status = 'draft' ORDER BY created_at DESC"
-    )->fetchAll();
+    $order = $tab === 'published' ? 'start_datetime DESC' : 'created_at DESC';
+    $st = $pdo->prepare(
+        "SELECT id, title, city, start_datetime, submitter_name, submitter_email, created_at, is_featured, status
+         FROM events WHERE status = :s ORDER BY {$order}"
+    );
+    $st->execute([':s' => $tab]);
+    $rows = $st->fetchAll();
     foreach ($pdo->query("SELECT status, COUNT(*) AS c FROM events GROUP BY status") as $r) {
         $counts[$r['status']] = (int) $r['c'];
     }
 } catch (Throwable $e) {
     error_log('admin index DB hiba: ' . $e->getMessage());
+}
+
+/** Egy művelet-gomb (POST + CSRF). */
+function actBtn(string $action, int $id, string $tab, string $csrf, string $label, string $cls = 'admin-btn', bool $confirm = false): string
+{
+    $oc = $confirm ? ' onsubmit="return confirm(\'Biztosan?\')"' : '';
+    return '<form method="post" action="action.php" class="admin-actform"' . $oc . '>'
+        . '<input type="hidden" name="csrf" value="' . h($csrf) . '">'
+        . '<input type="hidden" name="action" value="' . h($action) . '">'
+        . '<input type="hidden" name="id" value="' . $id . '">'
+        . '<input type="hidden" name="tab" value="' . h($tab) . '">'
+        . '<button class="' . h($cls) . '" type="submit">' . h($label) . '</button></form>';
 }
 
 $cssVer = @filemtime(__DIR__ . '/../assets/style.css') ?: time();
@@ -39,15 +61,24 @@ $cssVer = @filemtime(__DIR__ . '/../assets/style.css') ?: time();
   </div>
 
   <main class="admin-main">
-    <h1>Beküldött események</h1>
-    <p class="admin-stats">
-      Jóváhagyásra vár: <strong><?= (int) $counts['draft'] ?></strong> ·
-      Közzétett: <strong><?= (int) $counts['published'] ?></strong> ·
-      Lemondott: <strong><?= (int) $counts['cancelled'] ?></strong>
-    </p>
+    <h1>Események kezelése</h1>
 
-    <?php if (!$drafts): ?>
-      <div class="admin-empty">Jelenleg nincs jóváhagyásra váró beküldés. 🍷</div>
+    <?php if ($msg === 'ok'): ?>
+      <div class="admin-msg">A művelet sikeres. ✓</div>
+    <?php elseif ($msg === 'hiba'): ?>
+      <div class="admin-error">A művelet nem sikerült (lejárt munkamenet vagy hiba). Próbáld újra.</div>
+    <?php endif; ?>
+
+    <nav class="admin-tabs">
+      <?php foreach ($TABS as $key => $label): ?>
+        <a class="admin-tab<?= $tab === $key ? ' is-active' : '' ?>" href="index.php?tab=<?= h($key) ?>">
+          <?= h($label) ?> (<?= (int) $counts[$key] ?>)
+        </a>
+      <?php endforeach; ?>
+    </nav>
+
+    <?php if (!$rows): ?>
+      <div class="admin-empty">Ebben a nézetben nincs esemény.</div>
     <?php else: ?>
       <table class="admin-table">
         <thead>
@@ -56,31 +87,39 @@ $cssVer = @filemtime(__DIR__ . '/../assets/style.css') ?: time();
             <th>Helyszín</th>
             <th>Időpont</th>
             <th>Beküldő</th>
-            <th>Beküldve</th>
+            <th>Műveletek</th>
           </tr>
         </thead>
         <tbody>
-          <?php foreach ($drafts as $d): ?>
+          <?php foreach ($rows as $r): $id = (int) $r['id']; ?>
             <tr>
               <td>
-                <strong><?= h($d['title']) ?></strong>
-                <span class="admin-pill admin-pill--draft">draft</span>
+                <?php if ((int) $r['is_featured'] === 1): ?><span class="admin-star" title="Kiemelt">★</span> <?php endif; ?>
+                <strong><?= h($r['title']) ?></strong>
               </td>
-              <td><?= h($d['city'] ?: '—') ?></td>
-              <td><?= h(formatDateRange($d['start_datetime'], null)) ?></td>
+              <td><?= h($r['city'] ?: '—') ?></td>
+              <td><?= h(formatDateRange($r['start_datetime'], null)) ?></td>
               <td>
-                <?= h($d['submitter_name'] ?: '—') ?><br>
-                <?php if (!empty($d['submitter_email'])): ?>
-                  <a href="mailto:<?= h($d['submitter_email']) ?>"><?= h($d['submitter_email']) ?></a>
+                <?= h($r['submitter_name'] ?: '—') ?>
+                <?php if (!empty($r['submitter_email'])): ?><br><a href="mailto:<?= h($r['submitter_email']) ?>"><?= h($r['submitter_email']) ?></a><?php endif; ?>
+              </td>
+              <td class="admin-actions-cell">
+                <a class="admin-link" href="edit.php?id=<?= $id ?>">Szerkesztés</a>
+                <?php if ($tab === 'draft'): ?>
+                  <?= actBtn('publish', $id, $tab, $csrf, 'Jóváhagyás', 'admin-btn admin-btn--go') ?>
+                  <?= actBtn('cancel', $id, $tab, $csrf, 'Elutasítás', 'admin-btn admin-btn--danger', true) ?>
+                <?php elseif ($tab === 'published'): ?>
+                  <?= actBtn('feature', $id, $tab, $csrf, (int) $r['is_featured'] === 1 ? 'Kiemelés le' : 'Kiemel') ?>
+                  <?= actBtn('draft', $id, $tab, $csrf, 'Visszavonás') ?>
+                  <?= actBtn('cancel', $id, $tab, $csrf, 'Lemondás', 'admin-btn admin-btn--danger', true) ?>
+                <?php else: /* cancelled */ ?>
+                  <?= actBtn('draft', $id, $tab, $csrf, 'Visszaállítás') ?>
                 <?php endif; ?>
               </td>
-              <td><?= h((new DateTimeImmutable($d['created_at']))->format('Y-m-d H:i')) ?></td>
             </tr>
           <?php endforeach; ?>
         </tbody>
       </table>
-      <p class="admin-note">A jóváhagyás / szerkesztés / elutasítás műveletek a következő
-        lépésben kerülnek be — előbb egyeztetjük, hogyan szeretnéd kezelni őket.</p>
     <?php endif; ?>
   </main>
 </body>

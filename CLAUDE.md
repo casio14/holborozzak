@@ -116,8 +116,10 @@ JSON-LD vázat (alap `WebSite`+`Organization`); `$jsonLd`-vel bővíthető oldal
     esemény jóváhagyásra vár.
   - **`admin/`** — védett admin felület (session-alapú belépés). `auth.php` (session +
     `require_admin()` + CSRF helperek), `login.php`/`logout.php`, `index.php` (jóváhagyásra
-    váró draftok listája — egyelőre csak olvasható; a jóváhagyás/szerkesztés/elutasítás
-    műveletek később). Hitelesítés: `config.php` `admin` szekció (`user` + bcrypt
+    események kezelése). `index.php`: státusz-fülek (Beérkezett/Közzétett/Lemondott) +
+    művelet-gombok; `action.php`: státuszváltás (publish/cancel/draft) + kiemelés-kapcsoló
+    (POST+CSRF, PRG); `edit.php`: teljes szerkesztő (mezők, állapot, kiemelés, kép,
+    kategóriák újraírása). Hitelesítés: `config.php` `admin` szekció (`user` + bcrypt
     `pass_hash`); éles: `ADMIN_USER` + `ADMIN_PASSWORD` secret (a CI bcrypt-eli).
     `noindex` + `robots.txt` `Disallow: /admin/`.
   - **`esemenyek.php` = teljes lista:** tabok + multiselect szűrők (borvidék/kategória) +
