@@ -63,47 +63,78 @@ function webSearchToolType(string $model): string
     return 'web_search_20250305';
 }
 
-/** Claude web search hívás (pause_turn-kezeléssel) → záró szöveg. */
+/**
+ * Claude web search hívás STREAMELVE → a végső szöveg.
+ * A streamelés folyamatos eseményeket küld, így a hosszú (web search) hívás közben
+ * nem szakad meg a kapcsolat ("Connection reset by peer").
+ */
 function searchEventsViaClaude(string $apiKey, string $model, string $system, string $userText): string
 {
-    $messages = [['role' => 'user', 'content' => $userText]];
-    $tools = [['type' => webSearchToolType($model), 'name' => 'web_search', 'max_uses' => 5]];
-    $headers = [
-        'content-type: application/json',
-        'x-api-key: ' . $apiKey,
-        'anthropic-version: 2023-06-01',
-    ];
+    $payload = json_encode([
+        'model'      => $model,
+        'max_tokens' => 4000,
+        'system'     => $system,
+        'messages'   => [['role' => 'user', 'content' => $userText]],
+        'tools'      => [['type' => webSearchToolType($model), 'name' => 'web_search', 'max_uses' => 5]],
+        'stream'     => true,
+    ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 
-    for ($i = 0; $i < 8; $i++) {
-        $payload = json_encode([
-            'model'      => $model,
-            'max_tokens' => 4000,
-            'system'     => $system,
-            'messages'   => $messages,
-            'tools'      => $tools,
-        ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    $text = '';
+    $apiError = '';
+    $buffer = '';
 
-        [$code, $resp] = httpPost('https://api.anthropic.com/v1/messages', $payload, $headers, 600);
-        $data = json_decode($resp, true);
-        if ($code >= 400) {
-            throw new RuntimeException('AI hiba: ' . ($data['error']['message'] ?? ('HTTP ' . $code)));
-        }
-
-        $messages[] = ['role' => 'assistant', 'content' => $data['content'] ?? []];
-
-        if (($data['stop_reason'] ?? '') === 'pause_turn') {
-            continue; // szerveroldali eszköz fut tovább — újraküldjük
-        }
-
-        $text = '';
-        foreach (($data['content'] ?? []) as $b) {
-            if (($b['type'] ?? '') === 'text') {
-                $text .= (string) $b['text'];
+    $ch = curl_init('https://api.anthropic.com/v1/messages');
+    curl_setopt_array($ch, [
+        CURLOPT_POST           => true,
+        CURLOPT_CONNECTTIMEOUT => 20,
+        CURLOPT_TIMEOUT        => 600,
+        CURLOPT_HTTPHEADER     => [
+            'content-type: application/json',
+            'x-api-key: ' . $apiKey,
+            'anthropic-version: 2023-06-01',
+        ],
+        CURLOPT_POSTFIELDS     => $payload,
+        CURLOPT_WRITEFUNCTION  => function ($c, string $chunk) use (&$buffer, &$text, &$apiError): int {
+            $buffer .= $chunk;
+            while (($pos = strpos($buffer, "\n")) !== false) {
+                $line = trim(substr($buffer, 0, $pos));
+                $buffer = substr($buffer, $pos + 1);
+                if ($line === '' || strncmp($line, 'data:', 5) !== 0) {
+                    continue;
+                }
+                $json = trim(substr($line, 5));
+                if ($json === '' || $json === '[DONE]') {
+                    continue;
+                }
+                $ev = json_decode($json, true);
+                if (!is_array($ev)) {
+                    continue;
+                }
+                $t = $ev['type'] ?? '';
+                if ($t === 'content_block_delta' && (($ev['delta']['type'] ?? '') === 'text_delta')) {
+                    $text .= (string) $ev['delta']['text'];
+                } elseif ($t === 'error') {
+                    $apiError = (string) ($ev['error']['message'] ?? 'ismeretlen hiba');
+                }
             }
-        }
-        return $text;
+            return strlen($chunk);
+        },
+    ]);
+    $ok   = curl_exec($ch);
+    $err  = curl_error($ch);
+    $code = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+
+    if ($ok === false) {
+        throw new RuntimeException('HTTP hiba: ' . $err);
     }
-    return '';
+    if ($apiError !== '') {
+        throw new RuntimeException('AI hiba: ' . $apiError);
+    }
+    if ($code >= 400) {
+        throw new RuntimeException('AI hiba: HTTP ' . $code . ' — ' . substr($text, 0, 300));
+    }
+    return $text;
 }
 
 // ---------------------------------------------------------------------------
