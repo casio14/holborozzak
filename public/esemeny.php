@@ -97,10 +97,10 @@ require __DIR__ . '/partials/header.php';
       <?php if (!empty($event['ticket_url']) || !empty($event['website_url'])): ?>
         <div class="event-detail__actions">
           <?php if (!empty($event['ticket_url'])): ?>
-            <a class="btn btn--primary" href="<?= h($event['ticket_url']) ?>" target="_blank" rel="noopener nofollow">Jegyek →</a>
+            <a class="btn btn--primary" href="<?= h(goUrl($event, 'ticket')) ?>" target="_blank" rel="noopener nofollow">Jegyek →</a>
           <?php endif; ?>
           <?php if (!empty($event['website_url'])): ?>
-            <a class="btn btn--ghost" href="<?= h($event['website_url']) ?>" target="_blank" rel="noopener nofollow">Hivatalos oldal →</a>
+            <a class="btn btn--ghost" href="<?= h(goUrl($event, 'website')) ?>" target="_blank" rel="noopener nofollow">Hivatalos oldal →</a>
           <?php endif; ?>
         </div>
       <?php endif; ?>

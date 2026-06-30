@@ -13,4 +13,7 @@ return [
         'user' => 'c105746ptrk',
         'pass' => '', // <- ide a jelszó (lokálisan); éles: a CI tölti ki
     ],
+    // Titkos „só" az IP-hasheléshez (kattintás-naplózó). Éles: APP_SALT secret.
+    // Lokálisan tetszőleges hosszú véletlen szöveg.
+    'app_salt' => 'valami-helyi-fejlesztoi-so',
 ];

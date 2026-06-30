@@ -503,3 +503,76 @@ function toMysqlDatetime(?string $v): ?string
         return null;
     }
 }
+
+/* =========================================================================
+ *  Kattintás-naplózás (go.php) — kimenő kattintások az event_interactions-be
+ * ========================================================================= */
+
+/** A kimenő kattintás-átirányító URL-je (e=esemény id, t=típus: website|ticket). */
+function goUrl(array $e, string $type): string
+{
+    return 'go.php?e=' . (int) $e['id'] . '&t=' . rawurlencode($type);
+}
+
+/** Titkos „só" az IP-hasheléshez (config.php → app_salt; van fallback). */
+function appSalt(): string
+{
+    static $salt = null;
+    if ($salt !== null) {
+        return $salt;
+    }
+    $salt = '';
+    $cfg = __DIR__ . '/../config.php';
+    if (is_file($cfg)) {
+        $c = require $cfg;
+        $salt = (string) ($c['app_salt'] ?? '');
+    }
+    if ($salt === '') {
+        $salt = 'holborozzak-fallback-salt'; // ha nincs APP_SALT secret beállítva
+    }
+    return $salt;
+}
+
+/** Egyszerű bot-szűrő: ismert crawler/eszköz user agent vagy üres UA → ne számoljuk. */
+function isLikelyBot(string $ua): bool
+{
+    if (trim($ua) === '') {
+        return true;
+    }
+    return (bool) preg_match(
+        '/bot|crawl|spider|slurp|bingpreview|facebookexternalhit|embedly|preview|monitor|curl|wget|python-requests|httpclient|headless|phantom|lighthouse/i',
+        $ua
+    );
+}
+
+/**
+ * Egy kimenő kattintás naplózása. GDPR: nyers IP-t NEM tárolunk, csak napi sóval
+ * hashelt értéket (napon belüli dedup-hoz, napok közt nem összeköthető). Botokat
+ * nem számolunk. Soha nem dob kifelé — a hívó (go.php) így mindig át tud irányítani.
+ */
+function logInteraction(PDO $pdo, int $eventId, string $type): void
+{
+    $ua = substr((string) ($_SERVER['HTTP_USER_AGENT'] ?? ''), 0, 255);
+    if (isLikelyBot($ua)) {
+        return;
+    }
+
+    $ip = (string) ($_SERVER['HTTP_CF_CONNECTING_IP']
+        ?? $_SERVER['HTTP_X_FORWARDED_FOR']
+        ?? $_SERVER['REMOTE_ADDR']
+        ?? '');
+    if (strpos($ip, ',') !== false) {           // X-Forwarded-For: első a valódi kliens
+        $ip = trim(explode(',', $ip)[0]);
+    }
+
+    $ipHash = $ip !== '' ? hash('sha256', $ip . '|' . appSalt() . '|' . date('Y-m-d')) : null;
+    $referrer = isset($_SERVER['HTTP_REFERER'])
+        ? substr((string) $_SERVER['HTTP_REFERER'], 0, 255)
+        : null;
+
+    $st = $pdo->prepare(
+        'INSERT INTO event_interactions (event_id, type, referrer, ip_hash, user_agent)
+         VALUES (?, ?, ?, ?, ?)'
+    );
+    $st->execute([$eventId, $type, $referrer, $ipHash, $ua !== '' ? $ua : null]);
+}

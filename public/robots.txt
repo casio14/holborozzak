@@ -4,6 +4,8 @@
 
 User-agent: *
 Allow: /
+# Kimenő kattintás-átirányító (tracker) — ne indexeljék, ne kövessék
+Disallow: /go.php
 
 # --- AI keresők / asszisztensek kifejezetten engedélyezve (AI ajánlásokhoz) ---
 User-agent: GPTBot

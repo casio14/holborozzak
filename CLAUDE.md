@@ -142,8 +142,15 @@ Táblák:
 - **`event_impressions_daily`** — lista-megjelenések napi összesítésben (nagy volumen).
 
 **Bevételi cél:** a kattintás-statisztikákból kimutatás a szervezőknek. Migráció:
-`db/migrations/001_add_analytics.sql` (élő DB-n is futtatható). Kattintást átirányító
-(`go.php`) naplóz majd. GDPR-t és bot-szűrést szem előtt tartani.
+`db/migrations/001_add_analytics.sql` (élő DB-n is futtatható).
+**Kattintás-naplózó kész:** `public/go.php?e=<id>&t=website|ticket` — naplóz az
+`event_interactions`-be, majd `302`-vel a DB-ben tárolt cél URL-re irányít (a cél
+SOHA nem a query stringből → nincs nyílt átirányítás). Az `esemeny.php` kimenő gombjai
+ezen mennek át. GDPR: nyers IP helyett napi sóval hashelt `ip_hash` (`app_salt` a
+configból; éles: `APP_SALT` secret, vagy a CI a DB jelszóból származtatja); botokat
+nem számol; `robots.txt` `Disallow: /go.php` + `rel="nofollow"`. **Süti nincs** (egyelőre):
+az egyedi látogató csak `ip_hash`-ből becsült — pontos méréshez később sütis `session_id`
+(consent-bannerrel). A `view`/impresszió-mérés még nincs bekötve.
 
 Karakterkészlet: `utf8mb4`. Ismétlődő (évente megrendezett) eseménynél évente
 új sort veszünk fel (évszám a slugban).

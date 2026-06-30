@@ -71,15 +71,19 @@ jobs:
       - name: config.php generálása (DB hozzáférés a secretből)
         env:
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          APP_SALT: ${{ secrets.APP_SALT }}
         run: |
           set -euo pipefail
           umask 077
           # PHP single-quote escape: \ -> \\ , ' -> \'
           ESC=${DB_PASSWORD//\\/\\\\}
           ESC=${ESC//\'/\\\'}
+          # APP_SALT: ha nincs beállítva, a DB_PASSWORD-ből származtatunk egy stabil sót
+          SALT_SRC=${APP_SALT:-$DB_PASSWORD}
+          SALT=$(printf '%s' "holborozzak|$SALT_SRC" | sha256sum | cut -d' ' -f1)
           {
             echo '<?php'
-            echo '// Generálva a CI által — NE kerüljön gitbe. Jelszó: DB_PASSWORD secret.'
+            echo '// Generálva a CI által — NE kerüljön gitbe. Titkok: DB_PASSWORD, APP_SALT secret.'
             echo 'return ['
             echo "    'db' => ["
             echo "        'host' => 'mysql.rackhost.hu',"
@@ -88,6 +92,7 @@ jobs:
             echo "        'user' => 'c105746ptrk',"
             printf "        'pass' => '%s',\n" "$ESC"
             echo '    ],'
+            printf "    'app_salt' => '%s',\n" "$SALT"
             echo '];'
           } > public/config.php
           # NEM írjuk ki a tartalmat (jelszó!), csak a méretet:
