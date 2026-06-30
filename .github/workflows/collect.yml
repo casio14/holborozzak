@@ -1,6 +1,6 @@
 name: Esemény-gyűjtés (napi)
 
-# Naponta egyszer lefut: a Claude web search-csel közelgő magyar borrendezvényeket
+# 3 naponta lefut: a Claude web search-csel közelgő magyar borrendezvényeket
 # keres az interneten, és az újakat jelöltként beszúrja az event_candidates táblába.
 # A jóváhagyás az adminban kézzel történik (NEM publikál automatikusan).
 #
@@ -8,7 +8,7 @@ name: Esemény-gyűjtés (napi)
 
 on:
   schedule:
-    - cron: '0 5 * * *'   # minden nap 05:00 UTC (~07:00 CEST)
+    - cron: '0 5 */3 * *'   # 3 naponta, 05:00 UTC (~07:00 CEST)
   workflow_dispatch:
 
 # Egyszerre csak egy gyűjtés fusson

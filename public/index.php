@@ -63,7 +63,7 @@ require __DIR__ . '/partials/header.php';
         <?php foreach ($featured as $e): $st = eventStatus($e['start_datetime'], $e['end_datetime']); ?>
           <article class="event-card">
             <a class="event-card__media" href="<?= h(eventUrl($e)) ?>">
-              <img src="<?= h($e['image_url'] ?: 'assets/hero.jpg') ?>" alt="<?= h($e['image_alt'] ?: $e['title']) ?>" loading="lazy">
+              <img src="<?= h(eventImage($e)) ?>" alt="<?= h($e['image_alt'] ?: $e['title']) ?>" loading="lazy">
               <span class="event-card__badge">Kiemelt</span>
             </a>
             <div class="event-card__body">

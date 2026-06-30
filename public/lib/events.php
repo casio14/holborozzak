@@ -87,7 +87,7 @@ function filterEvents(array $events, string $view): array
 /** Az összes közelgő/most zajló, közzétett esemény, címkékkel és borvidékkel. */
 function fetchUpcomingEvents(PDO $pdo): array
 {
-    $sql = "SELECT e.*, r.name AS region_name, r.slug AS region_slug,
+    $sql = "SELECT e.*, r.name AS region_name, r.slug AS region_slug, r.image_url AS region_image_url,
                    GROUP_CONCAT(DISTINCT CONCAT(c.slug, '\\t', c.name) ORDER BY c.name SEPARATOR '||') AS cat_pairs
             FROM events e
             LEFT JOIN wine_regions r ON r.id = e.region_id
@@ -116,7 +116,7 @@ function fetchUpcomingEvents(PDO $pdo): array
 /** Egy időszakkal átfedő, közzétett események (naptárhoz; múltbeli is). */
 function fetchEventsBetween(PDO $pdo, string $from, string $to): array
 {
-    $sql = "SELECT e.*, r.name AS region_name, r.slug AS region_slug,
+    $sql = "SELECT e.*, r.name AS region_name, r.slug AS region_slug, r.image_url AS region_image_url,
                    GROUP_CONCAT(DISTINCT CONCAT(c.slug, '\\t', c.name) ORDER BY c.name SEPARATOR '||') AS cat_pairs
             FROM events e
             LEFT JOIN wine_regions r ON r.id = e.region_id
@@ -310,7 +310,7 @@ function eventsItemListJsonLd(array $events, string $base, string $dir, string $
 /** Egy közzétett esemény lekérdezése slug alapján (címkékkel, borvidékkel). */
 function fetchEventBySlug(PDO $pdo, string $slug): ?array
 {
-    $sql = "SELECT e.*, r.name AS region_name, r.slug AS region_slug,
+    $sql = "SELECT e.*, r.name AS region_name, r.slug AS region_slug, r.image_url AS region_image_url,
                    GROUP_CONCAT(DISTINCT CONCAT(c.slug, '\\t', c.name) ORDER BY c.name SEPARATOR '||') AS cat_pairs
             FROM events e
             LEFT JOIN wine_regions r ON r.id = e.region_id
@@ -479,6 +479,18 @@ function shortMonthUpper(string $start): string
 {
     $m = (int) (new DateTimeImmutable($start))->format('n');
     return mb_strtoupper(rtrim(HU_MONTHS_SHORT[$m], '.'), 'UTF-8');
+}
+
+/** A megjelenítendő kép: esemény képe → borvidék képe → generikus hero. */
+function eventImage(array $e): string
+{
+    if (!empty($e['image_url'])) {
+        return $e['image_url'];
+    }
+    if (!empty($e['region_image_url'])) {
+        return $e['region_image_url'];
+    }
+    return 'assets/hero.jpg';
 }
 
 /** Rövid HTML-escape segéd. */

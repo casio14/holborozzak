@@ -35,7 +35,7 @@ foreach ($events as $e) {
             'venue'  => $e['venue_name'],
             'free'   => (int) $e['is_free'] === 1,
             'url'    => eventUrl($e),
-            'img'    => $e['image_url'] ?: '',
+            'img'    => eventImage($e),
             'status' => eventStatus($e['start_datetime'], $e['end_datetime']),
             'cats'   => categoryNames($e),
         ];

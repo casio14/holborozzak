@@ -46,8 +46,8 @@ $pageTitle = $event['title'] . ' — holborozzak.hu';
 $pageDescription = $event['short_description']
     ?: ('Borrendezvény: ' . $event['title'] . (!empty($event['city']) ? ' — ' . $event['city'] : ''));
 $ogType = 'article';
-if (!empty($event['image_url'])) {
-    $ogImage = $base . $dir . '/' . ltrim($event['image_url'], '/');
+if (!empty($event['image_url']) || !empty($event['region_image_url'])) {
+    $ogImage = $base . $dir . '/' . ltrim(eventImage($event), '/');
 }
 $activeNav = 'esemenyek';
 
@@ -78,7 +78,7 @@ require __DIR__ . '/partials/header.php';
 
       <div class="ed-hero">
         <div class="ed-hero__img">
-          <img src="<?= h($event['image_url'] ?: 'assets/hero.jpg') ?>" alt="<?= h($event['image_alt'] ?: $event['title']) ?>">
+          <img src="<?= h(eventImage($event)) ?>" alt="<?= h($event['image_alt'] ?: $event['title']) ?>">
           <?php if ((int) $event['is_featured'] === 1): ?><span class="ed-hero__badge">Kiemelt</span><?php endif; ?>
         </div>
         <div class="ed-hero__band">

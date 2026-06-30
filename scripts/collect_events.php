@@ -125,7 +125,8 @@ $system = "Magyar borrendezvény-kutató vagy. A web_search eszközzel KERESS az
     . "eseményeket: borfesztiválok, bornapok, szüreti rendezvények, kóstolók, pincék programjai. "
     . "Futtass több, változatos keresést (különböző borvidékek, hónapok, rendezvénytípusok).\n"
     . "A végén KIZÁRÓLAG egyetlen JSON TÖMBÖT adj vissza (markdown és magyarázat nélkül), ahol minden elem: "
-    . "{title, start_datetime, end_datetime, city, venue_name, region_name, website_url, source_url, short_description}.\n"
+    . "{title, start_datetime, end_datetime, city, venue_name, region_name, website_url, source_url, short_description, image_url}.\n"
+    . "Az image_url az eseményhez tartozó kép közvetlen URL-je, ha találsz ilyet (különben üres string).\n"
     . "Dátumformátum: 'YYYY-MM-DDTHH:MM:SS' (ismeretlen idő: 00:00:00); ha nincs adat, üres string. "
     . "A region_name a 22 magyar borvidék egyike legyen, ha azonosítható. A source_url az az oldal, ahol az "
     . "esemény megerősítve szerepel. CSAK valós, forrással alátámasztott eseményeket adj vissza — soha ne találj ki adatot.";
@@ -149,10 +150,10 @@ if (!is_array($items)) {
 
 $insSql = "INSERT INTO event_candidates
     (source_url, title, short_description, start_datetime, end_datetime,
-     venue_name, city, region_name, website_url, dedup_key, status)
+     venue_name, city, region_name, website_url, image_url, dedup_key, status)
    VALUES
     (:src, :title, :short, :start, :end,
-     :venue, :city, :region, :web, :dedup, 'new')";
+     :venue, :city, :region, :web, :img, :dedup, 'new')";
 $ins = $pdo->prepare($insSql);
 
 $found = 0;
@@ -187,6 +188,7 @@ foreach ($items as $d) {
         ':city'   => $city !== '' ? $city : null,
         ':region' => ($d['region_name'] ?? '') ?: null,
         ':web'    => ($d['website_url'] ?? '') ?: null,
+        ':img'    => ($d['image_url'] ?? '') ?: null,
         ':dedup'  => $dedup,
     ]);
     $added++;
