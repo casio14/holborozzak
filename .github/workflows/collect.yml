@@ -1,0 +1,37 @@
+name: Esemény-gyűjtés (napi)
+
+# Naponta egyszer lefut: a Claude web search-csel közelgő magyar borrendezvényeket
+# keres az interneten, és az újakat jelöltként beszúrja az event_candidates táblába.
+# A jóváhagyás az adminban kézzel történik (NEM publikál automatikusan).
+#
+# Kézi indítás: Actions → "Esemény-gyűjtés (napi)" → Run workflow.
+
+on:
+  schedule:
+    - cron: '0 5 * * *'   # minden nap 05:00 UTC (~07:00 CEST)
+  workflow_dispatch:
+
+# Egyszerre csak egy gyűjtés fusson
+concurrency:
+  group: collect-events
+  cancel-in-progress: false
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Kód letöltése
+        uses: actions/checkout@v4
+
+      - name: PHP beállítása
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, pdo_mysql, curl
+
+      - name: Gyűjtő futtatása
+        env:
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          ANTHROPIC_MODEL: claude-haiku-4-5
+        run: php scripts/collect_events.php

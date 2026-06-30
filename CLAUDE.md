@@ -143,6 +143,11 @@ JSON-LD vázat (alap `WebSite`+`Organization`); `$jsonLd`-vel bővíthető oldal
   - `partials/header.php`, `partials/footer.php` — közös layout váz (minden oldal ezt használja).
     - **TODO (elnapolva):** a logó még nyitott — jelenleg ideiglenes szőlőfürt-SVG van.
       Felmerült irány: „A" koncepció = térkép-tű + borospohár (a „hol borozzak?" játék).
+- `scripts/` — CI-ben futó segédscriptek (NEM deployolódik FTP-n). `collect_events.php`:
+  napi esemény-gyűjtő — a Claude `web_search` eszközével közelgő magyar borrendezvényeket
+  KERES az interneten (nem fix oldalakat néz), dedupál, és `event_candidates`-be ír `new`
+  jelöltként. Indítja: `.github/workflows/collect.yml` (napi cron). Env: `DB_PASSWORD`,
+  `ANTHROPIC_API_KEY`, `ANTHROPIC_MODEL`. A jóváhagyás kézi (admin → Jelöltek).
 - `db/` — adatbázis séma (`schema.sql`), `seed.sql` (minta események), migrációk. NEM kerül a webszerverre.
 - `docs/` — tervdokumentumok (pl. `adatmodell.md`). NEM kerül a webszerverre.
 - `.github/workflows/` — CI/CD (deploy).
