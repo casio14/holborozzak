@@ -126,7 +126,12 @@ JSON-LD vázat (alap `WebSite`+`Organization`); `$jsonLd`-vel bővíthető oldal
     események kezelése). `index.php`: státusz-fülek (Beérkezett/Közzétett/Lemondott) +
     művelet-gombok; `action.php`: státuszváltás (publish/cancel/draft) + kiemelés-kapcsoló
     (POST+CSRF, PRG); `edit.php`: teljes szerkesztő (mezők, állapot, kiemelés, kép,
-    kategóriák újraírása). Hitelesítés: `config.php` `admin` szekció (`user` + bcrypt
+    kategóriák újraírása). `jeloltek.php`: **esemény-jelöltek** (automatikus gyűjtés 1. fázis) —
+    „Import URL-ből" (a `lib/ai.php` Claude-hívással kinyeri az esemény adatait egy
+    weboldalból), dedup (`lib/candidates.php`), jóváhagyás → `draft` event / elvetés.
+    Jelöltek külön táblában (`event_candidates`, migráció `005`), NEM az `events`-ben.
+    Anthropic kulcs: `config.php` `anthropic` szekció (`ANTHROPIC_API_KEY` secret; modell
+    alap `claude-opus-4-8`, cURL a Messages API-ra). Hitelesítés: `config.php` `admin` szekció (`user` + bcrypt
     `pass_hash`); éles: `ADMIN_USER` + `ADMIN_PASSWORD` secret (a CI bcrypt-eli).
     `noindex` + `robots.txt` `Disallow: /admin/`.
   - **`esemenyek.php` = teljes lista:** tabok + multiselect szűrők (borvidék/kategória) +

@@ -1433,3 +1433,10 @@ main { flex: 1 0 auto; }
   text-decoration: none; font-weight: 700; font-size: .8rem;
 }
 .admin-link:hover { border-color: var(--gold); }
+
+/* Admin: URL-import doboz + segédszöveg a jelölt-soroknál */
+.admin-import { background: var(--paper); border: 1px solid var(--line); border-radius: 12px; padding: 1.1rem 1.25rem; margin: 0 0 1.5rem; }
+.admin-import label { display: block; font-weight: 700; font-size: .9rem; color: var(--wine-900); margin-bottom: .5rem; }
+.admin-import__row { display: flex; gap: .5rem; flex-wrap: wrap; }
+.admin-import__row input { flex: 1; min-width: 240px; border: 1px solid var(--line); border-radius: 10px; padding: .7rem .85rem; font: inherit; font-size: 1rem; background: #fff; }
+.admin-sub { color: var(--muted); font-size: .85rem; }

@@ -74,6 +74,7 @@ jobs:
           APP_SALT: ${{ secrets.APP_SALT }}
           ADMIN_USER: ${{ secrets.ADMIN_USER }}
           ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: |
           set -euo pipefail
           umask 077
@@ -94,6 +95,7 @@ jobs:
             echo "FIGYELEM: ADMIN_PASSWORD nincs beállítva (vagy nincs php) — admin belépés letiltva."
           fi
           AHASH=$(esc "$AHASH")
+          AKEY=$(esc "${ANTHROPIC_API_KEY:-}")
 
           {
             echo '<?php'
@@ -110,6 +112,10 @@ jobs:
             echo "    'admin' => ["
             printf "        'user' => '%s',\n" "$AUSER"
             printf "        'pass_hash' => '%s',\n" "$AHASH"
+            echo '    ],'
+            echo "    'anthropic' => ["
+            printf "        'api_key' => '%s',\n" "$AKEY"
+            echo "        'model' => 'claude-opus-4-8',"
             echo '    ],'
             echo '];'
           } > public/config.php
