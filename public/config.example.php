@@ -34,4 +34,16 @@ return [
     // A napi gyűjtő (GitHub Actions) ezzel a tokennel POST-ol a collect-ingest.php-ra.
     // Éles: COLLECT_TOKEN secret (ugyanaz az érték a workflow secretjében).
     'collect_token' => '',
+
+    // A hírlevél-küldő cron (GitHub Actions) tokenje a newsletter-send.php-hoz.
+    // Éles: NEWSLETTER_TOKEN secret (ugyanaz az érték a workflow secretjében).
+    'newsletter_token' => '',
+
+    // E-mail feladó (üdvözlő + hírlevél). Éles: MAIL_FROM secret.
+    // Üresen hagyva a kiszolgáló hosztjából képzett no-reply cím a fallback —
+    // a kézbesíthetőséghez (SPF) érdemes valódi, a domainhez tartozó címet megadni.
+    'mail' => [
+        'from_email' => '',
+        'from_name'  => 'holborozzak.hu',
+    ],
 ];

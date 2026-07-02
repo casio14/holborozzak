@@ -1,0 +1,41 @@
+name: Hírlevél küldése
+
+# HETENTE fut, de a szerveroldali végpont (newsletter-send.php) 13 napos
+# védelme miatt ténylegesen KÉTHETENTE megy ki levél. Így nincs szükség
+# "minden 14. nap" cron-bűvészkedésre, és a ritmus hónapfordulón sem csúszik.
+#
+# Kézi futtatás: Actions -> "Hírlevél küldése" -> Run workflow.
+#   force=1 esetén a 13 napos védelmet is megkerüli (óvatosan!).
+#
+# Szükséges secretek:
+#   NEWSLETTER_TOKEN — ugyanaz az érték, mint a config.php newsletter_token-je
+#                      (a deploy generálja ugyanebből a secretből).
+#   NEWSLETTER_URL   — opcionális; alapértelmezés az ideiglenes cím.
+
+on:
+  schedule:
+    - cron: '0 7 * * 1'   # hétfő 07:00 UTC (~09:00 magyar idő)
+  workflow_dispatch:
+    inputs:
+      force:
+        description: 'Küldés akkor is, ha 13 napon belül már ment levél (1 = igen)'
+        required: false
+        default: ''
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Token-védett küldő végpont meghívása
+        env:
+          URL: ${{ secrets.NEWSLETTER_URL || 'https://kissptrk.hu/borozzak/newsletter-send.php' }}
+          TOKEN: ${{ secrets.NEWSLETTER_TOKEN }}
+          FORCE: ${{ github.event.inputs.force || '' }}
+        run: |
+          set -euo pipefail
+          if [ -z "$TOKEN" ]; then
+            echo "HIBA: a NEWSLETTER_TOKEN secret nincs beállítva."
+            exit 1
+          fi
+          RESP=$(curl -fsS -X POST "${URL}${FORCE:+?force=1}" -H "X-Newsletter-Token: $TOKEN")
+          echo "Szerver válasz: $RESP"

@@ -14,6 +14,8 @@ Disallow: /ics.php
 Disallow: /collect-ingest.php
 # Hírlevél-leiratkozás (tokenes linkek — ne indexelje kereső)
 Disallow: /leiratkozas.php
+# Hírlevél-küldő végpont (API)
+Disallow: /newsletter-send.php
 
 # --- AI keresők / asszisztensek kifejezetten engedélyezve (AI ajánlásokhoz) ---
 User-agent: GPTBot

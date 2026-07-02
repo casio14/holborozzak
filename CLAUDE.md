@@ -116,7 +116,20 @@ JSON-LD vázat (alap `WebSite`+`Organization`); `$jsonLd`-vel bővíthető oldal
     esemény beküldése → `esemeny-bekuldes.php`, ill. kiemelés iránti mailto)
     → Hírlevél. Kereső a `lib/events.php` `searchEvents()`-tel (ékezet-érzéketlen).
   - **`newsletter.php`** — hírlevél feliratkozás (POST→PRG); a `subscribers` táblát
-    futásidőben is létrehozza.
+    futásidőben is létrehozza (`lib/subscribers.php`), leiratkozó tokent generál, és
+    ÚJ feliratkozónak **üdvözlő e-mailt** küld (`lib/mail.php` + `lib/newsletter.php`).
+  - **`leiratkozas.php`** — hírlevél-leiratkozás: tokenes link (`?t=`, megerősítő
+    gombbal — a levelező-előolvasók GET-je nem töröl) vagy e-mail címes űrlap
+    (semleges válasz). `noindex` + robots `Disallow`.
+  - **`newsletter-send.php`** — token-védett hírlevél-küldő végpont
+    (`NEWSLETTER_TOKEN` secret ↔ config `newsletter_token`). A
+    `.github/workflows/newsletter.yml` cron HETENTE hívja, de a szerveroldali
+    13 napos védelem miatt ténylegesen KÉTHETENTE megy ki levél (`?force=1`
+    megkerüli). Tartalma: a következő 3 hét közzétett eseményei (max 12);
+    küldés-napló: `newsletter_log` tábla. Feladó: config `mail.from_email`
+    (`MAIL_FROM` secret; üresen host-alapú no-reply fallback). Küldés PHP
+    `mail()`-lel a Rackhost szerverről.
+  - **`admin/feliratkozok.php`** — feliratkozó-lista, CSV-export, törlés (CSRF).
   - **`esemeny-bekuldes.php`** — nyilvános esemény **beküldő űrlap** (POST→PRG):
     validál, `draft` státuszú eseményt szúr be (slug auto, ütközésmentes), a kiválasztott
     kategóriákat az `event_categories`-be köti, a beküldő nevét/e-mailjét eltárolja

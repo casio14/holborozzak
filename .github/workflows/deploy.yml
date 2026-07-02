@@ -76,6 +76,8 @@ jobs:
           ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           COLLECT_TOKEN: ${{ secrets.COLLECT_TOKEN }}
+          NEWSLETTER_TOKEN: ${{ secrets.NEWSLETTER_TOKEN }}
+          MAIL_FROM: ${{ secrets.MAIL_FROM }}
         run: |
           set -euo pipefail
           umask 077
@@ -98,6 +100,8 @@ jobs:
           AHASH=$(esc "$AHASH")
           AKEY=$(esc "${ANTHROPIC_API_KEY:-}")
           CTOK=$(esc "${COLLECT_TOKEN:-}")
+          NTOK=$(esc "${NEWSLETTER_TOKEN:-}")
+          MFROM=$(esc "${MAIL_FROM:-}")
 
           {
             echo '<?php'
@@ -120,6 +124,11 @@ jobs:
             echo "        'model' => 'claude-haiku-4-5',"
             echo '    ],'
             printf "    'collect_token' => '%s',\n" "$CTOK"
+            printf "    'newsletter_token' => '%s',\n" "$NTOK"
+            echo "    'mail' => ["
+            printf "        'from_email' => '%s',\n" "$MFROM"
+            echo "        'from_name' => 'holborozzak.hu',"
+            echo '    ],'
             echo '];'
           } > public/config.php
           # NEM írjuk ki a tartalmat (jelszó!), csak a méretet:
