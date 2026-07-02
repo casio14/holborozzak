@@ -55,14 +55,30 @@ $headExtra = '<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/
 
 require __DIR__ . '/partials/header.php';
 ?>
-  <div class="container">
-    <div class="page-head">
-      <h1>Eseménytérkép</h1>
-      <p class="page-head__sub">Nézd meg térképen, mely borrendezvények vannak a közeledben — <?= count($events) ?> esemény.</p>
-    </div>
+  <div class="map-topbar">
+    <h1>Eseménytérkép</h1>
+    <p class="map-topbar__sub">Nézd meg térképen, mely borrendezvények vannak a közeledben — <?= count($events) ?> esemény.</p>
   </div>
 
-  <div id="map" class="event-map" role="region" aria-label="Borrendezvények térképe"></div>
+  <div class="map-split">
+    <aside class="map-list" aria-label="Események a térképen">
+      <p class="map-list__hint">Kattints egy eseményre — a térkép odaugrik.</p>
+      <?php foreach ($points as $i => $p): ?>
+        <a class="map-item" href="<?= h($p['url']) ?>" data-i="<?= $i ?>">
+          <img class="map-item__img" src="<?= h($p['img']) ?>" alt="" loading="lazy">
+          <span class="map-item__main">
+            <span class="map-item__t"><?= h($p['title']) ?></span>
+            <span class="map-item__d"><?= h($p['date']) ?></span>
+            <span class="map-item__s"><?= h(trim(($p['venue'] ? $p['venue'] . ', ' : '') . ($p['city'] ?? ''))) ?></span>
+          </span>
+        </a>
+      <?php endforeach; ?>
+      <?php if (!$points): ?>
+        <p class="map-list__hint">Jelenleg nincs térképen megjeleníthető esemény. <a href="esemenyek.php">Nézd meg a listát →</a></p>
+      <?php endif; ?>
+    </aside>
+    <div id="map" class="event-map" role="region" aria-label="Borrendezvények térképe"></div>
+  </div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
@@ -124,15 +140,29 @@ require __DIR__ . '/partials/header.php';
     }
 
     var bounds = [];
+    var markers = [];
     pts.forEach(function (p) {
-      cluster.addLayer(
-        L.marker([p.lat, p.lng], { icon: dotIcon })
-          .bindPopup(popupHtml(p), { maxWidth: 260, minWidth: 260, className: 'event-popup' })
-      );
+      var m = L.marker([p.lat, p.lng], { icon: dotIcon })
+        .bindPopup(popupHtml(p), { maxWidth: 260, minWidth: 260, className: 'event-popup' });
+      cluster.addLayer(m);
+      markers.push(m);
       bounds.push([p.lat, p.lng]);
     });
     map.addLayer(cluster);
     if (bounds.length) { map.fitBounds(bounds, { padding: [50, 50], maxZoom: 8 }); }
+
+    // Bal oldali lista → térkép: kattintásra odaközelít és kinyitja a kártyát.
+    // (JS nélkül a lista-elem az esemény oldalára visz — progresszív fejlesztés.)
+    document.querySelectorAll('.map-item').forEach(function (a) {
+      a.addEventListener('click', function (e) {
+        var m = markers[parseInt(a.getAttribute('data-i'), 10)];
+        if (!m) { return; }
+        e.preventDefault();
+        document.querySelectorAll('.map-item.is-active').forEach(function (x) { x.classList.remove('is-active'); });
+        a.classList.add('is-active');
+        cluster.zoomToShowLayer(m, function () { m.openPopup(); });
+      });
+    });
 
     // „Helyzetem” gomb a zoom alatt: a saját pozícióra közelít
     var LocateControl = L.Control.extend({
