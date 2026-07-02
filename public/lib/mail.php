@@ -50,5 +50,13 @@ function sendMailHtml(string $to, string $subject, string $html, array $extraHea
     // a sortörés szóköznek számít a szövegben és az attribútumokban is).
     $html = wordwrap($html, 500, "\n", false);
 
-    return mail($to, mb_encode_mimeheader($subject, 'UTF-8'), $html, implode("\r\n", $lines));
+    // Boríték-feladó (Return-Path) igazítása a From címhez: enélkül a szerver
+    // rendszerfelhasználója lenne a boríték-feladó, a DMARC/SPF igazodás elhasal,
+    // és a levél spam-be megy. Csak biztonságos címet adunk át a shellnek.
+    $extra = '';
+    if (preg_match('/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+$/', $fromEmail)) {
+        $extra = '-f' . $fromEmail;
+    }
+
+    return mail($to, mb_encode_mimeheader($subject, 'UTF-8'), $html, implode("\r\n", $lines), $extra);
 }
