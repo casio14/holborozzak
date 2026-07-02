@@ -81,11 +81,14 @@ try {
     $items = [];
     foreach ($events as $e) {
         $items[] = [
-            'title' => (string) $e['title'],
-            'url'   => eventUrl($e, $base, $dir),
-            'date'  => formatDateRange($e['start_datetime'], $e['end_datetime']),
-            'city'  => (string) ($e['city'] ?? ''),
-            'free'  => (int) $e['is_free'] === 1,
+            'title'    => (string) $e['title'],
+            'url'      => eventUrl($e, $base, $dir),
+            'date'     => formatDateRange($e['start_datetime'], $e['end_datetime']),
+            'city'     => (string) ($e['city'] ?? ''),
+            'free'     => (int) $e['is_free'] === 1,
+            'day'      => dayNumber($e['start_datetime']),
+            'mon'      => shortMonthUpper($e['start_datetime']),
+            'featured' => (int) $e['is_featured'] === 1,
         ];
     }
 
