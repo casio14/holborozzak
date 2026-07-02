@@ -89,16 +89,10 @@
 .tip__body { display: block; padding: .8rem .95rem .95rem; }
 .tip--r { left: auto; right: 0; }
 .tip b { display: block; font-family: Georgia, "Times New Roman", serif; font-size: 1.08rem; color: var(--ink); margin-bottom: .2rem; }
-.tip .meta { color: var(--muted); }
-.tip .meta .d { color: var(--wine-700); font-weight: 700; }
-.tip .tag { display: inline-block; margin-top: .45rem; }
-/* „Részletek →" gomb-imitáció a mockupban (élesben valódi elem) */
-.tip__body::after {
-  content: "Részletek →";
-  display: inline-block; margin-top: .75rem;
-  background: var(--wine-700); color: var(--cream);
-  font-weight: 700; padding: .5rem 1.15rem; border-radius: 10px;
-}
+.tip__date { display: block; color: var(--wine-700); font-weight: 700; margin-bottom: .2rem; }
+.tip__loc { display: block; color: var(--muted); }
+.tip__price { display: none; } /* a kártyán csak cím + dátum + helyszín + címkék */
+.tip__tags { display: flex; flex-wrap: wrap; gap: .35rem; margin-top: .55rem; }
 .bar:hover .tip, .bar:focus-visible .tip { display: block; }
 
 /* Jelmagyarázat (a fejléc alatt, a rács fölött) */

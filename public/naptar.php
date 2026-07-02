@@ -191,7 +191,6 @@ require __DIR__ . '/partials/header.php';
               [$bg, $fg] = categoryColor($e);
               $tipRight  = ($col + $span - 1) >= 5;
               $loc       = trim(($e['venue_name'] ? $e['venue_name'] . ', ' : '') . ($e['city'] ?? ''));
-              $price     = (int) $e['is_free'] === 1 ? 'Ingyenes' : (string) ($e['price_info'] ?? '');
           ?>
             <a class="cal__bar<?= $contL ? ' cal__bar--cont-l' : '' ?><?= $contR ? ' cal__bar--cont-r' : '' ?>"
                style="grid-column: <?= $col ?> / span <?= $span ?>; background: <?= h($bg) ?>; color: <?= h($fg) ?>"
@@ -203,14 +202,12 @@ require __DIR__ . '/partials/header.php';
                   <b><?= h($e['title']) ?></b>
                   <span class="cal-tip__date"><?= h(formatDateRange($e['start_datetime'], $e['end_datetime'])) ?></span>
                   <?php if ($loc !== ''): ?><span class="cal-tip__loc">📍 <?= h($loc) ?></span><?php endif; ?>
-                  <?php if ($price !== '' && (int) $e['is_free'] !== 1): ?><span class="cal-tip__price"><?= h($price) ?></span><?php endif; ?>
                   <?php if ($e['categories'] || (int) $e['is_free'] === 1): ?>
                   <span class="cal-tip__tags">
                     <?php foreach (array_slice($e['categories'], 0, 2) as $c): ?><span class="tag"><?= h($c['name']) ?></span><?php endforeach; ?>
                     <?php if ((int) $e['is_free'] === 1): ?><span class="tag tag--free">Ingyenes</span><?php endif; ?>
                   </span>
                   <?php endif; ?>
-                  <span class="cal-tip__btn">Részletek →</span>
                 </span>
               </span>
             </a>

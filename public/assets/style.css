@@ -706,7 +706,7 @@ main { flex: 1 0 auto; }
 .cal__bar-t { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
 /* Hover-előnézet: világos mini-kártya képpel — fókuszra is megjelenik.
-   Felépítés: kép → cím (szeriff) → borvörös dátum → helyszín → címkék → Részletek gomb. */
+   Felépítés: kép → cím (szeriff) → borvörös dátum → helyszín → címkék. */
 .cal-tip {
   display: none;
   position: absolute;
@@ -736,18 +736,8 @@ main { flex: 1 0 auto; }
   margin-bottom: .2rem;
 }
 .cal-tip__date { display: block; color: var(--wine-700); font-weight: 700; margin-bottom: .2rem; }
-.cal-tip__loc, .cal-tip__price { display: block; color: var(--muted); }
+.cal-tip__loc { display: block; color: var(--muted); }
 .cal-tip__tags { display: flex; flex-wrap: wrap; gap: .35rem; margin-top: .55rem; }
-.cal-tip__btn {
-  display: inline-block;
-  margin-top: .75rem;
-  background: var(--wine-700);
-  color: var(--cream);
-  font-weight: 700;
-  padding: .5rem 1.15rem;
-  border-radius: 10px;
-}
-.cal__bar:hover .cal-tip__btn { background: var(--wine-900); }
 .cal__bar:hover .cal-tip,
 .cal__bar:focus-visible .cal-tip { display: block; }
 
