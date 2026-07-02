@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Főoldal 1. variáns — Immerzív panoráma · mockup</title>
+<link rel="stylesheet" href="../base.css">
+<style>
+/* ===== Főoldal 1. variáns: immerzív panoráma — nagy hero, üveg-kereső, belelógó panel ===== */
+
+.hero {
+  position: relative; min-height: 74vh;
+  display: flex; align-items: center; justify-content: center; text-align: center;
+  padding: 4rem 1.75rem 7rem;
+}
+.hero__bg { position: absolute; inset: 0; overflow: hidden; }
+.hero__bg img { width: 100%; height: 100%; object-fit: cover; }
+.hero__bg::after {
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(43, 29, 32, .35) 0%, rgba(74, 14, 28, .45) 55%, rgba(43, 20, 24, .92) 100%);
+}
+.hero__inner { position: relative; z-index: 1; max-width: 760px; }
+.hero__eyebrow { margin: 0 0 .8rem; text-transform: uppercase; letter-spacing: .22em; font-size: .8rem; font-weight: 700; color: var(--gold-200); }
+.hero h1 { margin: 0 0 1rem; color: #fff; font-size: clamp(2.2rem, 6vw, 3.8rem); text-shadow: 0 2px 20px rgba(0, 0, 0, .45); }
+.hero__lead { margin: 0 auto 2rem; max-width: 36rem; color: #f3e8e0; font-size: clamp(1.05rem, 2.2vw, 1.22rem); }
+
+.hero__search {
+  display: flex; gap: 8px; max-width: 640px; margin: 0 auto;
+  background: rgba(255, 253, 249, .16);
+  border: 1px solid rgba(255, 255, 255, .35);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  padding: 8px; border-radius: 16px;
+  box-shadow: 0 16px 50px rgba(0, 0, 0, .3);
+}
+.hero__search input {
+  flex: 1; min-width: 0; border: none; background: rgba(255, 255, 255, .92);
+  border-radius: 10px; padding: .95rem 1.1rem; font-size: 1rem;
+}
+.hero__search button {
+  border: none; background: var(--gold); color: var(--wine-900);
+  border-radius: 10px; padding: .95rem 1.6rem; font-weight: 800; font-size: 1rem; cursor: pointer;
+}
+.hero__search button:hover { background: #b8923f; }
+
+.hero__stats { margin: 1.6rem auto 0; display: flex; gap: 1.8rem; justify-content: center; flex-wrap: wrap; color: #fff; }
+.hero__stat b { display: block; font-family: Georgia, serif; font-size: 1.5rem; color: var(--gold-200); }
+.hero__stat span { font-size: .82rem; opacity: .85; }
+
+/* Belelógó tartalompanel */
+.panel {
+  position: relative; z-index: 2;
+  max-width: var(--maxw); margin: -70px auto 0; padding: 2rem 2rem .5rem;
+  background: var(--paper); border: 1px solid var(--line);
+  border-radius: 24px 24px 0 0; box-shadow: 0 -18px 50px rgba(74, 14, 28, .18);
+}
+.sec { margin: 0 0 2.6rem; }
+.sec__head { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; margin-bottom: 1.1rem; }
+.sec__head h2 { margin: 0; color: var(--wine-900); font-size: 1.5rem; }
+.sec__more { font-weight: 700; text-decoration: none; }
+.sec__more:hover { color: var(--gold); }
+
+/* Kiemelt kártyák */
+.cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.2rem; }
+.card { background: #fff; border: 1px solid var(--line); border-radius: 16px; overflow: hidden; box-shadow: var(--shadow); transition: transform .12s ease; }
+.card:hover { transform: translateY(-3px); }
+.card__media { position: relative; display: block; }
+.card__media img { display: block; width: 100%; height: 160px; object-fit: cover; }
+.card__badge { position: absolute; top: .7rem; left: .7rem; background: var(--gold); color: var(--wine-900); font-size: .7rem; font-weight: 800; text-transform: uppercase; padding: .22rem .55rem; border-radius: 6px; }
+.card__body { padding: .9rem 1rem 1.1rem; }
+.card__date { margin: 0 0 .3rem; color: var(--wine-700); font-weight: 700; font-size: .85rem; display: flex; gap: .45rem; align-items: center; flex-wrap: wrap; }
+.card__title { margin: 0 0 .3rem; font-size: 1.1rem; }
+.card__title a { color: var(--wine-900); text-decoration: none; }
+.card__meta { margin: 0 0 .55rem; color: var(--muted); font-size: .88rem; }
+
+/* Közelgő sorok */
+.rows { background: #fff; border: 1px solid var(--line); border-radius: 16px; overflow: hidden; box-shadow: var(--shadow); }
+.row { display: flex; align-items: center; gap: 1rem; padding: .85rem 1.1rem; border-bottom: 1px solid var(--line); text-decoration: none; color: inherit; }
+.row:last-child { border-bottom: none; }
+.row:hover { background: #fbf6ec; }
+.dateb { flex: none; width: 52px; text-align: center; background: var(--cream); border: 1px solid var(--line); border-radius: 10px; padding: .3rem 0; }
+.dateb__day { display: block; font-family: Georgia, serif; font-weight: 700; font-size: 1.25rem; color: var(--wine-900); line-height: 1.1; }
+.dateb__mon { display: block; font-size: .66rem; font-weight: 800; letter-spacing: .08em; color: var(--wine-700); }
+.row__main { flex: 1; min-width: 0; }
+.row__title { display: block; font-weight: 700; color: var(--wine-900); }
+.row__sub { display: block; font-size: .85rem; color: var(--muted); }
+.row__right { flex: none; text-align: right; color: var(--muted); font-size: .85rem; }
+.row__chev { color: var(--gold); font-weight: 800; margin-left: .5rem; }
+
+/* Böngéssz-csempék */
+.tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.2rem; }
+.tile { position: relative; display: block; background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 1.3rem 1.4rem; text-decoration: none; color: inherit; box-shadow: var(--shadow); transition: transform .12s ease; }
+.tile:hover { transform: translateY(-3px); border-color: #e0d3bf; }
+.tile__ic { display: inline-flex; align-items: center; justify-content: center; width: 46px; height: 46px; border-radius: 12px; background: var(--wine-700); color: #fff; margin-bottom: .6rem; }
+.tile__ic svg { width: 23px; height: 23px; }
+.tile h3 { margin: 0 0 .25rem; color: var(--wine-900); font-size: 1.15rem; }
+.tile p { margin: 0; color: var(--muted); font-size: .9rem; }
+
+/* CTA + hírlevél */
+.cta {
+  display: flex; align-items: center; justify-content: space-between; gap: 1.2rem; flex-wrap: wrap;
+  background: linear-gradient(135deg, var(--wine-700), var(--wine-900));
+  border-radius: 16px; padding: 1.6rem 2rem; color: #fff; margin-bottom: 2.6rem;
+}
+.cta h2 { margin: 0 0 .15rem; color: #fff; font-size: 1.4rem; }
+.cta p { margin: 0; color: var(--gold-200); }
+.cta__eyebrow { margin: 0 0 .2rem; text-transform: uppercase; letter-spacing: .2em; font-size: .74rem; color: var(--gold-200); }
+.cta__actions { display: flex; gap: .7rem; flex-wrap: wrap; }
+
+.news { text-align: center; background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 2.2rem 1.5rem; margin-bottom: 2rem; }
+.news h2 { margin: .2rem 0 .4rem; color: var(--wine-900); }
+.news p { margin: 0 auto 1.2rem; max-width: 46ch; color: var(--muted); }
+.news form { display: flex; gap: .5rem; max-width: 440px; margin: 0 auto; }
+.news input { flex: 1; min-width: 0; border: 1px solid var(--line); border-radius: 10px; padding: .8rem 1rem; font-size: 1rem; }
+
+@media (max-width: 900px) {
+  .cards, .tiles { grid-template-columns: 1fr; }
+  .panel { margin-top: -50px; padding: 1.4rem 1.2rem .5rem; }
+  .row__right { display: none; }
+  .news form { flex-direction: column; }
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="site-header__inner">
+    <a class="brand" href="index.html">
+      <span class="brand__name">hol<span class="brand__accent">borozzak</span>.hu</span>
+      <span class="brand__tag">Borrendezvények egy helyen</span>
+    </a>
+    <nav class="site-nav">
+      <a href="#">Események</a>
+      <a href="#">Naptár</a>
+      <a href="#">Térkép</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="hero__bg"><img src="../../../public/assets/hero.jpg" alt=""></div>
+  <div class="hero__inner">
+    <p class="hero__eyebrow">Magyarország borrendezvényei</p>
+    <h1>Fedezd fel az ország legjobb bor-eseményeit</h1>
+    <p class="hero__lead">Fesztiválok, kóstolók és pincelátogatások Tokajtól Villányig — egy helyen, mindig naprakészen.</p>
+    <form class="hero__search" role="search">
+      <input type="search" placeholder="Keresés helyszín, borvidék vagy esemény szerint…">
+      <button type="button">Keresés</button>
+    </form>
+    <div class="hero__stats">
+      <span class="hero__stat"><b>120+</b><span>közelgő esemény</span></span>
+      <span class="hero__stat"><b>22</b><span>borvidék</span></span>
+      <span class="hero__stat"><b>Naponta</b><span>frissítve</span></span>
+    </div>
+  </div>
+</section>
+
+<div class="panel">
+  <section class="sec">
+    <div class="sec__head"><h2>Kiemelt események</h2><a class="sec__more" href="#">Összes esemény →</a></div>
+    <div class="cards">
+      <article class="card">
+        <a class="card__media" href="#"><img src="../../../public/assets/hero.jpg" alt=""><span class="card__badge">Kiemelt</span></a>
+        <div class="card__body">
+          <p class="card__date"><time>szept. 10–13.</time><span class="status is-soon">Közelgő</span></p>
+          <h3 class="card__title"><a href="#">Budapesti Borfesztivál</a></h3>
+          <p class="card__meta">📍 Budai Vár, Budapest</p>
+          <div><span class="tag">Borfesztivál</span> <span class="tag">Kóstoló</span></div>
+        </div>
+      </article>
+      <article class="card">
+        <a class="card__media" href="#"><img src="../../../public/assets/hero.jpg" alt="" style="object-position: 50% 20%;"><span class="card__badge">Kiemelt</span></a>
+        <div class="card__body">
+          <p class="card__date"><time>aug. 28–30.</time><span class="status is-soon">Közelgő</span></p>
+          <h3 class="card__title"><a href="#">Etyeki Piknik</a></h3>
+          <p class="card__meta">📍 Újhegy, Etyek</p>
+          <div><span class="tag">Piknik</span> <span class="tag">Gasztronómia</span></div>
+        </div>
+      </article>
+      <article class="card">
+        <a class="card__media" href="#"><img src="../../../public/assets/hero.jpg" alt="" style="object-position: 50% 80%;"><span class="card__badge">Kiemelt</span></a>
+        <div class="card__body">
+          <p class="card__date"><time>júl. 18–20.</time><span class="status is-live">Folyamatban</span></p>
+          <h3 class="card__title"><a href="#">Szent György-hegy Hajnalig</a></h3>
+          <p class="card__meta">📍 Szent György-hegy, Tapolca</p>
+          <div><span class="tag">Pincetúra</span> <span class="tag tag--free" style="background:#e6efe0;color:#3f5a2a;">Ingyenes</span></div>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="sec__head"><h2>Közelgő események</h2><a class="sec__more" href="#">Összes esemény →</a></div>
+    <div class="rows">
+      <a class="row" href="#">
+        <span class="dateb"><span class="dateb__day">18</span><span class="dateb__mon">JÚL</span></span>
+        <span class="row__main"><span class="row__title">Szent György-hegy Hajnalig</span><span class="row__sub">júl. 18–20. · Pincetúra, Kóstoló</span></span>
+        <span class="row__right">Tapolca · Badacsony<span class="row__chev">→</span></span>
+      </a>
+      <a class="row" href="#">
+        <span class="dateb"><span class="dateb__day">15</span><span class="dateb__mon">AUG</span></span>
+        <span class="row__main"><span class="row__title">Soproni Borfesztivál</span><span class="row__sub">aug. 15–17. · Borfesztivál</span></span>
+        <span class="row__right">Sopron · Soproni<span class="row__chev">→</span></span>
+      </a>
+      <a class="row" href="#">
+        <span class="dateb"><span class="dateb__day">28</span><span class="dateb__mon">AUG</span></span>
+        <span class="row__main"><span class="row__title">Etyeki Piknik</span><span class="row__sub">aug. 28–30. · Piknik, Gasztronómia</span></span>
+        <span class="row__right">Etyek · Etyek–Buda<span class="row__chev">→</span></span>
+      </a>
+      <a class="row" href="#">
+        <span class="dateb"><span class="dateb__day">10</span><span class="dateb__mon">SZEPT</span></span>
+        <span class="row__main"><span class="row__title">Budapesti Borfesztivál</span><span class="row__sub">szept. 10–13. · Borfesztivál, Kóstoló</span></span>
+        <span class="row__right">Budapest · Etyek–Buda<span class="row__chev">→</span></span>
+      </a>
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="sec__head"><h2>Böngéssz másképp</h2></div>
+    <div class="tiles">
+      <a class="tile" href="#">
+        <span class="tile__ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="3.6" cy="6" r="1.3" fill="currentColor" stroke="none"/><circle cx="3.6" cy="12" r="1.3" fill="currentColor" stroke="none"/><circle cx="3.6" cy="18" r="1.3" fill="currentColor" stroke="none"/></svg></span>
+        <h3>Összes esemény</h3><p>A teljes lista — szűrés borvidék, kategória és időpont szerint.</p>
+      </a>
+      <a class="tile" href="#">
+        <span class="tile__ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 6.5 9 3.5 15 6.5 21 3.5 21 17.5 15 20.5 9 17.5 3 20.5"/><line x1="9" y1="3.5" x2="9" y2="17.5"/><line x1="15" y1="6.5" x2="15" y2="20.5"/></svg></span>
+        <h3>Térkép</h3><p>Nézd meg, milyen rendezvények vannak a közeledben.</p>
+      </a>
+      <a class="tile" href="#">
+        <span class="tile__ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4.5" width="18" height="16" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="8" y1="2.5" x2="8" y2="6"/><line x1="16" y1="2.5" x2="16" y2="6"/></svg></span>
+        <h3>Naptár</h3><p>Böngészés dátum szerint, naptáros nézetben.</p>
+      </a>
+    </div>
+  </section>
+
+  <section class="cta">
+    <div>
+      <p class="cta__eyebrow">Szervezőknek</p>
+      <h2>Rendezel borrendezvényt?</h2>
+      <p>Küldd be ingyenesen, vagy vedd fel velünk a kapcsolatot, ha ki szeretnéd emelni.</p>
+    </div>
+    <div class="cta__actions">
+      <a class="btn btn--gold" href="#">Esemény beküldése →</a>
+      <a class="btn btn--ghost-light" href="#">Kiemelés iránt érdeklődöm</a>
+    </div>
+  </section>
+
+  <section class="news">
+    <span style="font-weight:700; color:var(--wine-700);">🍷 Hírlevél</span>
+    <h2>Ne maradj le egy borrendezvényről se</h2>
+    <p>Iratkozz fel, és időben értesítünk a közelgő fesztiválokról, kóstolókról és szüreti programokról.</p>
+    <form><input type="email" placeholder="email@cim.hu"><button type="button" class="btn btn--primary">Feliratkozom</button></form>
+  </section>
+</div>
+
+<p class="mock-note">Design-mockup minta-adatokkal — Főoldal 1. variáns: immerzív panoráma. A gombok nem élnek.</p>
+
+<nav class="variant-switch" aria-label="Variánsok">
+  <span>Főoldal:</span>
+  <a href="f1-immerziv.html" class="is-current" title="Immerzív panoráma">1</a>
+  <a href="f2-mozaik.html" title="Mozaik / friss">2</a>
+  <a href="f3-terkep.html" title="Térkép-fókusz">3</a>
+  <a href="f4-sotet.html" title="Sötét-elegáns">4</a>
+</nav>
+
+</body>
+</html>

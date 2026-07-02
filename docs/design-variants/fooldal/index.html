@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Főoldal — design-variánsok · holborozzak.hu</title>
+<link rel="stylesheet" href="../base.css">
+<style>
+.intro { max-width: 820px; margin: 2.5rem auto 0; padding: 0 1.75rem; text-align: center; }
+.intro h1 { color: var(--wine-900); margin: 0 0 .5rem; }
+.intro p { color: var(--muted); margin: 0; }
+.intro a { font-weight: 700; }
+
+.grid {
+  max-width: 1020px; margin: 2rem auto 0; padding: 0 1.75rem;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 1.3rem;
+}
+.opt {
+  display: block; text-decoration: none; color: inherit;
+  background: var(--paper); border: 1px solid var(--line); border-radius: 16px;
+  overflow: hidden; box-shadow: var(--shadow);
+  transition: transform .12s ease, box-shadow .12s ease;
+}
+.opt:hover { transform: translateY(-3px); box-shadow: 0 14px 40px rgba(74, 14, 28, .16); }
+.opt__thumb { height: 130px; position: relative; }
+.opt__body { padding: 1rem 1.2rem 1.2rem; }
+.opt__body h2 { margin: 0 0 .3rem; color: var(--wine-900); font-size: 1.2rem; }
+.opt__body h2 .n { color: var(--gold); margin-right: .4rem; }
+.opt__body p { margin: 0; font-size: .92rem; color: var(--muted); }
+.opt__go { display: inline-block; margin-top: .6rem; font-weight: 700; color: var(--wine-700); }
+
+.th { position: absolute; border-radius: 3px; }
+.th-img { background: linear-gradient(135deg, #b98a94, #7c4a53); }
+.th-wine { background: linear-gradient(135deg, var(--wine-700), var(--wine-900)); }
+.th-paper { background: #fff; border: 1px solid var(--line); }
+.th-gold { background: var(--gold); }
+.th-dark { background: #2a0a12; }
+.th-map { background: #edefe9; }
+.th-dot { border-radius: 50%; background: var(--wine-700); border: 2px solid var(--gold); }
+
+@media (max-width: 760px) { .grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="site-header__inner">
+    <a class="brand" href="../index.html">
+      <span class="brand__name">hol<span class="brand__accent">borozzak</span>.hu</span>
+      <span class="brand__tag">Borrendezvények egy helyen</span>
+    </a>
+  </div>
+</header>
+
+<div class="intro">
+  <h1>Főoldal — 4 design-variáns</h1>
+  <p>Ugyanaz a tartalom (hero + kereső, kiemelt, közelgő, böngéssz-csempék, CTA, hírlevél) négy különböző stílusban.
+     A jobb alsó sarokban lévő kapcsolóval variánsok közt ugrálhatsz. <a href="../index.html">← Esemény-oldal variánsok</a></p>
+</div>
+
+<div class="grid">
+  <a class="opt" href="f1-immerziv.html">
+    <div class="opt__thumb th-img">
+      <span class="th th-gold" style="left:34%; top:42%; width:32%; height:11%;"></span>
+      <span class="th th-paper" style="left:10%; bottom:-10%; width:80%; height:30%; border-radius:10px 10px 0 0;"></span>
+    </div>
+    <div class="opt__body">
+      <h2><span class="n">1</span>Immerzív panoráma</h2>
+      <p>Nagy, teljes képernyős hero üveghatású keresővel és statisztikákkal; a tartalom egy belelógó panelen indul. Az esemény-oldalhoz választott design párja.</p>
+      <span class="opt__go">Megnézem élőben →</span>
+    </div>
+  </a>
+
+  <a class="opt" href="f2-mozaik.html">
+    <div class="opt__thumb" style="background:var(--cream);">
+      <span class="th th-text" style="left:6%; top:22%; width:38%; height:30%; background:repeating-linear-gradient(0deg,#d9cfc0 0 3px,transparent 3px 8px);"></span>
+      <span class="th th-paper" style="left:6%; bottom:14%; width:38%; height:14%; border:2px solid var(--wine-700); border-radius:8px;"></span>
+      <span class="th th-img" style="left:50%; top:12%; width:26%; height:76%;"></span>
+      <span class="th th-img" style="left:78%; top:12%; width:16%; height:36%;"></span>
+      <span class="th th-wine" style="left:78%; top:52%; width:16%; height:36%;"></span>
+    </div>
+    <div class="opt__body">
+      <h2><span class="n">2</span>Mozaik / friss</h2>
+      <p>Világos, kétoszlopos hero kép-mozaikkal; kiemelt események vízszintes kártyákon, pirula-sorok, játékos részletek. Könnyed, modern hangulat.</p>
+      <span class="opt__go">Megnézem élőben →</span>
+    </div>
+  </a>
+
+  <a class="opt" href="f3-terkep.html">
+    <div class="opt__thumb th-map">
+      <span class="th th-dot" style="left:14%; top:22%; width:12px; height:12px;"></span>
+      <span class="th th-dot" style="left:76%; top:18%; width:12px; height:12px;"></span>
+      <span class="th th-dot" style="left:22%; top:66%; width:12px; height:12px;"></span>
+      <span class="th th-dot" style="left:66%; top:72%; width:12px; height:12px;"></span>
+      <span class="th th-paper" style="left:30%; top:26%; width:40%; height:48%; border-radius:10px;"></span>
+    </div>
+    <div class="opt__body">
+      <h2><span class="n">3</span>Térkép-fókusz</h2>
+      <p>A „hol borozzak?” kérdésre épít: a hero maga egy térkép pulzáló esemény-jelölőkkel, középen kereső-kártya borvidék-chipekkel. Egyedi, márkázó koncepció.</p>
+      <span class="opt__go">Megnézem élőben →</span>
+    </div>
+  </a>
+
+  <a class="opt" href="f4-sotet.html">
+    <div class="opt__thumb th-dark">
+      <span class="th" style="left:30%; top:20%; width:40%; height:8%; background:var(--gold-200); opacity:.8;"></span>
+      <span class="th" style="left:24%; top:36%; width:52%; height:5%; background:var(--gold); opacity:.5;"></span>
+      <span class="th th-paper" style="left:26%; bottom:18%; width:48%; height:16%; background:rgba(255,255,255,.08); border:1px solid rgba(200,161,75,.4);"></span>
+    </div>
+    <div class="opt__body">
+      <h2><span class="n">4</span>Sötét-elegáns</h2>
+      <p>Mély burgundi háttér, arany szeriff tipográfia, díszes elválasztók — prémium borászat-hangulat. A legnagyobb váltás a jelenlegihez képest.</p>
+      <span class="opt__go">Megnézem élőben →</span>
+    </div>
+  </a>
+</div>
+
+<p class="mock-note">Ezek statikus mockupok minta-adatokkal — a kiválasztott variánst utána ültetjük át a valódi <code>public/index.php</code>-ba.</p>
+
+</body>
+</html>
