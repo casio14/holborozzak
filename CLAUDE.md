@@ -129,6 +129,14 @@ JSON-LD vázat (alap `WebSite`+`Organization`); `$jsonLd`-vel bővíthető oldal
     küldés-napló: `newsletter_log` tábla. Feladó: config `mail.from_email`
     (`MAIL_FROM` secret; üresen host-alapú no-reply fallback). Küldés PHP
     `mail()`-lel a Rackhost szerverről.
+  - **Rackhost e-mail/HTTP tanulságok (ne felejtsd!):**
+    - Az egyéni HTTP-fejléceket (pl. `X-Newsletter-Token`) a Rackhost proxy
+      ELDOBJA → a tokent POST-törzsben (is) kell küldeni (collect-ingest és
+      newsletter-send is így megy).
+    - `mail()`-nél kötelező a `-f` boríték-feladó (Return-Path) a From címmel —
+      enélkül DMARC/SPF igazodási hiba → spam (lib/mail.php kezeli).
+    - A 998+ karakteres sorokat az MTA kényszerrel tördeli (szó/attribútum
+      közepén is) → a sendMailHtml küldés előtt 500 karakternél tördel.
   - **`admin/feliratkozok.php`** — feliratkozó-lista, CSV-export, törlés (CSRF).
   - **`esemeny-bekuldes.php`** — nyilvános esemény **beküldő űrlap** (POST→PRG):
     validál, `draft` státuszú eseményt szúr be (slug auto, ütközésmentes), a kiválasztott
