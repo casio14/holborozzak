@@ -38,7 +38,7 @@ require __DIR__ . '/partials/header.php';
       <div class="legal-card">
         <span class="legal-card__num" aria-hidden="true">1</span>
         <h2>Az adatkezelő</h2>
-        <p>Kiss Patrik (magánszemély), e-mail:
+        <p>A szolgáltató neve: Holborozzak, e-mail:
           <a href="mailto:info@holborozzak.hu">info@holborozzak.hu</a>.
           További adatok: <a href="impresszum.php">Impresszum</a>.</p>
       </div>

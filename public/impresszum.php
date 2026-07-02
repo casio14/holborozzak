@@ -11,7 +11,7 @@ require __DIR__ . '/partials/header.php';
 
       <h2>Az oldal üzemeltetője</h2>
       <address>
-        <strong>Üzemeltető:</strong> Kiss Patrik (magánszemély)<br>
+        <strong>Szolgáltató neve:</strong> Holborozzak<br>
         <strong>Weboldal:</strong> holborozzak.hu<br>
         <strong>Kapcsolat:</strong> <a href="mailto:info@holborozzak.hu">info@holborozzak.hu</a>
       </address>
