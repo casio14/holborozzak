@@ -747,39 +747,28 @@ main { flex: 1 0 auto; }
 .cal__bar:hover .cal-tip,
 .cal__bar:focus-visible .cal-tip { display: block; }
 
-/* Mobil: agenda-lista a rács helyett (kis kijelzőn a 7 oszlop olvashatatlan) */
-.cal-agenda { display: none; }
-.cal-agenda__row {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  background: var(--paper);
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  padding: .7rem 1rem;
-  margin-bottom: .55rem;
-  text-decoration: none;
-  color: inherit;
-}
-.cal-agenda__row:hover { border-color: var(--gold); }
-.cal-agenda__date {
-  flex: none;
-  width: 50px;
-  text-align: center;
-  background: var(--cream);
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  padding: .25rem 0;
-}
-.cal-agenda__date b { display: block; font-family: Georgia, "Times New Roman", serif; font-size: 1.2rem; color: var(--wine-900); line-height: 1.1; }
-.cal-agenda__date i { display: block; font-style: normal; font-size: .62rem; font-weight: 800; color: var(--wine-700); }
-.cal-agenda__main { flex: 1; min-width: 0; }
-.cal-agenda__title { display: block; font-weight: 700; color: var(--wine-900); }
-.cal-agenda__sub { display: block; color: var(--muted); font-size: .85rem; }
+/* Nap-fejléc: hosszú név asztali, rövidítés mobil nézetben */
+.cal__dow .dow-abbr { display: none; }
 
+/* Hover-kártya csak hoverképes eszközön (touch-on koppintás = navigáció) */
+@media (hover: none) {
+  .cal__bar:hover .cal-tip { display: none; }
+}
+
+/* Mobil: kompakt rács — a sávok szöveg nélküli színes csíkok (régi nézet) */
 @media (max-width: 760px) {
-  .cal { display: none; }
-  .cal-agenda { display: block; }
+  .cal__dow .dow-full { display: none; }
+  .cal__dow .dow-abbr { display: inline; }
+  .cal-toolbar { padding: .7rem .9rem; }
+  .cal-toolbar__month { font-size: 1.15rem; }
+  .cal-nav__btn { width: 34px; height: 34px; font-size: 1.05rem; }
+  .cal-nav__today { padding: .4rem .75rem; font-size: .8rem; }
+  .cal-legend { padding: .5rem .9rem; gap: .35rem .9rem; font-size: .72rem; }
+  .cal__week { min-height: 64px; grid-auto-rows: minmax(12px, auto); padding-bottom: .35rem; }
+  .cal__d { font-size: .78rem; padding: .25rem .35rem; }
+  .cal__d--today b { width: 20px; height: 20px; }
+  .cal__bar { height: 12px; min-height: 12px; padding: 0; margin: 2px 3px; border-radius: 4px; }
+  .cal__bar-t { display: none; }
 }
 
 /* ---------- Nap-lap (felugró napi eseménylista) ---------- */

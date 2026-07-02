@@ -115,9 +115,19 @@
 .agenda .t { flex: 1; font-weight: 700; color: var(--wine-900); }
 .agenda .s { color: var(--muted); font-size: .85rem; font-weight: 400; }
 
+/* Az agenda-lista nyugdíjazva: mobilon is a (kompakt) rács látszik */
+.agenda { display: none; }
+
 @media (max-width: 760px) {
-  .cal, .legend { display: none; }
-}
-@media (min-width: 761px) {
-  .agenda { display: none; }
+  .cal-head { padding: .7rem .9rem; }
+  .cal-head__title { font-size: 1.15rem; }
+  .cal-nav__btn { width: 34px; height: 34px; font-size: 1.05rem; }
+  .cal-nav__today { padding: .4rem .75rem; font-size: .8rem; }
+  .legend { padding: .5rem .9rem; gap: .35rem .9rem; font-size: .72rem; }
+  .dow span { font-size: .58rem; padding: .35rem .1rem; letter-spacing: 0; overflow: hidden; white-space: nowrap; }
+  .week { min-height: 64px; grid-auto-rows: minmax(12px, auto); padding-bottom: .35rem; }
+  .d { font-size: .78rem; padding: .25rem .35rem; }
+  .d--today span { width: 20px; height: 20px; }
+  .bar { height: 12px; min-height: 12px; padding: 0; margin: 2px 3px; border-radius: 4px; }
+  .bar__t { display: none; }
 }
