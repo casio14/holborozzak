@@ -164,7 +164,7 @@ require __DIR__ . '/partials/header.php';
       </div>
       <?php endif; ?>
 
-      <div class="cal__dow"><span>Hétfő</span><span>Kedd</span><span>Szerda</span><span>Csüt</span><span>Péntek</span><span>Szombat</span><span>Vasárnap</span></div>
+      <div class="cal__dow"><span aria-label="Hétfő"><span class="dow-full" aria-hidden="true">Hétfő</span><span class="dow-abbr" aria-hidden="true">H</span></span><span aria-label="Kedd"><span class="dow-full" aria-hidden="true">Kedd</span><span class="dow-abbr" aria-hidden="true">K</span></span><span aria-label="Szerda"><span class="dow-full" aria-hidden="true">Szerda</span><span class="dow-abbr" aria-hidden="true">Sze</span></span><span aria-label="Csütörtök"><span class="dow-full" aria-hidden="true">Csüt</span><span class="dow-abbr" aria-hidden="true">Cs</span></span><span aria-label="Péntek"><span class="dow-full" aria-hidden="true">Péntek</span><span class="dow-abbr" aria-hidden="true">P</span></span><span aria-label="Szombat"><span class="dow-full" aria-hidden="true">Szombat</span><span class="dow-abbr" aria-hidden="true">Szo</span></span><span aria-label="Vasárnap"><span class="dow-full" aria-hidden="true">Vasárnap</span><span class="dow-abbr" aria-hidden="true">V</span></span></div>
 
       <?php foreach ($weeks as $week): ?>
         <?php
@@ -215,26 +215,6 @@ require __DIR__ . '/partials/header.php';
         </div>
       <?php endforeach; ?>
     </div>
-
-    <!-- Mobil: agenda-lista a rács helyett (kis kijelzőn a 7 oszlop olvashatatlan) -->
-    <?php if ($shown): ?>
-    <div class="cal-agenda">
-      <?php foreach ($bars as $bar): $e = $bar['e']; ?>
-        <a class="cal-agenda__row" href="<?= h(eventUrl($e)) ?>">
-          <span class="cal-agenda__date">
-            <b><?= h(dayNumber($e['start_datetime'])) ?></b>
-            <i><?= h(shortMonthUpper($e['start_datetime'])) ?></i>
-          </span>
-          <span class="cal-agenda__main">
-            <span class="cal-agenda__title"><?= h($e['title']) ?></span>
-            <span class="cal-agenda__sub">
-              <?= h(formatDateRange($e['start_datetime'], $e['end_datetime'])) ?><?php if (!empty($e['city'])): ?> · <?= h($e['city']) ?><?php endif; ?><?php if ((int) $e['is_free'] === 1): ?> · Ingyenes<?php endif; ?>
-            </span>
-          </span>
-        </a>
-      <?php endforeach; ?>
-    </div>
-    <?php endif; ?>
 
     <?php if (!$shown): ?>
       <p class="section-intro"><?= $monthEvents ? 'Nincs a szűrőnek megfelelő esemény ebben a hónapban.' : 'Ebben a hónapban nincs rögzített esemény.' ?>
