@@ -74,24 +74,31 @@
 .bar__t { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .week:last-of-type { border-radius: 0 0 15px 15px; }
 
-/* Hover-előnézet: mini esemény-kártya képpel, a sáv alatt (fókuszra is megjelenik).
-   Sötét (bordó) kártya a jó kontrasztért — a világos verzió alig látszott. */
+/* Hover-előnézet: világos mini-kártya képpel, a sáv alatt (fókuszra is megjelenik).
+   Kép → szeriff cím → borvörös dátum → helyszín/ár → címkék → Részletek gomb. */
 .tip {
   display: none; position: absolute; top: calc(100% + 8px); left: 0; z-index: 30;
   width: 264px;
-  background: linear-gradient(165deg, #3a121d, var(--wine-900));
-  border: 1px solid var(--gold); border-radius: 12px;
-  box-shadow: 0 18px 44px rgba(0, 0, 0, .45);
-  color: #f3e8e0; white-space: normal;
-  font-weight: 400; font-size: .84rem; line-height: 1.5;
+  background: #fff; border: 1px solid var(--line); border-radius: 14px;
+  box-shadow: 0 20px 50px rgba(43, 20, 24, .35);
+  color: var(--ink); white-space: normal;
+  font-weight: 400; font-size: .84rem; line-height: 1.45;
   overflow: hidden;
 }
-.tip__img { display: block; width: 100%; height: 110px; object-fit: cover; border-bottom: 2px solid var(--gold); }
-.tip__body { display: block; padding: .7rem .95rem .85rem; }
+.tip__img { display: block; width: 100%; height: 118px; object-fit: cover; }
+.tip__body { display: block; padding: .8rem .95rem .95rem; }
 .tip--r { left: auto; right: 0; }
-.tip b { display: block; font-family: Georgia, "Times New Roman", serif; font-size: 1.02rem; color: #fff; margin-bottom: .2rem; }
-.tip .meta { color: var(--gold-200); }
-.tip .tag { display: inline-block; margin-top: .45rem; background: var(--gold); color: var(--wine-900); }
+.tip b { display: block; font-family: Georgia, "Times New Roman", serif; font-size: 1.08rem; color: var(--ink); margin-bottom: .2rem; }
+.tip .meta { color: var(--muted); }
+.tip .meta .d { color: var(--wine-700); font-weight: 700; }
+.tip .tag { display: inline-block; margin-top: .45rem; }
+/* „Részletek →" gomb-imitáció a mockupban (élesben valódi elem) */
+.tip__body::after {
+  content: "Részletek →";
+  display: inline-block; margin-top: .75rem;
+  background: var(--wine-700); color: var(--cream);
+  font-weight: 700; padding: .5rem 1.15rem; border-radius: 10px;
+}
 .bar:hover .tip, .bar:focus-visible .tip { display: block; }
 
 /* Jelmagyarázat (a fejléc alatt, a rács fölött) */
