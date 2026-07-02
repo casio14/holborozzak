@@ -37,5 +37,12 @@ jobs:
             echo "HIBA: a NEWSLETTER_TOKEN secret nincs beállítva."
             exit 1
           fi
-          RESP=$(curl -fsS -X POST "${URL}${FORCE:+?force=1}" -H "X-Newsletter-Token: $TOKEN")
-          echo "Szerver válasz: $RESP"
+          # A tokent fejlécben ÉS POST-törzsben is küldjük (egyes proxyk eldobják
+          # az egyéni fejléceket). Hibánál a szerver diagnosztikai válaszát is kiírjuk.
+          BODY=$(mktemp)
+          STATUS=$(curl -sS -o "$BODY" -w '%{http_code}' -X POST "${URL}${FORCE:+?force=1}" \
+            -H "X-Newsletter-Token: $TOKEN" \
+            --data-urlencode "token=$TOKEN")
+          echo "HTTP statusz: $STATUS"
+          echo "Szerver válasz: $(cat "$BODY")"
+          [ "$STATUS" = "200" ] || exit 1

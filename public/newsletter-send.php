@@ -20,10 +20,24 @@ header('Content-Type: application/json; charset=utf-8');
 $cfgFile = __DIR__ . '/config.php';
 $cfg = is_file($cfgFile) ? require $cfgFile : [];
 $expected = (string) ($cfg['newsletter_token'] ?? '');
-$given = (string) ($_SERVER['HTTP_X_NEWSLETTER_TOKEN'] ?? ($_POST['token'] ?? ''));
+$fromHeader = (string) ($_SERVER['HTTP_X_NEWSLETTER_TOKEN'] ?? '');
+$fromPost   = (string) ($_POST['token'] ?? '');
+$given = $fromHeader !== '' ? $fromHeader : $fromPost;
+// A whitespace-t levágjuk: a secretbe másoláskor könnyen kerül sortörés/szóköz.
+$given = trim($given);
 if ($expected === '' || !hash_equals($expected, $given)) {
     http_response_code(403);
-    echo json_encode(['error' => 'forbidden', 'hint' => $expected === '' ? 'config newsletter_token ures (deploy kell)' : 'token nem egyezik']);
+    echo json_encode([
+        'error' => 'forbidden',
+        'hint'  => $expected === '' ? 'config newsletter_token ures (deploy kell)' : 'token nem egyezik',
+        // Veszélytelen diagnosztika (értéket nem árul el): honnan jött token és milyen hosszú.
+        'diag'  => [
+            'kapott_fejlecben' => $fromHeader !== '',
+            'kapott_postban'   => $fromPost !== '',
+            'kapott_hossz'     => strlen($given),
+            'vart_hossz'       => strlen($expected),
+        ],
+    ]);
     exit;
 }
 
