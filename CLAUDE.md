@@ -53,10 +53,6 @@ A weboldal címe: **holborozzak.hu**
   - **Major/minor léptetés:** kézzel írd át a `VERSION` fájlt (a patch onnantól 0-ról indul).
   - **Rollback / adott verzió:** Actions → Run workflow → a "Use workflow from"
     legördülőből válaszd a kívánt tag-et; ilyenkor nem készül új tag, csak újra deployol.
-  - **TODO (takarítás):** az első hibás deploy árvafájljai a szerveren a
-    `/web/kissptrk.hu/web/kissptrk.hu/borozzak/` alatt maradtak — törlés: az egyszeri,
-    kézi indítású `.github/workflows/cleanup.yml` workflow-val (Actions → Run workflow);
-    siker után a workflow és ez a TODO törölhető.
   - **TODO (biztonság):** ha a Rackhost ad SFTP/SSH-t, váltani titkosított feltöltésre.
 - **Adatbázis (MySQL, Rackhost):**
   - Kiszolgáló: `mysql.rackhost.hu`
