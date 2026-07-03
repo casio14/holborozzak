@@ -54,7 +54,9 @@ A weboldal címe: **holborozzak.hu**
   - **Rollback / adott verzió:** Actions → Run workflow → a "Use workflow from"
     legördülőből válaszd a kívánt tag-et; ilyenkor nem készül új tag, csak újra deployol.
   - **TODO (takarítás):** az első hibás deploy árvafájljai a szerveren a
-    `/web/kissptrk.hu/web/kissptrk.hu/borozzak/` alatt maradtak — FTP-n/fájlkezelőből törölhetők.
+    `/web/kissptrk.hu/web/kissptrk.hu/borozzak/` alatt maradtak — törlés: az egyszeri,
+    kézi indítású `.github/workflows/cleanup.yml` workflow-val (Actions → Run workflow);
+    siker után a workflow és ez a TODO törölhető.
   - **TODO (biztonság):** ha a Rackhost ad SFTP/SSH-t, váltani titkosított feltöltésre.
 - **Adatbázis (MySQL, Rackhost):**
   - Kiszolgáló: `mysql.rackhost.hu`
@@ -91,16 +93,18 @@ JSON-LD vázat (alap `WebSite`+`Organization`); `$jsonLd`-vel bővíthető oldal
     `config.php`-ból olvassa.
   - `config.php` — **generált**, NEM gitben: éles környezetben a CI hozza létre a
     `DB_PASSWORD` secretből; lokálisan a `config.example.php`-ból másolod.
-  - `health.php` — ideiglenes DB-egészség ellenőrző (élesítés előtt törölni/védeni).
   - `version.php` — generált verziófájl (CI).
   - `terkep.php` — **Eseménytérkép**: Leaflet + CARTO világos csempék, **szőlőfürt
     jelölők darabszám-jelvénnyel**, **markercluster** (zoom-alapú összevonás/szétválás),
     popup részletlinkkel. SEO: szerveroldali lista + `Event`/`ItemList` JSON-LD.
   - `naptar.php` — **Eseménynaptár**: havi naptárrács (hét-első nézet), eseményekkel a
     napjukon, hónaplépegetéssel (`?ev=&ho=`). A Naptár menüpont ide mutat.
-  - `esemeny.php` — esemény **részletoldal** (`esemeny.php?slug=…`): teljes `Event`
+  - `esemeny.php` — esemény **részletoldal**, szép URL-lel: **`/esemeny/<slug>`**
+    (`.htaccess` rewrite; a régi `esemeny.php?slug=…` 301-gyel ide irányít; a
+    `partials/header.php` `<base>` tagje miatt a relatív linkek a mélyebb útvonalon is
+    működnek — új oldalaknál is relatív linkeket használj, a base megoldja). Teljes `Event`
     JSON-LD, canonical, OG-kép; 404 a nem létezőre. A kártyák/sorok/térkép ide linkelnek.
-    (Szép URL `/esemeny/<slug>` később, a végleges domainen, rewrite-tal.) Elrendezés:
+    Elrendezés:
     **hero** (borító + tömör borvörös címsáv: cím, dátum, státusz), alatta reszponzív rács
     (`.ed-grid`, CSS grid-areas): balra leírás, jobb oldalsávban infó (hol/borvidék/ár) +
     gombok (Jegyek/Hivatalos oldal a `go.php`-n át; **Facebook**; **Naptárhoz adom** →
