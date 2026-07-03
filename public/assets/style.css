@@ -1460,6 +1460,11 @@ main { flex: 1 0 auto; }
   margin: 0;
   width: 260px !important;
 }
+/* Mobilon kisebb kártya (a JS is 224px-szel nyitja) + alacsonyabb kép */
+@media (max-width: 560px) {
+  .event-popup .leaflet-popup-content { width: 224px !important; }
+  .event-popup .map-card__media { height: 88px; }
+}
 .event-popup .leaflet-popup-close-button {
   width: 26px !important;
   height: 26px !important;

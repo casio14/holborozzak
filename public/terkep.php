@@ -106,7 +106,10 @@ require __DIR__ . '/partials/header.php';
     }
     var dotIcon = L.divIcon({ className: 'grape-dot', html: '', iconSize: [18, 18], iconAnchor: [9, 9], popupAnchor: [0, -10] });
 
-    var map = L.map('map', { scrollWheelZoom: true }).setView([47.16, 19.50], 7);
+    // closePopupOnClick: false — mobilon a nagy popup auto-pan-je után az érintés
+    // „szellem-kattintásként" a térképre érkezne, és azonnal bezárná a kártyát.
+    // Bezárás: az X gombbal vagy másik jelölő megnyitásával.
+    var map = L.map('map', { scrollWheelZoom: true, closePopupOnClick: false }).setView([47.16, 19.50], 7);
     L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
       maxZoom: 19, subdomains: 'abcd',
       attribution: '&copy; OpenStreetMap, &copy; CARTO'
@@ -139,11 +142,14 @@ require __DIR__ . '/partials/header.php';
       return h;
     }
 
+    // Mobilon keskenyebb kártya: jobban elfér a kisebb térképen, kevesebb auto-pan kell
+    var POPUP_W = window.matchMedia('(max-width: 560px)').matches ? 224 : 260;
+
     var bounds = [];
     var markers = [];
     pts.forEach(function (p) {
       var m = L.marker([p.lat, p.lng], { icon: dotIcon })
-        .bindPopup(popupHtml(p), { maxWidth: 260, minWidth: 260, className: 'event-popup' });
+        .bindPopup(popupHtml(p), { maxWidth: POPUP_W, minWidth: POPUP_W, className: 'event-popup' });
       cluster.addLayer(m);
       markers.push(m);
       bounds.push([p.lat, p.lng]);
