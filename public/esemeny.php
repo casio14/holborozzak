@@ -41,6 +41,15 @@ if (!$event) {
 }
 
 // --- Megtalált esemény ---
+
+// Megtekintés naplózása (analitika): bot-szűrt, hashelt IP-vel; hibája nem
+// akadályozhatja az oldal kiszolgálását.
+try {
+    logInteraction(db(), (int) $event['id'], 'view');
+} catch (Throwable $e) {
+    error_log('esemeny.php view naplózás hiba: ' . $e->getMessage());
+}
+
 $canonicalUrl = eventUrl($event, $base, $dir);
 $pageTitle = $event['title'] . ' — holborozzak.hu';
 $pageDescription = $event['short_description']
