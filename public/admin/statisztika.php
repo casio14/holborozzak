@@ -4,8 +4,9 @@ declare(strict_types=1);
 // holborozzak.hu — admin: kattintás- és megtekintés-statisztika.
 //
 // Forrás: event_interactions (view / click_website / click_ticket).
-// GDPR: az „egyedi" érték a napi sóval hashelt IP-kből becsült (napok között
-// nem összeköthető, így több napos időszakon a napi egyediek összege).
+// Egyedi látogató: a mérési sütit elfogadóknál az anonim session_id (napokon
+// átívelően pontos), a többieknél a napi sóval hashelt IP a becslés (napok
+// között nem összeköthető). A „Sütis látogató-mérés" blokk csak session-alapú.
 
 require __DIR__ . '/auth.php';
 require __DIR__ . '/../lib/events.php';
@@ -20,28 +21,67 @@ if (!isset($PERIODS[$days])) {
 // A $days fix whitelist-ből ($PERIODS) jön, így biztonságos az interpoláció.
 $where = $days > 0 ? "WHERE i.created_at >= DATE_SUB(NOW(), INTERVAL {$days} DAY)" : '';
 
+// Egyedi látogató: a sütis anonim azonosító a pontos; ahol nincs (nem járult
+// hozzá), ott a napi sóval hashelt IP a becslés.
+$UID = 'COALESCE(i.session_id, i.ip_hash)';
+// Csak sütis (hozzájárult) látogatók — a napokon átívelő metrikákhoz
+$whereSess = $where !== ''
+    ? $where . ' AND i.session_id IS NOT NULL'
+    : 'WHERE i.session_id IS NOT NULL';
+
 $totals = ['view' => 0, 'click_website' => 0, 'click_ticket' => 0];
 $uniq   = ['view' => 0, 'click_website' => 0, 'click_ticket' => 0];
+$visitor = ['sessions' => 0, 'returning' => 0, 'viewers' => 0, 'clickers' => 0, 'avg_events' => 0.0];
 $rows = [];
 $daily = [];
+$referrers = [];
 $dbError = false;
 try {
     $pdo = db();
 
     // Összesítők típusonként
     foreach ($pdo->query(
-        "SELECT i.type, COUNT(*) AS c, COUNT(DISTINCT i.ip_hash) AS u
+        "SELECT i.type, COUNT(*) AS c, COUNT(DISTINCT {$UID}) AS u
          FROM event_interactions i {$where} GROUP BY i.type"
     ) as $r) {
         $totals[$r['type']] = (int) $r['c'];
         $uniq[$r['type']]   = (int) $r['u'];
     }
 
+    // Sütis látogató-metrikák (pontos, napokon átívelő számok)
+    $v = $pdo->query(
+        "SELECT COUNT(DISTINCT i.session_id) AS s,
+                COUNT(DISTINCT CASE WHEN i.type = 'view' THEN i.session_id END) AS vw,
+                COUNT(DISTINCT CASE WHEN i.type IN ('click_website','click_ticket') THEN i.session_id END) AS cl
+         FROM event_interactions i {$whereSess}"
+    )->fetch();
+    if ($v) {
+        $visitor['sessions'] = (int) $v['s'];
+        $visitor['viewers']  = (int) $v['vw'];
+        $visitor['clickers'] = (int) $v['cl'];
+    }
+    // Visszatérő: legalább 2 különböző napon aktív sütis látogató
+    $visitor['returning'] = (int) $pdo->query(
+        "SELECT COUNT(*) FROM (
+            SELECT i.session_id FROM event_interactions i {$whereSess}
+            GROUP BY i.session_id
+            HAVING COUNT(DISTINCT DATE(i.created_at)) >= 2
+         ) t"
+    )->fetchColumn();
+    // Átlagosan hány KÜLÖNBÖZŐ eseményt néz meg egy sütis látogató
+    $visitor['avg_events'] = (float) ($pdo->query(
+        "SELECT AVG(t.cnt) FROM (
+            SELECT COUNT(DISTINCT i.event_id) AS cnt
+            FROM event_interactions i {$whereSess} AND i.type = 'view'
+            GROUP BY i.session_id
+         ) t"
+    )->fetchColumn() ?: 0);
+
     // Eseményenkénti bontás (kattintás szerint csökkenő)
     $rows = $pdo->query(
         "SELECT e.id, e.title, e.city, e.status, e.start_datetime,
                 SUM(i.type = 'view')          AS views,
-                COUNT(DISTINCT CASE WHEN i.type = 'view' THEN i.ip_hash END) AS uv,
+                COUNT(DISTINCT CASE WHEN i.type = 'view' THEN {$UID} END) AS uv,
                 SUM(i.type = 'click_website') AS cw,
                 SUM(i.type = 'click_ticket')  AS ct
          FROM event_interactions i
@@ -63,6 +103,20 @@ try {
          WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL 13 DAY)
          GROUP BY DATE(created_at)
          ORDER BY d DESC"
+    )->fetchAll();
+
+    // Honnan jönnek a látogatók? Hivatkozó domainek (a saját oldal nélkül)
+    $refCond = "i.referrer IS NOT NULL AND i.referrer NOT LIKE '%holborozzak.hu%'"
+        . " AND i.referrer NOT LIKE '%kissptrk.hu%'";
+    $whereRef = $where !== '' ? $where . ' AND ' . $refCond : 'WHERE ' . $refCond;
+    $referrers = $pdo->query(
+        "SELECT SUBSTRING_INDEX(SUBSTRING_INDEX(i.referrer, '/', 3), '//', -1) AS host,
+                COUNT(*) AS c,
+                COUNT(DISTINCT {$UID}) AS u
+         FROM event_interactions i {$whereRef}
+         GROUP BY host
+         ORDER BY c DESC
+         LIMIT 15"
     )->fetchAll();
 } catch (Throwable $e) {
     error_log('admin statisztika DB hiba: ' . $e->getMessage());
@@ -132,6 +186,30 @@ $cssVer = @filemtime(__DIR__ . '/../assets/style.css') ?: time();
       </div>
     </div>
 
+    <h2 class="admin-h2">Sütis látogató-mérés <span class="admin-stat__sub">(csak a mérési sütit elfogadó látogatók — napokon átívelően pontos)</span></h2>
+    <div class="admin-stats">
+      <div class="admin-stat">
+        <span class="admin-stat__num"><?= number_format($visitor['sessions'], 0, ',', ' ') ?></span>
+        <span class="admin-stat__label">Mért látogató</span>
+        <span class="admin-stat__sub">egyedi böngésző, duplaszámolás nélkül</span>
+      </div>
+      <div class="admin-stat">
+        <span class="admin-stat__num"><?= number_format($visitor['returning'], 0, ',', ' ') ?></span>
+        <span class="admin-stat__label">Visszatérő látogató</span>
+        <span class="admin-stat__sub">legalább 2 különböző napon járt itt</span>
+      </div>
+      <div class="admin-stat">
+        <span class="admin-stat__num"><?= ctr($visitor['clickers'], $visitor['viewers']) ?></span>
+        <span class="admin-stat__label">Látogató-konverzió</span>
+        <span class="admin-stat__sub"><?= number_format($visitor['clickers'], 0, ',', ' ') ?> kattintó / <?= number_format($visitor['viewers'], 0, ',', ' ') ?> megtekintő</span>
+      </div>
+      <div class="admin-stat">
+        <span class="admin-stat__num"><?= number_format($visitor['avg_events'], 1, ',', ' ') ?></span>
+        <span class="admin-stat__label">Esemény / látogató</span>
+        <span class="admin-stat__sub">átlagosan ennyi különböző eseményt néz meg</span>
+      </div>
+    </div>
+
     <h2 class="admin-h2">Események szerint</h2>
     <?php if (!$rows): ?>
       <div class="admin-empty">Ebben az időszakban még nincs rögzített interakció.</div>
@@ -197,9 +275,35 @@ $cssVer = @filemtime(__DIR__ . '/../assets/style.css') ?: time();
       </table>
     <?php endif; ?>
 
-    <p class="admin-note">Botok nélkül számolva. Az „egyedi" érték a napi sóval hashelt IP-kből
-      becsült (napok között nem összeköthető, ezért több napos időszakon a napi egyediek összege).
-      Az impresszió-mérés (lista-megjelenések) még nincs bekötve.</p>
+    <h2 class="admin-h2">Honnan jönnek a látogatók? <span class="admin-stat__sub">(hivatkozó domainek, a saját oldal nélkül)</span></h2>
+    <?php if (!$referrers): ?>
+      <div class="admin-empty">Ebben az időszakban nincs külső hivatkozásból érkező interakció.</div>
+    <?php else: ?>
+      <table class="admin-table admin-table--narrow">
+        <thead>
+          <tr>
+            <th>Domain</th>
+            <th class="admin-num">Interakció</th>
+            <th class="admin-num">Egyedi látogató</th>
+          </tr>
+        </thead>
+        <tbody>
+          <?php foreach ($referrers as $r): ?>
+            <tr>
+              <td><?= h($r['host']) ?></td>
+              <td class="admin-num"><?= number_format((int) $r['c'], 0, ',', ' ') ?></td>
+              <td class="admin-num">~<?= number_format((int) $r['u'], 0, ',', ' ') ?></td>
+            </tr>
+          <?php endforeach; ?>
+        </tbody>
+      </table>
+    <?php endif; ?>
+
+    <p class="admin-note">Botok nélkül számolva. Az „egyedi" (~) értékeknél a mérési sütit
+      elfogadó látogatóknál a süti anonim azonosítója számít (napokon átívelően pontos);
+      a többieknél a napi sóval hashelt IP a becslés (napok között nem összeköthető, ezért
+      több napos időszakon a napi egyediek összege). A „Sütis látogató-mérés" blokk csak a
+      sütit elfogadókat tartalmazza. Az impresszió-mérés (lista-megjelenések) még nincs bekötve.</p>
   </main>
 </body>
 </html>
