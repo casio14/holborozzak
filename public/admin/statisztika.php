@@ -41,6 +41,7 @@ try {
     $rows = $pdo->query(
         "SELECT e.id, e.title, e.city, e.status, e.start_datetime,
                 SUM(i.type = 'view')          AS views,
+                COUNT(DISTINCT CASE WHEN i.type = 'view' THEN i.ip_hash END) AS uv,
                 SUM(i.type = 'click_website') AS cw,
                 SUM(i.type = 'click_ticket')  AS ct
          FROM event_interactions i
@@ -140,6 +141,7 @@ $cssVer = @filemtime(__DIR__ . '/../assets/style.css') ?: time();
           <tr>
             <th>Esemény</th>
             <th class="admin-num">Megtekintés</th>
+            <th class="admin-num">Egyedi látogató</th>
             <th class="admin-num">Honlap katt.</th>
             <th class="admin-num">Jegy katt.</th>
             <th class="admin-num">CTR</th>
@@ -147,7 +149,8 @@ $cssVer = @filemtime(__DIR__ . '/../assets/style.css') ?: time();
         </thead>
         <tbody>
           <?php foreach ($rows as $r):
-              $views = (int) $r['views']; $cw = (int) $r['cw']; $ct = (int) $r['ct']; ?>
+              $views = (int) $r['views']; $uv = (int) $r['uv'];
+              $cw = (int) $r['cw']; $ct = (int) $r['ct']; ?>
             <tr>
               <td>
                 <strong><?= h($r['title']) ?></strong>
@@ -158,6 +161,7 @@ $cssVer = @filemtime(__DIR__ . '/../assets/style.css') ?: time();
                   &nbsp;·&nbsp; <a class="admin-link" href="esemeny-preview.php?id=<?= (int) $r['id'] ?>" target="_blank" rel="noopener">Előnézet ↗</a></span>
               </td>
               <td class="admin-num"><?= number_format($views, 0, ',', ' ') ?></td>
+              <td class="admin-num">~<?= number_format($uv, 0, ',', ' ') ?></td>
               <td class="admin-num"><?= number_format($cw, 0, ',', ' ') ?></td>
               <td class="admin-num"><?= number_format($ct, 0, ',', ' ') ?></td>
               <td class="admin-num"><?= ctr($cw + $ct, $views) ?></td>
