@@ -92,10 +92,10 @@ require __DIR__ . '/partials/header.php';
 
       <div class="legal-card">
         <span class="legal-card__num" aria-hidden="true">7</span>
-        <h2>Záró rendelkezések</h2>
-        <p>A jelen ÁSZF-ben nem szabályozott kérdésekben a magyar jog — különösen a
-          Polgári Törvénykönyv és az elektronikus kereskedelmi szolgáltatásokról szóló
-          2001. évi CVIII. törvény — az irányadó. Kapcsolódó dokumentumok:
+        <h2>Kapcsolat</h2>
+        <p>Ha kérdésed van a jelen ÁSZF-fel kapcsolatban, fordulj hozzánk bizalommal az
+          <a href="mailto:info@holborozzak.hu">info@holborozzak.hu</a> címen — igyekszünk
+          mielőbb válaszolni. Kapcsolódó dokumentumok:
           <a href="adatvedelem.php">Adatkezelési tájékoztató</a> ·
           <a href="impresszum.php">Impresszum</a></p>
       </div>
