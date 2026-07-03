@@ -9,6 +9,7 @@ require_admin();
 
 $msg = '';
 $err = '';
+$report = []; // dedup: a kiszűrt duplikátumok tételes listája
 $csrf = admin_csrf_token();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -113,6 +114,65 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $id = (int) ($_POST['id'] ?? 0);
                 $pdo->prepare('UPDATE event_candidates SET status = "rejected" WHERE id = ? AND status = "new"')->execute([$id]);
                 $msg = 'Jelölt elvetve.';
+            } elseif ($action === 'dedup') {
+                // Duplikátumok kiszűrése: azonos (cím|nap|város) jelöltek közül a
+                // legtöbb kitöltött mezővel rendelkezőt tartjuk meg; a már felvett
+                // eseményekkel egyezők szintén duplikátumok. Nem véglegesen törlünk:
+                // status='duplicate', így visszakereshető.
+                $all = $pdo->query("SELECT * FROM event_candidates WHERE status = 'new' ORDER BY id ASC")->fetchAll();
+
+                $fields = ['short_description', 'description', 'start_datetime', 'end_datetime',
+                           'venue_name', 'city', 'region_name', 'website_url', 'facebook_url',
+                           'ticket_url', 'image_url', 'price_info'];
+                $score = static function (array $c) use ($fields): int {
+                    $n = 0;
+                    foreach ($fields as $f) {
+                        if (!empty($c[$f])) { $n++; }
+                    }
+                    return $n;
+                };
+                $label = static fn (array $c): string => $c['title']
+                    . ($c['start_datetime'] ? ' — ' . substr((string) $c['start_datetime'], 0, 10) : '')
+                    . ($c['city'] ? ', ' . $c['city'] : '');
+
+                // A kulcsot frissen számoljuk (a tárolt dedup_key régi soroknál hiányozhat)
+                $groups = [];
+                foreach ($all as $c) {
+                    $key = candidateDedupKey((string) $c['title'], $c['start_datetime'] ?: null, $c['city'] ?: null);
+                    $groups[$key][] = $c;
+                }
+
+                $dupIds = [];
+                foreach ($groups as $g) {
+                    if (count($g) < 2) {
+                        continue;
+                    }
+                    usort($g, static fn ($a, $b) => [$score($b), (int) $a['id']] <=> [$score($a), (int) $b['id']]);
+                    $best = array_shift($g);
+                    foreach ($g as $d) {
+                        $dupIds[] = (int) $d['id'];
+                        $report[] = '„' . $label($d) . '” → megtartva helyette a teljesebb jelölt (#' . (int) $best['id'] . ')';
+                    }
+                }
+                // A már felvett (draft/közzétett) eseményekkel egyező jelöltek is duplikátumok
+                foreach ($all as $c) {
+                    if (in_array((int) $c['id'], $dupIds, true)) {
+                        continue;
+                    }
+                    if (eventDuplicate($pdo, (string) $c['title'], $c['start_datetime'] ?: null, $c['city'] ?: null)) {
+                        $dupIds[] = (int) $c['id'];
+                        $report[] = '„' . $label($c) . '” → már szerepel az események között';
+                    }
+                }
+
+                if ($dupIds) {
+                    $in = implode(',', array_fill(0, count($dupIds), '?'));
+                    $pdo->prepare("UPDATE event_candidates SET status = 'duplicate' WHERE id IN ($in)")
+                        ->execute($dupIds);
+                    $msg = count($dupIds) . ' duplikátum kiszűrve (státusz: duplicate — nem végleges törlés).';
+                } else {
+                    $msg = 'Nem találtam duplikátumot a jelöltek között.';
+                }
             }
         } catch (Throwable $e) {
             error_log('admin/jeloltek.php hiba: ' . $e->getMessage());
@@ -156,10 +216,20 @@ $cssVer = @filemtime(__DIR__ . '/../assets/style.css') ?: time();
     <p class="admin-stats">
       Jóváhagyásra vár: <strong><?= (int) $counts['new'] ?></strong> ·
       Jóváhagyott: <strong><?= (int) $counts['approved'] ?></strong> ·
-      Elvetett: <strong><?= (int) $counts['rejected'] ?></strong>
+      Elvetett: <strong><?= (int) $counts['rejected'] ?></strong> ·
+      Duplikátum: <strong><?= (int) $counts['duplicate'] ?></strong>
     </p>
 
-    <?php if ($msg !== ''): ?><div class="admin-msg"><?= h($msg) ?></div><?php endif; ?>
+    <?php if ($msg !== ''): ?>
+      <div class="admin-msg">
+        <?= h($msg) ?>
+        <?php if ($report): ?>
+          <ul class="admin-dedup-list">
+            <?php foreach ($report as $line): ?><li><?= h($line) ?></li><?php endforeach; ?>
+          </ul>
+        <?php endif; ?>
+      </div>
+    <?php endif; ?>
     <?php if ($err !== ''): ?><div class="admin-error"><?= h($err) ?></div><?php endif; ?>
 
     <form method="post" action="jeloltek.php" class="admin-import">
@@ -171,6 +241,15 @@ $cssVer = @filemtime(__DIR__ . '/../assets/style.css') ?: time();
         <button type="submit" class="btn btn--primary">Beolvasás</button>
       </div>
       <span class="admin-note">Tipp: egy konkrét esemény oldalát add meg (nem listaoldalt). A találat jelöltként jelenik meg lent.</span>
+    </form>
+
+    <form method="post" action="jeloltek.php" class="admin-actform admin-dedup-form"
+          onsubmit="return confirm('Kiszűröd a duplikátumokat? (Nem végleges törlés: duplicate státuszt kapnak.)')">
+      <input type="hidden" name="csrf" value="<?= h($csrf) ?>">
+      <input type="hidden" name="action" value="dedup">
+      <button class="admin-btn" type="submit">Duplikátumok kiszűrése</button>
+      <span class="admin-note">Azonos cím + nap + város jelöltekből a legteljesebbet tartja meg; a már
+        felvett eseményekkel egyezőket is kiszűri. Az eredmény tételesen megjelenik.</span>
     </form>
 
     <?php if (!$rows): ?>
