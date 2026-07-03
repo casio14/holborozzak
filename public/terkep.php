@@ -106,7 +106,10 @@ require __DIR__ . '/partials/header.php';
     }
     var dotIcon = L.divIcon({ className: 'grape-dot', html: '', iconSize: [18, 18], iconAnchor: [9, 9], popupAnchor: [0, -10] });
 
-    var map = L.map('map', { scrollWheelZoom: true }).setView([47.16, 19.50], 7);
+    // closePopupOnClick: false — mobilon a nagy popup auto-pan-je után az érintés
+    // „szellem-kattintásként" a térképre érkezne, és azonnal bezárná a kártyát.
+    // Bezárás: az X gombbal vagy másik jelölő megnyitásával.
+    var map = L.map('map', { scrollWheelZoom: true, closePopupOnClick: false }).setView([47.16, 19.50], 7);
     L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
       maxZoom: 19, subdomains: 'abcd',
       attribution: '&copy; OpenStreetMap, &copy; CARTO'
@@ -139,38 +142,14 @@ require __DIR__ . '/partials/header.php';
       return h;
     }
 
-    // Mobilon NEM lebegő popupot nyitunk, hanem alulról felcsúszó kártya-lapot:
-    // a kis (fél képernyős) térképen a nagy popup + auto-pan törékeny (azonnal
-    // záródó kártya). A lap a térkép mozgásától teljesen független.
-    var MOBILE = window.matchMedia('(max-width: 860px)').matches;
-
-    var sheet = null;
-    function closeSheet() { if (sheet) { sheet.hidden = true; } }
-    function openSheet(p) {
-      if (!sheet) {
-        sheet = document.createElement('div');
-        sheet.className = 'map-sheet';
-        sheet.innerHTML = '<div class="map-sheet__backdrop"></div>'
-          + '<div class="map-sheet__panel"><button type="button" class="map-sheet__close" aria-label="Bezárás">&times;</button>'
-          + '<div class="map-sheet__body"></div></div>';
-        document.body.appendChild(sheet);
-        sheet.querySelector('.map-sheet__backdrop').addEventListener('click', closeSheet);
-        sheet.querySelector('.map-sheet__close').addEventListener('click', closeSheet);
-        document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { closeSheet(); } });
-      }
-      sheet.querySelector('.map-sheet__body').innerHTML = popupHtml(p);
-      sheet.hidden = false;
-    }
+    // Mobilon keskenyebb kártya: jobban elfér a kisebb térképen, kevesebb auto-pan kell
+    var POPUP_W = window.matchMedia('(max-width: 560px)').matches ? 224 : 260;
 
     var bounds = [];
     var markers = [];
     pts.forEach(function (p) {
-      var m = L.marker([p.lat, p.lng], { icon: dotIcon });
-      if (MOBILE) {
-        m.on('click', function () { openSheet(p); });
-      } else {
-        m.bindPopup(popupHtml(p), { maxWidth: 260, minWidth: 260, className: 'event-popup' });
-      }
+      var m = L.marker([p.lat, p.lng], { icon: dotIcon })
+        .bindPopup(popupHtml(p), { maxWidth: POPUP_W, minWidth: POPUP_W, className: 'event-popup' });
       cluster.addLayer(m);
       markers.push(m);
       bounds.push([p.lat, p.lng]);
@@ -182,15 +161,12 @@ require __DIR__ . '/partials/header.php';
     // (JS nélkül a lista-elem az esemény oldalára visz — progresszív fejlesztés.)
     document.querySelectorAll('.map-item').forEach(function (a) {
       a.addEventListener('click', function (e) {
-        var i = parseInt(a.getAttribute('data-i'), 10);
-        var m = markers[i];
+        var m = markers[parseInt(a.getAttribute('data-i'), 10)];
         if (!m) { return; }
         e.preventDefault();
         document.querySelectorAll('.map-item.is-active').forEach(function (x) { x.classList.remove('is-active'); });
         a.classList.add('is-active');
-        cluster.zoomToShowLayer(m, function () {
-          if (MOBILE) { openSheet(pts[i]); } else { m.openPopup(); }
-        });
+        cluster.zoomToShowLayer(m, function () { m.openPopup(); });
       });
     });
 
