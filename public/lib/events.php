@@ -234,10 +234,11 @@ function listUrl(string $view, array $regions = [], array $cats = [], string $so
     return 'esemenyek.php' . ($p ? ('?' . http_build_query($p)) : '');
 }
 
-/** Esemény részletoldalának URL-je (relatív vagy abszolút, ha base/dir adott). */
+/** Esemény részletoldalának URL-je (relatív vagy abszolút, ha base/dir adott).
+ *  Szép URL: esemeny/<slug> — a .htaccess írja át az esemeny.php-ra. */
 function eventUrl(array $e, string $base = '', string $dir = ''): string
 {
-    return ($base . $dir) . ($base ? '/' : '') . 'esemeny.php?slug=' . rawurlencode($e['slug']);
+    return ($base . $dir) . ($base ? '/' : '') . 'esemeny/' . rawurlencode($e['slug']);
 }
 
 /** Egy esemény Schema.org Event objektuma (@context nélkül; ItemList-be vagy önállóan). */

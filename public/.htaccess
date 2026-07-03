@@ -4,3 +4,9 @@
 # Az ideiglenes almappás címen (kissptrk.hu/borozzak/) a Rackhost alapértelmezett
 # 404-e jelenik meg helyette — a végleges domainen ez az oldal lép életbe.
 ErrorDocument 404 /404.php
+
+# Szép esemény-URL: /esemeny/<slug> → esemeny.php?slug=<slug>
+# Relatív minta (nincs RewriteBase), így az ideiglenes almappás címen
+# (kissptrk.hu/borozzak/) és a végleges domain gyökerén is működik.
+RewriteEngine On
+RewriteRule ^esemeny/([a-z0-9-]+)/?$ esemeny.php?slug=$1 [L,QSA]

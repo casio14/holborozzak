@@ -30,7 +30,7 @@ try {
     $st = db()->query("SELECT slug, updated_at FROM events WHERE status = 'published' ORDER BY start_datetime DESC");
     foreach ($st as $e) {
         $urls[] = [
-            'loc'        => $u('esemeny.php?slug=' . rawurlencode((string) $e['slug'])),
+            'loc'        => $u('esemeny/' . rawurlencode((string) $e['slug'])),
             'lastmod'    => date('Y-m-d', strtotime((string) $e['updated_at']) ?: time()),
             'changefreq' => 'weekly',
             'priority'   => '0.8',

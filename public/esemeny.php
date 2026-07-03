@@ -11,6 +11,11 @@ $base = ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 
 $dir = rtrim(dirname($_SERVER['SCRIPT_NAME'] ?? '/'), '/');
 
 $slug = trim((string) ($_GET['slug'] ?? ''));
+// Tartalék: ha a szerver a /esemeny/<slug> kérést nem query-vel adta át
+// (pl. MultiViews), az útvonalból is kinyerjük a slugot.
+if ($slug === '' && preg_match('#/esemeny/([^/?]+)#', (string) ($_SERVER['REQUEST_URI'] ?? ''), $m)) {
+    $slug = trim(urldecode($m[1]));
+}
 $event = null;
 if ($slug !== '') {
     try {
@@ -41,6 +46,13 @@ if (!$event) {
 }
 
 // --- Megtalált esemény ---
+
+// A régi esemeny.php?slug=… cím 301-gyel a szép URL-re irányít (SEO: egyetlen
+// kanonikus cím, nincs duplikált tartalom). A naplózás előtt fut, ne számoljon duplán.
+if (strpos((string) ($_SERVER['REQUEST_URI'] ?? ''), 'esemeny.php') !== false) {
+    header('Location: ' . eventUrl($event, $base, $dir), true, 301);
+    exit;
+}
 
 // Megtekintés naplózása (analitika): bot-szűrt, hashelt IP-vel; hibája nem
 // akadályozhatja az oldal kiszolgálását.

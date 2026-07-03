@@ -53,7 +53,7 @@ try {
 if ($target === null || $target === ''
     || !filter_var($target, FILTER_VALIDATE_URL)
     || !preg_match('#^https?://#i', $target)) {
-    $back = $slug !== null ? ('esemeny.php?slug=' . rawurlencode($slug)) : $fallback;
+    $back = $slug !== null ? ('esemeny/' . rawurlencode($slug)) : $fallback;
     header('Location: ' . $back, true, 302);
     exit;
 }

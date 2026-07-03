@@ -23,8 +23,13 @@ $ogType  = $ogType  ?? 'website';
 $robots  = $robots  ?? 'index,follow';
 $activeNav = $activeNav ?? ''; // melyik menüpont aktív: esemenyek | naptar | terkep
 
+// Az oldal gyökere (ahol a PHP fájlok élnek) — a SCRIPT_NAME-ből, így a szép
+// URL-es (/esemeny/<slug>) kéréseknél is a valós könyvtárat adja. A <base> tag
+// erre mutat, ezért a relatív linkek/assetek a mélyebb útvonalú oldalakon is jók.
+$baseHref = $baseUrl . rtrim(dirname($_SERVER['SCRIPT_NAME'] ?? '/'), '/') . '/';
+
 // Alapértelmezett megosztókép (oldalanként felülírható az oldal $ogImage-ével)
-$ogImage = $ogImage ?? ($baseUrl . rtrim(dirname($_SERVER['SCRIPT_NAME'] ?? '/'), '/') . '/assets/hero.jpg');
+$ogImage = $ogImage ?? ($baseHref . 'assets/hero.jpg');
 
 // --- Strukturált adat: alap WebSite + Organization minden oldalon ---
 $defaultJsonLd = [
@@ -56,6 +61,7 @@ $jsVer  = @filemtime(__DIR__ . '/../assets/app.js') ?: time();
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <base href="<?= htmlspecialchars($baseHref, ENT_QUOTES) ?>">
   <title><?= htmlspecialchars($pageTitle, ENT_QUOTES) ?></title>
   <meta name="description" content="<?= htmlspecialchars($pageDescription, ENT_QUOTES) ?>">
   <meta name="robots" content="<?= htmlspecialchars($robots, ENT_QUOTES) ?>">
