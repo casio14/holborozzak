@@ -200,7 +200,12 @@ ezen mennek át. GDPR: nyers IP helyett napi sóval hashelt `ip_hash` (`app_salt
 configból; éles: `APP_SALT` secret, vagy a CI a DB jelszóból származtatja); botokat
 nem számol; `robots.txt` `Disallow: /go.php` + `rel="nofollow"`. **Süti nincs** (egyelőre):
 az egyedi látogató csak `ip_hash`-ből becsült — pontos méréshez később sütis `session_id`
-(consent-bannerrel). A `view`/impresszió-mérés még nincs bekötve.
+(consent-bannerrel). **`view`-mérés kész:** az `esemeny.php` részletoldal-megtekintéskor
+naplóz (ugyanazzal a `logInteraction()`-nel). Az impresszió-mérés (lista-megjelenések,
+`event_impressions_daily`) még nincs bekötve.
+**Admin statisztika kész:** `admin/statisztika.php` — időszak-fülek (7/30/90 nap/teljes),
+összesítő csempék (megtekintés/honlap-katt./jegy-katt./CTR + egyedi becslés),
+eseményenkénti táblázat CTR-rel, napi bontás (14 nap).
 
 Karakterkészlet: `utf8mb4`. Ismétlődő (évente megrendezett) eseménynél évente
 új sort veszünk fel (évszám a slugban).
