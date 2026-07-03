@@ -67,5 +67,50 @@ if (is_file($versionFile)) {
       </div>
     </div>
   </footer>
+
+  <?php /* Süti-sáv: csak amíg nincs döntés (hb_consent süti). Elfogadáskor a JS
+           anonim mérési azonosítót (hb_sid) állít be — személyes adat nélkül. */ ?>
+  <?php if (!isset($_COOKIE['hb_consent'])): ?>
+  <div class="cookie-bar" id="cookieBar" role="region" aria-label="Süti tájékoztató">
+    <p class="cookie-bar__text">🍪 Egyetlen anonim mérési sütit használnánk, hogy pontosabban
+      lássuk a látogatottságot — személyes adatot nem tárol, harmadik fél nem fér hozzá.
+      Részletek: <a href="adatvedelem.php">Adatkezelési tájékoztató</a>.</p>
+    <div class="cookie-bar__actions">
+      <button type="button" class="btn btn--primary cookie-bar__btn" id="cookieYes">Elfogadom</button>
+      <button type="button" class="btn cookie-bar__btn cookie-bar__btn--no" id="cookieNo">Nem fogadom el</button>
+    </div>
+  </div>
+  <?php endif; ?>
+  <script>
+  (function () {
+    function setCookie(n, v, days) {
+      var s = n + '=' + v + ';path=/;max-age=' + (days * 86400) + ';SameSite=Lax';
+      if (location.protocol === 'https:') { s += ';Secure'; }
+      document.cookie = s;
+    }
+    function getCookie(n) {
+      var m = document.cookie.match(new RegExp('(?:^|; )' + n + '=([^;]*)'));
+      return m ? m[1] : null;
+    }
+    // Anonim mérési azonosító (32 hex) — csak hozzájárulás után létezik
+    function ensureSid() {
+      if (/^[a-f0-9]{32}$/.test(getCookie('hb_sid') || '')) { return; }
+      var b = new Uint8Array(16), h = '', i;
+      if (window.crypto && crypto.getRandomValues) { crypto.getRandomValues(b); }
+      else { for (i = 0; i < 16; i++) { b[i] = Math.floor(Math.random() * 256); } }
+      for (i = 0; i < 16; i++) { h += (b[i] + 256).toString(16).slice(1); }
+      setCookie('hb_sid', h, 365);
+    }
+    if (getCookie('hb_consent') === '1') { ensureSid(); }
+    var bar = document.getElementById('cookieBar');
+    if (!bar) { return; }
+    document.getElementById('cookieYes').addEventListener('click', function () {
+      setCookie('hb_consent', '1', 180); ensureSid(); bar.remove();
+    });
+    document.getElementById('cookieNo').addEventListener('click', function () {
+      setCookie('hb_consent', '0', 180); setCookie('hb_sid', '', 0); bar.remove();
+    });
+  })();
+  </script>
 </body>
 </html>

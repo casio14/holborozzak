@@ -9,14 +9,14 @@ require __DIR__ . '/partials/header.php';
   <div class="container">
     <article class="legal">
       <h1>Adatkezelési tájékoztató</h1>
-      <p class="legal-effective">Hatályos: 2026. július 2. — Jelentős változás esetén ezt a
+      <p class="legal-effective">Hatályos: 2026. július 3. — Jelentős változás esetén ezt a
         tájékoztatót frissítjük, a dátum módosításával.</p>
 
       <div class="legal-summary" aria-label="Röviden">
         <div class="legal-summary__tile">
           <span class="i">🍪</span>
-          <b>Nincs süti</b>
-          <p>A nyilvános oldal nem használ sütiket.</p>
+          <b>Süti csak engedéllyel</b>
+          <p>Egy anonim mérési süti — csak ha elfogadod.</p>
         </div>
         <div class="legal-summary__tile">
           <span class="i">🔒</span>
@@ -48,12 +48,15 @@ require __DIR__ . '/partials/header.php';
         <h2>Milyen adatokat kezelünk?</h2>
 
         <h3>Látogatottsági statisztika</h3>
-        <p>Az eseményekhez tartozó kimenő kattintásoknál (jegyvásárlás, hivatalos oldal)
-          naplózzuk: a kattintás típusát és időpontját, a hivatkozó oldalt, a böngésző
-          technikai azonosítóját (user agent), valamint az IP-cím <strong>naponta változó
-          kulccsal képzett, visszafejthetetlen lenyomatát (hash)</strong>. A nyers IP-címet
-          nem tároljuk; a lenyomatok napok között nem kapcsolhatók össze, személyed
-          azonosítására nem alkalmasak. Ismert keresőrobotokat nem számolunk.</p>
+        <p>Az esemény-részletoldalak megtekintésénél és a kimenő kattintásoknál
+          (jegyvásárlás, hivatalos oldal) naplózzuk: a művelet típusát és időpontját, a
+          hivatkozó oldalt, a böngésző technikai azonosítóját (user agent), valamint az
+          IP-cím <strong>naponta változó kulccsal képzett, visszafejthetetlen lenyomatát
+          (hash)</strong>. A nyers IP-címet nem tároljuk; a lenyomatok napok között nem
+          kapcsolhatók össze, személyed azonosítására nem alkalmasak. Ismert
+          keresőrobotokat nem számolunk. Ha hozzájárultál a mérési sütihez (lásd a
+          Sütik szakaszt), a naplóbejegyzéshez a süti anonim azonosítója is
+          hozzákapcsolódik.</p>
 
         <h3>Hírlevél</h3>
         <p>Feliratkozáskor kezeljük az e-mail címedet, a feliratkozás időpontját és egy
@@ -79,6 +82,9 @@ require __DIR__ . '/partials/header.php';
           <li><strong>Statisztika:</strong> a weboldal működtetése, fejlesztése és a
             szervezők felé készülő látogatottsági kimutatások — jogalap: az adatkezelő
             jogos érdeke (GDPR 6. cikk (1) f)); az adatok személyhez nem köthetők.</li>
+          <li><strong>Mérési süti:</strong> a visszatérő látogatók pontosabb, anonim
+            mérése — jogalap: önkéntes hozzájárulásod (GDPR 6. cikk (1) a)), amelyet a
+            süti-sávon adsz meg, és a sütik törlésével bármikor visszavonhatsz.</li>
           <li><strong>Hírlevél:</strong> tájékoztatás a közelgő borrendezvényekről —
             jogalap: önkéntes hozzájárulásod (GDPR 6. cikk (1) a)), amelyet a
             leiratkozással bármikor visszavonhatsz.</li>
@@ -90,10 +96,22 @@ require __DIR__ . '/partials/header.php';
       <div class="legal-card">
         <span class="legal-card__num" aria-hidden="true">4</span>
         <h2>Sütik (cookie-k)</h2>
-        <p>A nyilvános weboldal <strong>nem használ sütiket</strong>, és nem futtat
-          harmadik féltől származó hirdetési vagy követő kódot. Ha a jövőben süti-alapú
-          mérést vezetnénk be, azt előzetes hozzájárulást kérő süti-sávval és e
-          tájékoztató frissítésével tesszük.</p>
+        <p>A weboldal <strong>kizárólag hozzájárulásod esetén</strong> használ egyetlen,
+          saját (first-party) mérési sütit — harmadik féltől származó hirdetési vagy
+          követő kódot nem futtatunk.</p>
+        <ul>
+          <li><strong><code>hb_consent</code></strong> — a süti-sávon hozott döntésedet
+            (elfogadás/elutasítás) jegyzi meg 180 napig, hogy ne kérdezzük újra.</li>
+          <li><strong><code>hb_sid</code></strong> — csak elfogadás esetén jön létre:
+            véletlenszerűen generált, <strong>anonim mérési azonosító</strong> (365 nap),
+            amely nem tartalmaz és nem is kapcsolható személyes adathoz. Arra szolgál,
+            hogy a látogatottsági statisztikában a visszatérő látogatókat pontosabban,
+            duplaszámolás nélkül lássuk.</li>
+        </ul>
+        <p>Ha a sávon a „Nem fogadom el" lehetőséget választod, mérési süti nem jön
+          létre, és az oldal minden funkciója ugyanúgy működik. Döntésedet később a
+          böngésző sütijeinek törlésével vonhatod vissza vagy változtathatod meg —
+          ekkor a süti-sáv újra megjelenik.</p>
       </div>
 
       <div class="legal-card">
