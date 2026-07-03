@@ -198,14 +198,21 @@ Táblák:
 SOHA nem a query stringből → nincs nyílt átirányítás). Az `esemeny.php` kimenő gombjai
 ezen mennek át. GDPR: nyers IP helyett napi sóval hashelt `ip_hash` (`app_salt` a
 configból; éles: `APP_SALT` secret, vagy a CI a DB jelszóból származtatja); botokat
-nem számol; `robots.txt` `Disallow: /go.php` + `rel="nofollow"`. **Süti nincs** (egyelőre):
-az egyedi látogató csak `ip_hash`-ből becsült — pontos méréshez később sütis `session_id`
-(consent-bannerrel). **`view`-mérés kész:** az `esemeny.php` részletoldal-megtekintéskor
+nem számol; `robots.txt` `Disallow: /go.php` + `rel="nofollow"`.
+**Sütis mérés kész (consent-alapú):** a lábléc süti-sávja (`partials/footer.php`)
+kér hozzájárulást; elfogadáskor JS anonim mérési azonosítót állít be
+(`hb_sid`, 32 hex, 365 nap; a döntés `hb_consent`, 180 nap). A `logInteraction()`
+CSAK `hb_consent=1` + formátum-valid `hb_sid` esetén tölti a `session_id` oszlopot —
+ez adja a napokon átívelő pontos egyedi/visszatérő mérést; elutasítóknál marad az
+`ip_hash`-becslés. Az adatvédelmi tájékoztató (`adatvedelem.php`) sütik szakasza
+ehhez igazítva. **`view`-mérés kész:** az `esemeny.php` részletoldal-megtekintéskor
 naplóz (ugyanazzal a `logInteraction()`-nel). Az impresszió-mérés (lista-megjelenések,
 `event_impressions_daily`) még nincs bekötve.
 **Admin statisztika kész:** `admin/statisztika.php` — időszak-fülek (7/30/90 nap/teljes),
-összesítő csempék (megtekintés/honlap-katt./jegy-katt./CTR + egyedi becslés),
-eseményenkénti táblázat CTR-rel, napi bontás (14 nap).
+összesítő csempék (megtekintés/honlap-katt./jegy-katt./CTR; egyedi =
+`COALESCE(session_id, ip_hash)`), „Sütis látogató-mérés" blokk (mért látogató,
+visszatérő, látogató-konverzió, esemény/látogató), eseményenkénti táblázat CTR-rel,
+napi bontás (14 nap), hivatkozó domainek (saját domain kiszűrve).
 
 Karakterkészlet: `utf8mb4`. Ismétlődő (évente megrendezett) eseménynél évente
 új sort veszünk fel (évszám a slugban).

@@ -1700,6 +1700,22 @@ main { flex: 1 0 auto; }
 .admin-pill { display: inline-block; margin-left: .4rem; padding: .1rem .5rem; border-radius: 999px; font-size: .72rem; font-weight: 700; }
 .admin-pill--draft { background: #f3ead6; color: #7a5a12; }
 
+/* Süti-sáv (consent) */
+.cookie-bar {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 3000;
+  display: flex; align-items: center; justify-content: center; gap: 1rem; flex-wrap: wrap;
+  padding: .8rem 1rem; background: var(--wine-900); color: var(--cream);
+  box-shadow: 0 -6px 20px rgba(0, 0, 0, .25);
+}
+.cookie-bar__text { margin: 0; font-size: .88rem; max-width: 640px; }
+.cookie-bar__text a { color: var(--gold); }
+.cookie-bar__actions { display: flex; gap: .5rem; flex-wrap: wrap; }
+.cookie-bar__btn { font-size: .85rem; padding: .5rem .9rem; }
+.cookie-bar__btn--no {
+  background: transparent; color: var(--cream); border: 1px solid rgba(255, 255, 255, .45);
+}
+.cookie-bar__btn--no:hover { border-color: var(--gold); color: var(--gold); }
+
 /* Admin: statisztika (csempék + számoszlopok) */
 .admin-stats {
   display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
