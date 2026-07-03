@@ -1460,6 +1460,9 @@ main { flex: 1 0 auto; }
   margin: 0;
   width: 260px !important;
 }
+/* Ha a kártya nem fér ki (maxHeight), belül görgethető — a Leaflet szürke
+   elválasztó szegélyei nélkül */
+.event-popup .leaflet-popup-scrolled { border-top: 0; border-bottom: 0; }
 /* Mobilon kisebb kártya (a JS is 224px-szel nyitja) + alacsonyabb kép */
 @media (max-width: 560px) {
   .event-popup .leaflet-popup-content { width: 224px !important; }

@@ -119,6 +119,9 @@ require __DIR__ . '/partials/header.php';
     var cluster = L.markerClusterGroup({
       showCoverageOnHover: false,
       maxClusterRadius: 50,
+      // A nagy kártya auto-pan-je a jelölőt a látótérből kitolhatja; alapból a
+      // cluster ilyenkor eltávolítja a jelölőt, ami azonnal bezárja a popupját.
+      removeOutsideVisibleBounds: false,
       iconCreateFunction: function (c) { return clusterIcon(c.getChildCount()); }
     });
 
@@ -144,12 +147,16 @@ require __DIR__ . '/partials/header.php';
 
     // Mobilon keskenyebb kártya: jobban elfér a kisebb térképen, kevesebb auto-pan kell
     var POPUP_W = window.matchMedia('(max-width: 560px)').matches ? 224 : 260;
+    // A kártya soha ne legyen magasabb a térképnél (mobilon 48vh): ha nem fér ki,
+    // görgethető lesz, és az auto-pan-nek sem kell a jelölőt a látótérből kitolnia.
+    var mapEl = document.getElementById('map');
+    var POPUP_MAX_H = Math.max(200, Math.round((mapEl ? mapEl.clientHeight : 400) * 0.72));
 
     var bounds = [];
     var markers = [];
     pts.forEach(function (p) {
       var m = L.marker([p.lat, p.lng], { icon: dotIcon })
-        .bindPopup(popupHtml(p), { maxWidth: POPUP_W, minWidth: POPUP_W, className: 'event-popup' });
+        .bindPopup(popupHtml(p), { maxWidth: POPUP_W, minWidth: POPUP_W, maxHeight: POPUP_MAX_H, className: 'event-popup' });
       cluster.addLayer(m);
       markers.push(m);
       bounds.push([p.lat, p.lng]);
