@@ -37,7 +37,7 @@ A weboldal címe: **holborozzak.hu**
   - Jelszó: **GitHub repository secret**-ben (`FTP_PASSWORD`), NEM a kódban.
   - Megjegyzés: a domain `holborozzak.hu`, de a könyvtár neve `kissptrk.hu` —
     ellenőrizni, hogy ez-e a `holborozzak.hu` document rootja.
-- **GitHub repo:** `git@github.com:casio14/borozzak.git`
+- **GitHub repo:** `git@github.com:casio14/holborozzak.git` (korábban `borozzak` néven)
 - **Deploy:** GitHub Actions (`.github/workflows/deploy.yml`) → `main`-re
   pusholáskor a `public/` mappa tartalmát felmásolja a webszerverre
   (`SamKirkland/FTP-Deploy-Action`, csak a változott fájlok).
