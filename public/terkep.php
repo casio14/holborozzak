@@ -108,8 +108,18 @@ require __DIR__ . '/partials/header.php';
 
     // closePopupOnClick: false — mobilon a nagy popup auto-pan-je után az érintés
     // „szellem-kattintásként" a térképre érkezne, és azonnal bezárná a kártyát.
-    // Bezárás: az X gombbal vagy másik jelölő megnyitásával.
+    // Helyette saját kezelő zár (lásd lent), ami a megnyitás utáni pillanatban
+    // érkező kattintást figyelmen kívül hagyja.
     var map = L.map('map', { scrollWheelZoom: true, closePopupOnClick: false }).setView([47.16, 19.50], 7);
+
+    // Térképre (nem jelölőre) kattintva is záródjon a kártya — de a megnyitást
+    // követő „szellem-kattintás" ne zárja be azonnal.
+    var popupOpenedAt = 0;
+    map.on('popupopen', function () { popupOpenedAt = Date.now(); });
+    map.on('click', function () {
+      if (Date.now() - popupOpenedAt < 500) { return; }
+      map.closePopup();
+    });
     L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
       maxZoom: 19, subdomains: 'abcd',
       attribution: '&copy; OpenStreetMap, &copy; CARTO'
