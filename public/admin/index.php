@@ -57,7 +57,7 @@ $cssVer = @filemtime(__DIR__ . '/../assets/style.css') ?: time();
 <body class="admin-body">
   <div class="admin-bar">
     <span class="admin-bar__title">holborozzak.hu — admin</span>
-    <span><a href="jeloltek.php">Jelöltek</a> &nbsp;·&nbsp; <a href="feliratkozok.php">Feliratkozók</a> &nbsp;·&nbsp; <a href="../" target="_blank">Oldal megtekintése ↗</a> &nbsp;·&nbsp; <a href="logout.php">Kilépés</a></span>
+    <span><a href="jeloltek.php">Jelöltek</a> &nbsp;·&nbsp; <a href="feliratkozok.php">Feliratkozók</a> &nbsp;·&nbsp; <a href="statisztika.php">Statisztika</a> &nbsp;·&nbsp; <a href="../" target="_blank">Oldal megtekintése ↗</a> &nbsp;·&nbsp; <a href="logout.php">Kilépés</a></span>
   </div>
 
   <main class="admin-main">
