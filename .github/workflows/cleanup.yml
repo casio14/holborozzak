@@ -1,0 +1,36 @@
+name: Szerver-takarítás (árvafájlok)
+
+# Egyszeri, KÉZI indítású takarítás: az első hibás deploy árvafájljait törli.
+# Az FTP-login a kissptrk.hu docrootjába érkezik; az árva fa ott a relatív
+# `web/` könyvtár (a szerveren: /web/kissptrk.hu/web/kissptrk.hu/borozzak/).
+# Az élő oldal a `borozzak/` alatt van — ahhoz NEM nyúlunk.
+
+on:
+  workflow_dispatch:
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: lftp telepítése
+        run: sudo apt-get update -q && sudo apt-get install -y -q lftp
+
+      - name: Árva web/ könyvtár listázása és törlése
+        env:
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+        run: |
+          set -uo pipefail
+          # A Rackhost FTP nem tud TLS-t (AUTH TLS -> 500), ezért sima FTP.
+          lftp -u "c105746ptrk,$FTP_PASSWORD" -e "
+            set ftp:ssl-allow no;
+            set cmd:fail-exit no;
+            echo '=== FTP-gyoker ELOTTE ===';
+            cls -la;
+            echo '=== Torlendo web/ fa tartalma ===';
+            find web;
+            echo '=== Torles: rm -rf web ===';
+            rm -rf web;
+            echo '=== FTP-gyoker UTANA ===';
+            cls -la;
+            bye
+          " ftp://wh11.rackhost.hu
