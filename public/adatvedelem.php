@@ -132,16 +132,9 @@ require __DIR__ . '/partials/header.php';
           Hozzájáruláson alapuló adatkezelésnél (hírlevél) a hozzájárulást bármikor
           visszavonhatod. Kérelmedet az
           <a href="mailto:info@holborozzak.hu">info@holborozzak.hu</a> címen fogadjuk,
-          és legkésőbb 30 napon belül válaszolunk.</p>
-      </div>
-
-      <div class="legal-card">
-        <span class="legal-card__num" aria-hidden="true">8</span>
-        <h2>Jogorvoslat</h2>
-        <p>Ha úgy érzed, hogy adataid kezelése sérti a jogszabályokat, panaszt tehetsz a
-          Nemzeti Adatvédelmi és Információszabadság Hatóságnál (NAIH) — 1055 Budapest,
-          Falk Miksa utca 9–11.; <a href="mailto:ugyfelszolgalat@naih.hu">ugyfelszolgalat@naih.hu</a>;
-          naih.hu —, vagy bírósághoz fordulhatsz.</p>
+          és legkésőbb 30 napon belül válaszolunk. Panasszal a Nemzeti Adatvédelmi és
+          Információszabadság Hatósághoz (<a href="https://naih.hu" target="_blank" rel="noopener">naih.hu</a>)
+          fordulhatsz.</p>
       </div>
     </article>
   </div>
