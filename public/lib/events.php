@@ -594,15 +594,27 @@ function isLikelyBot(string $ua): bool
 }
 
 /**
- * Egy kimenő kattintás naplózása. GDPR: nyers IP-t NEM tárolunk, csak napi sóval
- * hashelt értéket (napon belüli dedup-hoz, napok közt nem összeköthető). Botokat
- * nem számolunk. Soha nem dob kifelé — a hívó (go.php) így mindig át tud irányítani.
+ * Interakció (view/kattintás) naplózása. GDPR: nyers IP-t NEM tárolunk, csak napi
+ * sóval hashelt értéket (napon belüli dedup-hoz, napok közt nem összeköthető).
+ * Ha a látogató hozzájárult a mérési sütihez (hb_consent=1), az anonim
+ * session-azonosítót (hb_sid) is eltároljuk — ez adja a pontos egyedi/visszatérő
+ * mérést. Botokat nem számolunk. Soha nem dob kifelé — a hívó (go.php) így
+ * mindig át tud irányítani.
  */
 function logInteraction(PDO $pdo, int $eventId, string $type): void
 {
     $ua = substr((string) ($_SERVER['HTTP_USER_AGENT'] ?? ''), 0, 255);
     if (isLikelyBot($ua)) {
         return;
+    }
+
+    // Mérési süti — CSAK érvényes hozzájárulás mellett, szigorú formátum-ellenőrzéssel
+    $sid = null;
+    if ((string) ($_COOKIE['hb_consent'] ?? '') === '1') {
+        $c = (string) ($_COOKIE['hb_sid'] ?? '');
+        if (preg_match('/^[a-f0-9]{32}$/', $c)) {
+            $sid = $c;
+        }
     }
 
     $ip = (string) ($_SERVER['HTTP_CF_CONNECTING_IP']
@@ -619,8 +631,8 @@ function logInteraction(PDO $pdo, int $eventId, string $type): void
         : null;
 
     $st = $pdo->prepare(
-        'INSERT INTO event_interactions (event_id, type, referrer, ip_hash, user_agent)
-         VALUES (?, ?, ?, ?, ?)'
+        'INSERT INTO event_interactions (event_id, type, session_id, referrer, ip_hash, user_agent)
+         VALUES (?, ?, ?, ?, ?, ?)'
     );
-    $st->execute([$eventId, $type, $referrer, $ipHash, $ua !== '' ? $ua : null]);
+    $st->execute([$eventId, $type, $sid, $referrer, $ipHash, $ua !== '' ? $ua : null]);
 }
