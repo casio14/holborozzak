@@ -35,7 +35,24 @@ $visitor = ['sessions' => 0, 'returning' => 0, 'viewers' => 0, 'clickers' => 0, 
 $rows = [];
 $daily = [];
 $referrers = [];
+$aiTotals = ['interactions' => 0, 'unique' => 0, 'clicks' => 0];
+$aiRows = [];
 $dbError = false;
+
+// Ismert AI-asszisztens hivatkozók (referrer). Ha valaki egy AI válaszából kattint
+// az oldalra, a böngésző ezt a hostot küldi — ez a mérhető „AI ajánlotta" jel.
+$AI_LIKE = "(i.referrer LIKE '%chatgpt.com%' OR i.referrer LIKE '%openai.com%'"
+    . " OR i.referrer LIKE '%perplexity.ai%' OR i.referrer LIKE '%gemini.google.com%'"
+    . " OR i.referrer LIKE '%bard.google.com%' OR i.referrer LIKE '%copilot.microsoft.com%'"
+    . " OR i.referrer LIKE '%claude.ai%')";
+// Platform-név normalizálás (megjelenítéshez)
+$AI_CASE = "CASE
+    WHEN i.referrer LIKE '%chatgpt.com%' OR i.referrer LIKE '%openai.com%' THEN 'ChatGPT'
+    WHEN i.referrer LIKE '%perplexity.ai%' THEN 'Perplexity'
+    WHEN i.referrer LIKE '%gemini.google.com%' OR i.referrer LIKE '%bard.google.com%' THEN 'Google Gemini'
+    WHEN i.referrer LIKE '%copilot.microsoft.com%' THEN 'Microsoft Copilot'
+    WHEN i.referrer LIKE '%claude.ai%' THEN 'Claude'
+    ELSE 'Egyéb AI' END";
 try {
     $pdo = db();
 
@@ -118,6 +135,28 @@ try {
          ORDER BY c DESC
          LIMIT 15"
     )->fetchAll();
+
+    // AI-ajánlások: hány látogató érkezett AI-asszisztensből (referrer alapján)
+    $whereAi = $where !== '' ? $where . ' AND ' . $AI_LIKE : 'WHERE ' . $AI_LIKE;
+    $at = $pdo->query(
+        "SELECT COUNT(*) AS c, COUNT(DISTINCT {$UID}) AS u,
+                SUM(i.type IN ('click_website','click_ticket')) AS clk
+         FROM event_interactions i {$whereAi}"
+    )->fetch();
+    if ($at) {
+        $aiTotals['interactions'] = (int) $at['c'];
+        $aiTotals['unique']       = (int) $at['u'];
+        $aiTotals['clicks']       = (int) ($at['clk'] ?? 0);
+    }
+    // Platformonkénti bontás
+    $aiRows = $pdo->query(
+        "SELECT {$AI_CASE} AS ai, COUNT(*) AS c,
+                COUNT(DISTINCT {$UID}) AS u,
+                SUM(i.type IN ('click_website','click_ticket')) AS clk
+         FROM event_interactions i {$whereAi}
+         GROUP BY ai
+         ORDER BY c DESC"
+    )->fetchAll();
 } catch (Throwable $e) {
     error_log('admin statisztika DB hiba: ' . $e->getMessage());
     $dbError = true;
@@ -185,6 +224,57 @@ $cssVer = @filemtime(__DIR__ . '/../assets/style.css') ?: time();
         <span class="admin-stat__sub"><?= number_format($clicksTotal, 0, ',', ' ') ?> kattintás összesen</span>
       </div>
     </div>
+
+    <h2 class="admin-h2">🤖 AI-ajánlások <span class="admin-stat__sub">(látogatók, akik egy AI-asszisztens válaszából érkeztek)</span></h2>
+    <div class="admin-stats">
+      <div class="admin-stat">
+        <span class="admin-stat__num"><?= number_format($aiTotals['interactions'], 0, ',', ' ') ?></span>
+        <span class="admin-stat__label">AI-ból érkezés</span>
+        <span class="admin-stat__sub">megtekintés + kattintás AI-linkből</span>
+      </div>
+      <div class="admin-stat">
+        <span class="admin-stat__num">~<?= number_format($aiTotals['unique'], 0, ',', ' ') ?></span>
+        <span class="admin-stat__label">Egyedi AI-látogató</span>
+        <span class="admin-stat__sub">különböző látogató AI-ajánlásból</span>
+      </div>
+      <div class="admin-stat">
+        <span class="admin-stat__num"><?= number_format($aiTotals['clicks'], 0, ',', ' ') ?></span>
+        <span class="admin-stat__label">Továbbkattintás</span>
+        <span class="admin-stat__sub">AI-látogatóból a szervező oldalára</span>
+      </div>
+    </div>
+    <?php if ($aiRows): ?>
+      <table class="admin-table admin-table--narrow">
+        <thead>
+          <tr>
+            <th>AI-asszisztens</th>
+            <th class="admin-num">Érkezés</th>
+            <th class="admin-num">Egyedi látogató</th>
+            <th class="admin-num">Továbbkatt.</th>
+          </tr>
+        </thead>
+        <tbody>
+          <?php foreach ($aiRows as $r): ?>
+            <tr>
+              <td><?= h($r['ai']) ?></td>
+              <td class="admin-num"><?= number_format((int) $r['c'], 0, ',', ' ') ?></td>
+              <td class="admin-num">~<?= number_format((int) $r['u'], 0, ',', ' ') ?></td>
+              <td class="admin-num"><?= number_format((int) $r['clk'], 0, ',', ' ') ?></td>
+            </tr>
+          <?php endforeach; ?>
+        </tbody>
+      </table>
+    <?php else: ?>
+      <div class="admin-empty">Ebben az időszakban még nem érkezett látogató azonosítható
+        AI-asszisztensből. Ahogy a ChatGPT, Perplexity, Gemini stb. elkezdi ajánlani az
+        oldalt és a felhasználók rákattintanak, itt fog megjelenni.</div>
+    <?php endif; ?>
+    <p class="admin-note">Ez azt méri, hányan <strong>kattintottak át</strong> egy
+      AI-asszisztens (ChatGPT, Perplexity, Google Gemini, Microsoft Copilot, Claude)
+      válaszából az oldalra — ez a legmegbízhatóbb mérhető jele annak, hogy az AI ajánlotta
+      a holborozzak.hu-t. Amikor egy AI csak <em>megemlíti</em> az oldalt kattintás nélkül,
+      az technikailag nem mérhető. (A Google AI Overviews a sima <code>google.com</code>
+      hivatkozóként érkezik, ezért nem különíthető el.)</p>
 
     <h2 class="admin-h2">Sütis látogató-mérés <span class="admin-stat__sub">(csak a mérési sütit elfogadó látogatók — napokon átívelően pontos)</span></h2>
     <div class="admin-stats">
