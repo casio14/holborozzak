@@ -148,6 +148,10 @@ jobs:
           # egy felesleges 'web/holborozzak.hu/' alkönyvtárba tenné a fájlokat.
           local-dir: ./public/
           server-dir: ./
+          # Friss szinkron-állapot fájlnév: a kézi törlések után garantálja a teljes
+          # újratöltést (a régi állapotfájl kihagyta volna a törölt fájlokat). Nem
+          # romboló: csak feltölt, semmit nem töröl a szerverről.
+          state-name: .ftp-deploy-sync-state-2.json
           exclude: |
             **/.git*
             **/.git*/**
