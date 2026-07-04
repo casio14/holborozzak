@@ -75,18 +75,11 @@ require __DIR__ . '/partials/header.php';
 
       <section class="legal-sec">
         <h2>Sütik (cookie-k)</h2>
-        <p>A weboldalon <strong>kizárólag hozzájárulásod esetén</strong> helyezünk el egy
-          saját mérési sütit — reklámozó vagy követő sütit nem használunk.</p>
-        <ul>
-          <li><strong><code>hb_consent</code></strong> — megjegyzi, mit válaszoltál a
-            süti-kérdésre (elfogadtad vagy nem), így 180 napig nem kérdezzük meg újra.</li>
-          <li><strong><code>hb_sid</code></strong> — csak elfogadás esetén jön létre: egy
-            véletlenszerű kód (365 napig érvényes), amely nem árulja el, ki vagy — csak
-            annyit segít, hogy lássuk, ha valaki visszatér az oldalra.</li>
-        </ul>
-        <p>Ha a „Nem fogadom el" lehetőséget választod, nem jön létre mérési süti, és az
-          oldal minden funkciója ugyanúgy működik. Döntésedet később a böngésződ sütijeinek
-          törlésével bármikor megváltoztathatod — ekkor a kérdés újra megjelenik.</p>
+        <p>A weboldal egy anonim mérési sütit használ, hogy meg tudjuk különböztetni a
+          visszatérő látogatókat — ezt csak a süti-sávon adott hozzájárulásod esetén helyezzük
+          el. Ez a süti nem tartalmaz személyes adatot, és legfeljebb 365 napig marad a
+          böngésződben. A hozzájárulást a sütik törlésével bármikor visszavonhatod; ha nem
+          fogadod el, az oldal minden funkciója ugyanúgy működik.</p>
       </section>
 
       <section class="legal-sec">
