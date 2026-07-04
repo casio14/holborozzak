@@ -10,7 +10,7 @@ return [
         'host' => 'mysql.rackhost.hu',
         'port' => 3306,
         'name' => 'c105746holborozzak',
-        'user' => 'c105746ptrk',
+        'user' => 'c105746patrik',
         'pass' => '', // <- ide a jelszó (lokálisan); éles: a CI tölti ki
     ],
     // Titkos „só" az IP-hasheléshez (kattintás-naplózó). Éles: APP_SALT secret.

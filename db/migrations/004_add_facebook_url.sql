@@ -4,7 +4,7 @@
 -- A részletoldalon „Facebook-esemény" gomb; a beküldő/admin űrlapon megadható.
 --
 -- FIGYELEM: egyszer futtatandó (MySQL-ben nincs ADD COLUMN IF NOT EXISTS).
--- Futtatás: mysql -h mysql.rackhost.hu -u c105746ptrk -p c105746holborozzak < db/migrations/004_add_facebook_url.sql
+-- Futtatás: mysql -h mysql.rackhost.hu -u c105746patrik -p c105746holborozzak < db/migrations/004_add_facebook_url.sql
 
 SET NAMES utf8mb4;
 

@@ -5,7 +5,7 @@
 -- hanem ide, 'new' státusszal. Az adminban jóváhagyva belőlük draft event készül.
 --
 -- FIGYELEM: egyszer futtatandó. phpMyAdmin → Importálás, vagy:
---   mysql -h mysql.rackhost.hu -u c105746ptrk -p c105746holborozzak < db/migrations/005_add_event_candidates.sql
+--   mysql -h mysql.rackhost.hu -u c105746patrik -p c105746holborozzak < db/migrations/005_add_event_candidates.sql
 
 SET NAMES utf8mb4;
 

@@ -8,7 +8,7 @@
 -- Ha újra lefuttatnád és már léteznek az oszlopok, „Duplicate column" hibát ad — ez normális.
 --
 -- Futtatás:
---   mysql -h mysql.rackhost.hu -u c105746ptrk -p c105746holborozzak < db/migrations/002_add_wine_region_images.sql
+--   mysql -h mysql.rackhost.hu -u c105746patrik -p c105746holborozzak < db/migrations/002_add_wine_region_images.sql
 -- vagy phpMyAdmin → Importálás.
 
 SET NAMES utf8mb4;

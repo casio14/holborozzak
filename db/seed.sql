@@ -1,6 +1,6 @@
 -- holborozzak.hu — minta események (seed)
 -- Futtatás a séma (schema.sql) UTÁN:
---   mysql -h mysql.rackhost.hu -u c105746ptrk -p c105746holborozzak < db/seed.sql
+--   mysql -h mysql.rackhost.hu -u c105746patrik -p c105746holborozzak < db/seed.sql
 --   vagy phpMyAdmin → Importálás.
 -- Újra lefuttatható (INSERT IGNORE a slug egyediségére).
 -- A kép most placeholder (assets/hero.jpg); valódi képek később.

@@ -8,7 +8,7 @@
 -- Ha az oszlopok már léteznek, „Duplicate column" hibát ad — ez normális.
 --
 -- Futtatás:
---   mysql -h mysql.rackhost.hu -u c105746ptrk -p c105746holborozzak < db/migrations/003_add_event_submitter.sql
+--   mysql -h mysql.rackhost.hu -u c105746patrik -p c105746holborozzak < db/migrations/003_add_event_submitter.sql
 -- vagy phpMyAdmin → Importálás.
 
 SET NAMES utf8mb4;

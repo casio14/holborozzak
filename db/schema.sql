@@ -3,7 +3,7 @@
 --
 -- Futtatás:
 --   - phpMyAdminban: Importálás fül → ezt a fájlt
---   - vagy parancssorból: mysql -h mysql.rackhost.hu -u c105746ptrk -p c105746holborozzak < db/schema.sql
+--   - vagy parancssorból: mysql -h mysql.rackhost.hu -u c105746patrik -p c105746holborozzak < db/schema.sql
 
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;

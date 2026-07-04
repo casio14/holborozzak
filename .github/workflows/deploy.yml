@@ -111,7 +111,7 @@ jobs:
             echo "        'host' => 'mysql.rackhost.hu',"
             echo "        'port' => 3306,"
             echo "        'name' => 'c105746holborozzak',"
-            echo "        'user' => 'c105746ptrk',"
+            echo "        'user' => 'c105746patrik',"
             printf "        'pass' => '%s',\n" "$ESC"
             echo '    ],'
             printf "    'app_salt' => '%s',\n" "$SALT"

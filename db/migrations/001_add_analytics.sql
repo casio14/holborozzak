@@ -3,7 +3,7 @@
 --
 -- Biztonságosan lefuttatható egy MÁR létező adatbázison is (CREATE TABLE IF NOT EXISTS).
 -- Futtatás:
---   mysql -h mysql.rackhost.hu -u c105746ptrk -p c105746holborozzak < db/migrations/001_add_analytics.sql
+--   mysql -h mysql.rackhost.hu -u c105746patrik -p c105746holborozzak < db/migrations/001_add_analytics.sql
 -- vagy phpMyAdmin → Importálás.
 
 SET NAMES utf8mb4;

@@ -56,7 +56,7 @@ A weboldal címe: **holborozzak.hu**
 - **Adatbázis (MySQL, Rackhost):**
   - Kiszolgáló: `mysql.rackhost.hu`
   - Adatbázis neve: `c105746holborozzak`
-  - Felhasználónév: `c105746ptrk`
+  - Felhasználónév: `c105746patrik`
   - Jelszó: **GitHub repository secret**-ben (`DB_PASSWORD`), NEM a kódban.
   - Port: 3306 (alapértelmezett, ellenőrizni)
   - **Kívülről is elérhető** → migrációkat futtathatunk helyi gépről / CI-ből is.
