@@ -1,7 +1,7 @@
 <?php
 // Impresszum — az Ekertv. (2001. évi CVIII. tv.) 4. §-a szerinti adatok.
 $pageTitle = 'Impresszum — holborozzak.hu';
-$pageDescription = 'A holborozzak.hu üzemeltetőjének és tárhelyszolgáltatójának adatai, '
+$pageDescription = 'A holborozzak.hu üzemeltetőjének adatai, '
     . 'szerzői jogi és felelősségi tudnivalók.';
 require __DIR__ . '/partials/header.php';
 ?>
@@ -21,20 +21,6 @@ require __DIR__ . '/partials/header.php';
         </address>
         <p>A holborozzak.hu magyarországi borrendezvényeket (borfesztiválokat, bornapokat,
           kóstolókat, szüreti programokat) gyűjtő és bemutató, tájékoztató célú weboldal.</p>
-      </section>
-
-      <section class="legal-sec">
-        <h2>Tárhelyszolgáltató</h2>
-        <address>
-          <dl class="legal-kv">
-            <dt>Név</dt><dd>Rackhost Zrt.</dd>
-            <dt>Székhely</dt><dd>6722 Szeged, Tisza Lajos körút 41.</dd>
-            <dt>Cégjegyzékszám</dt><dd>06-10-000489 (Szegedi Törvényszék Cégbírósága)</dd>
-            <dt>Adószám</dt><dd>25333572-2-06</dd>
-            <dt>E-mail</dt><dd><a href="mailto:info@rackhost.hu">info@rackhost.hu</a></dd>
-            <dt>Web</dt><dd><a href="https://www.rackhost.hu" target="_blank" rel="noopener">rackhost.hu</a></dd>
-          </dl>
-        </address>
       </section>
 
       <section class="legal-sec">
