@@ -8,44 +8,31 @@ require __DIR__ . '/partials/header.php';
 ?>
   <div class="container">
     <article class="legal">
-      <h1>Adatkezelési tájékoztató</h1>
-      <p class="legal-effective">Hatályos: 2026. július 3. — Jelentős változás esetén ezt a
-        tájékoztatót frissítjük, a dátum módosításával.</p>
+      <h1 class="legal-formal-title">Adatkezelési tájékoztató</h1>
+      <p class="legal-formal-effective">Hatályos: 2026. július 3.</p>
+      <p class="legal-formal-note">Jelentős változás esetén ezt a tájékoztatót frissítjük,
+        a dátum módosításával.</p>
+      <hr class="legal-formal-rule">
 
-      <div class="legal-summary" aria-label="Röviden">
-        <div class="legal-summary__tile">
-          <span class="i">🍪</span>
-          <b>Süti csak engedéllyel</b>
-          <p>Egy anonim mérési süti — csak ha elfogadod.</p>
-        </div>
-        <div class="legal-summary__tile">
-          <span class="i">🔒</span>
-          <b>IP csak hashelve</b>
-          <p>Napi kulccsal, visszafejthetetlenül.</p>
-        </div>
-        <div class="legal-summary__tile">
-          <span class="i">📧</span>
-          <b>Hírlevél önkéntes</b>
-          <p>Egy kattintással leiratkozhatsz.</p>
-        </div>
-        <div class="legal-summary__tile">
-          <span class="i">🤝</span>
-          <b>Nem adjuk tovább</b>
-          <p>Adataidat nem értékesítjük, nem osztjuk meg.</p>
-        </div>
+      <div class="legal-formal-brief" aria-label="Röviden">
+        <b>Röviden:</b>
+        <ul>
+          <li>🍪 Egy anonim mérési süti — csak ha elfogadod.</li>
+          <li>🔒 Az IP-címet csak napi kulccsal, visszafejthetetlenül hashelve tároljuk.</li>
+          <li>📧 A hírlevél önkéntes — egy kattintással leiratkozhatsz.</li>
+          <li>🤝 Adataidat nem értékesítjük, nem osztjuk meg.</li>
+        </ul>
       </div>
 
-      <div class="legal-card">
-        <span class="legal-card__num" aria-hidden="true">1</span>
-        <h2>Az adatkezelő</h2>
+      <section class="legal-formal-sec">
+        <h2><span class="legal-formal-par" aria-hidden="true">1. §</span>Az adatkezelő</h2>
         <p>A szolgáltató neve: Holborozzak, e-mail:
           <a href="mailto:info@holborozzak.hu">info@holborozzak.hu</a>.
           További adatok: <a href="impresszum.php">Impresszum</a>.</p>
-      </div>
+      </section>
 
-      <div class="legal-card">
-        <span class="legal-card__num" aria-hidden="true">2</span>
-        <h2>Milyen adatokat kezelünk?</h2>
+      <section class="legal-formal-sec">
+        <h2><span class="legal-formal-par" aria-hidden="true">2. §</span>Milyen adatokat kezelünk?</h2>
 
         <h3>Látogatottsági statisztika</h3>
         <p>Az esemény-részletoldalak megtekintésénél és a kimenő kattintásoknál
@@ -73,11 +60,10 @@ require __DIR__ . '/partials/header.php';
         <h3>Admin felület</h3>
         <p>Az oldal adminisztrációs felülete belépési munkamenet-sütit használ — ez
           kizárólag az oda belépő adminisztrátorokat érinti, a látogatókat nem.</p>
-      </div>
+      </section>
 
-      <div class="legal-card">
-        <span class="legal-card__num" aria-hidden="true">3</span>
-        <h2>Cél és jogalap</h2>
+      <section class="legal-formal-sec">
+        <h2><span class="legal-formal-par" aria-hidden="true">3. §</span>Cél és jogalap</h2>
         <ul>
           <li><strong>Statisztika:</strong> a weboldal működtetése, fejlesztése és a
             szervezők felé készülő látogatottsági kimutatások — jogalap: az adatkezelő
@@ -91,11 +77,10 @@ require __DIR__ . '/partials/header.php';
           <li><strong>Esemény-beküldés:</strong> kapcsolattartás a beküldött esemény
             kapcsán — jogalap: hozzájárulás.</li>
         </ul>
-      </div>
+      </section>
 
-      <div class="legal-card">
-        <span class="legal-card__num" aria-hidden="true">4</span>
-        <h2>Sütik (cookie-k)</h2>
+      <section class="legal-formal-sec">
+        <h2><span class="legal-formal-par" aria-hidden="true">4. §</span>Sütik (cookie-k)</h2>
         <p>A weboldal <strong>kizárólag hozzájárulásod esetén</strong> használ egyetlen,
           saját (first-party) mérési sütit — harmadik féltől származó hirdetési vagy
           követő kódot nem futtatunk.</p>
@@ -112,11 +97,10 @@ require __DIR__ . '/partials/header.php';
           létre, és az oldal minden funkciója ugyanúgy működik. Döntésedet később a
           böngésző sütijeinek törlésével vonhatod vissza vagy változtathatod meg —
           ekkor a süti-sáv újra megjelenik.</p>
-      </div>
+      </section>
 
-      <div class="legal-card">
-        <span class="legal-card__num" aria-hidden="true">5</span>
-        <h2>Meddig tároljuk az adatokat?</h2>
+      <section class="legal-formal-sec">
+        <h2><span class="legal-formal-par" aria-hidden="true">5. §</span>Meddig tároljuk az adatokat?</h2>
         <ul>
           <li><strong>Hírlevél-adatok:</strong> a leiratkozásig; leiratkozáskor azonnal
             törlődnek.</li>
@@ -125,11 +109,10 @@ require __DIR__ . '/partials/header.php';
           <li><strong>Statisztika:</strong> a hashelt, személyhez nem köthető naplókat
             összesített kimutatások készítéséhez őrizzük meg.</li>
         </ul>
-      </div>
+      </section>
 
-      <div class="legal-card">
-        <span class="legal-card__num" aria-hidden="true">6</span>
-        <h2>Adatfeldolgozók, külső szolgáltatások</h2>
+      <section class="legal-formal-sec">
+        <h2><span class="legal-formal-par" aria-hidden="true">6. §</span>Adatfeldolgozók, külső szolgáltatások</h2>
         <p><strong>Tárhely és levélküldés:</strong> Rackhost Zrt. (6722 Szeged, Tisza Lajos
           körút 41.) — a weboldal és az adatbázis az ő szerverein fut, a hírlevelek innen
           kerülnek kiküldésre.</p>
@@ -140,11 +123,10 @@ require __DIR__ . '/partials/header.php';
           más adatot nem továbbítunk.</p>
         <p>Adataidat harmadik félnek nem adjuk el és nem adjuk át, az Európai Gazdasági
           Térségen kívülre nem továbbítjuk.</p>
-      </div>
+      </section>
 
-      <div class="legal-card">
-        <span class="legal-card__num" aria-hidden="true">7</span>
-        <h2>A te jogaid</h2>
+      <section class="legal-formal-sec">
+        <h2><span class="legal-formal-par" aria-hidden="true">7. §</span>A te jogaid</h2>
         <p>Kérheted a rád vonatkozó adatokról való tájékoztatást, azok helyesbítését,
           törlését, kezelésük korlátozását, illetve tiltakozhatsz a kezelés ellen.
           Hozzájáruláson alapuló adatkezelésnél (hírlevél) a hozzájárulást bármikor
@@ -153,7 +135,7 @@ require __DIR__ . '/partials/header.php';
           és legkésőbb 30 napon belül válaszolunk. Panasszal a Nemzeti Adatvédelmi és
           Információszabadság Hatósághoz (<a href="https://naih.hu" target="_blank" rel="noopener">naih.hu</a>)
           fordulhatsz.</p>
-      </div>
+      </section>
     </article>
   </div>
 <?php

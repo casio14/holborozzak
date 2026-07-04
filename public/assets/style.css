@@ -1301,10 +1301,11 @@ main { flex: 1 0 auto; }
 .legal p, .legal li { color: #4a3b36; }
 .legal address { font-style: normal; line-height: 1.9; }
 
-/* ÁSZF („klasszikus szerződés"): középre zárt cím, dupla arany vonal,
-   keretes „Röviden" doboz, § jelöléses, középre zárt szakaszcímek */
-.aszf-title { text-align: center; }
-.aszf-effective {
+/* Jogi oldalak „klasszikus szerződés" stílusa (ÁSZF + adatvédelem): középre
+   zárt cím, dupla arany vonal, keretes „Röviden" doboz, § jelöléses,
+   középre zárt szakaszcímek */
+.legal-formal-title { text-align: center; }
+.legal-formal-effective {
   text-align: center;
   letter-spacing: .14em;
   text-transform: uppercase;
@@ -1312,7 +1313,7 @@ main { flex: 1 0 auto; }
   color: var(--muted);
   margin: .2rem 0 0;
 }
-.aszf-rule {
+.legal-formal-rule {
   border: 0;
   border-top: 1px solid var(--gold);
   border-bottom: 1px solid var(--gold);
@@ -1320,7 +1321,7 @@ main { flex: 1 0 auto; }
   width: 180px;
   margin: 1.2rem auto 1.6rem;
 }
-.aszf-brief {
+.legal-formal-brief {
   border: 1px solid var(--gold-200);
   border-radius: 10px;
   background: #fff6e6;
@@ -1329,11 +1330,11 @@ main { flex: 1 0 auto; }
   color: #6b5630;
   margin-bottom: .6rem;
 }
-.aszf-brief b { color: var(--wine-900); }
-.aszf-brief ul { margin: .35rem 0 0; padding-left: 1.15rem; }
-.aszf-brief li { margin: .18rem 0; }
-.aszf-sec { margin-top: 1.7rem; }
-.aszf-sec h2 {
+.legal-formal-brief b { color: var(--wine-900); }
+.legal-formal-brief ul { margin: .35rem 0 0; padding-left: 1.15rem; }
+.legal-formal-brief li { margin: .18rem 0; }
+.legal-formal-sec { margin-top: 1.7rem; }
+.legal-formal-sec h2 {
   font-family: Georgia, "Times New Roman", serif;
   text-align: center;
   color: var(--wine-900);
@@ -1341,13 +1342,19 @@ main { flex: 1 0 auto; }
   letter-spacing: .06em;
   margin: 0 0 .6rem;
 }
-.aszf-par {
+.legal-formal-par {
   display: block;
   color: var(--gold);
   font-size: .85rem;
   letter-spacing: .2em;
   margin-bottom: .15rem;
 }
+/* Halvány, középre zárt kiegészítő megjegyzés a hatálydátum alatt */
+.legal-formal-note { text-align: center; color: var(--muted); font-size: .85rem; margin: .4rem 0 0; }
+/* Alszakaszok és listák a szakaszokon belül (balra zárva, jól olvashatóan) */
+.legal-formal-sec h3 { margin: 1rem 0 .3rem; color: var(--wine-700); font-size: .98rem; }
+.legal-formal-sec ul { margin: .5rem 0; padding-left: 1.15rem; }
+.legal-formal-sec li { margin: .2rem 0; }
 
 /* Impresszum („letisztult dokumentum"): arany vonal a cím alatt,
    elválasztott szekciók, címke–érték rács az adatokhoz */
