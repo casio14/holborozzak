@@ -15,6 +15,10 @@ RewriteRule ^(.*)$ https://holborozzak.hu/$1 [R=301,L]
 # Relatív minta (nincs RewriteBase), a domain gyökerén szolgálódik.
 RewriteRule ^esemeny/([a-z0-9-]+)/?$ esemeny.php?slug=$1 [L,QSA]
 
+# A dinamikus sitemap a szabványos /sitemap.xml címen is elérhető (a Google Search
+# Console és a legtöbb eszköz ezt várja) — belül a sitemap.php szolgálja ki.
+RewriteRule ^sitemap\.xml$ sitemap.php [L]
+
 # Statikus assetek böngésző-gyorsítótárazása (gyorsabb ismétléses betöltés → jobb
 # Core Web Vitals). A CSS/JS ?v=<filemtime> cache-buster miatt biztonságos a hosszú
 # lejárat. <IfModule> véd: ha a modul nincs betöltve, a blokk figyelmen kívül marad.

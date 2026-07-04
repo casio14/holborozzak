@@ -47,6 +47,18 @@
 - [ ] Friss `dateModified`/`datePublished` a strukturált adatban
 - [ ] Egyértelmű entitások (borvidék nevek, települések) — segíti az AI megértést
 
+## GEO-analitika (mérés)
+- [x] **AI-ajánlás mérés (referrer-alapú):** admin statisztika „AI-ajánlások" panel —
+      hány látogató érkezett AI-asszisztensből (ChatGPT, Perplexity, Gemini, Copilot,
+      Claude), platformonként, a `event_interactions.referrer` alapján.
+- [ ] **TODO — AI-crawler lekérések naplózása:** amikor egy AI *élő* crawlere
+      (ChatGPT-User, PerplexityBot, OAI-SearchBot) lekéri egy esemény oldalát egy
+      felhasználói kérdés megválaszolásához, azt is számoljuk (a „kattintás nélküli"
+      AI-használat egy része). Ehhez a jelenleg botszűrt naplózást (`logInteraction`
+      → `isLikelyBot`) kell kibővíteni: az AI-crawlereket ne dobjuk el, hanem külön
+      típussal/jelöléssel rögzítsük, és a statisztikában külön mutassuk. Nagyobb
+      változás (adatmodell + naplózó + admin nézet).
+
 ## Megnyitott döntések
-- [ ] Kell-e `og:image` alapértelmezett megosztókép (most nincs) — érdemes csinálni
+- [x] Alap `og:image` megosztókép (`assets/hero.jpg`) — kész, a `header.php` beállítja.
 - [ ] Lejárt események indexelési politikája

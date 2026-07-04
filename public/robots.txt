@@ -41,4 +41,4 @@ Allow: /
 User-agent: CCBot
 Allow: /
 
-Sitemap: https://holborozzak.hu/sitemap.php
+Sitemap: https://holborozzak.hu/sitemap.xml
