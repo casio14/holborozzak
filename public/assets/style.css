@@ -1300,6 +1300,27 @@ main { flex: 1 0 auto; }
 }
 .legal p, .legal li { color: #4a3b36; }
 .legal address { font-style: normal; line-height: 1.9; }
+
+/* Impresszum („letisztult dokumentum"): arany vonal a cím alatt,
+   elválasztott szekciók, címke–érték rács az adatokhoz */
+.legal-rule { width: 64px; height: 3px; background: var(--gold); border: 0; margin: .9rem 0 1.6rem; }
+.legal-sec { border-top: 1px solid var(--line); padding-top: 1.15rem; margin-top: 1.5rem; }
+.legal-sec:first-of-type { border-top: 0; margin-top: 0; padding-top: 0; }
+.legal-sec h2 { margin-top: 0; }
+.legal-kv {
+  display: grid;
+  grid-template-columns: 170px 1fr;
+  row-gap: .15rem;
+  column-gap: 1rem;
+  margin: .6rem 0;
+  line-height: 1.55;
+}
+.legal-kv dt { color: var(--muted); font-size: .88rem; padding-top: .12rem; }
+.legal-kv dd { margin: 0; color: var(--ink); }
+@media (max-width: 560px) {
+  .legal-kv { grid-template-columns: 1fr; row-gap: 0; }
+  .legal-kv dd { margin-bottom: .5rem; }
+}
 .legal .legal-note {
   background: #fff6e6;
   border: 1px solid var(--gold-200);
