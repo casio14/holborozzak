@@ -3,7 +3,28 @@
 # Egyedi 404 oldal. A holborozzak.hu gyökerén ez a helyes út (/404.php).
 ErrorDocument 404 /404.php
 
+RewriteEngine On
+
+# Kanonikus host: www → nem-www (301). Enélkül a www és a nem-www külön indexelődne
+# (duplikált tartalom, megosztott rangsor-jelzés). A http→https-t a Rackhost proxy
+# már kikényszeríti, ezért itt csak a hostot egységesítjük.
+RewriteCond %{HTTP_HOST} ^www\.holborozzak\.hu$ [NC]
+RewriteRule ^(.*)$ https://holborozzak.hu/$1 [R=301,L]
+
 # Szép esemény-URL: /esemeny/<slug> → esemeny.php?slug=<slug>
 # Relatív minta (nincs RewriteBase), a domain gyökerén szolgálódik.
-RewriteEngine On
 RewriteRule ^esemeny/([a-z0-9-]+)/?$ esemeny.php?slug=$1 [L,QSA]
+
+# Statikus assetek böngésző-gyorsítótárazása (gyorsabb ismétléses betöltés → jobb
+# Core Web Vitals). A CSS/JS ?v=<filemtime> cache-buster miatt biztonságos a hosszú
+# lejárat. <IfModule> véd: ha a modul nincs betöltve, a blokk figyelmen kívül marad.
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType text/css "access plus 7 days"
+  ExpiresByType application/javascript "access plus 7 days"
+  ExpiresByType image/jpeg "access plus 30 days"
+  ExpiresByType image/png "access plus 30 days"
+  ExpiresByType image/svg+xml "access plus 30 days"
+  ExpiresByType image/webp "access plus 30 days"
+  ExpiresByType image/x-icon "access plus 30 days"
+</IfModule>
