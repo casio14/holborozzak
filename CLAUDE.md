@@ -31,21 +31,20 @@ A weboldal címe: **holborozzak.hu**
 - **Tech stack:** PHP (szerveroldali renderelés) + MySQL adatbázis.
   Frontend: sima HTML/CSS (borhoz köthető színek). Nincs build lépés.
 - **Webszerver (Rackhost, FTP):**
-  - Kiszolgáló: `wh11.rackhost.hu`
+  - Kiszolgáló: `wh28.rackhost.hu`
   - Felhasználónév: `c105746ptrk`
-  - Célkönyvtár (deploy ide): `/web/kissptrk.hu/`
+  - Célkönyvtár (deploy ide): `/web/holborozzak.hu/` (a `holborozzak.hu` document rootja)
   - Jelszó: **GitHub repository secret**-ben (`FTP_PASSWORD`), NEM a kódban.
-  - Megjegyzés: a domain `holborozzak.hu`, de a könyvtár neve `kissptrk.hu` —
-    ellenőrizni, hogy ez-e a `holborozzak.hu` document rootja.
 - **GitHub repo:** `git@github.com:casio14/holborozzak.git` (korábban `borozzak` néven)
 - **Deploy:** GitHub Actions (`.github/workflows/deploy.yml`) → `main`-re
   pusholáskor a `public/` mappa tartalmát felmásolja a webszerverre
   (`SamKirkland/FTP-Deploy-Action`, csak a változott fájlok).
   - **Protokoll: sima `ftp`** — a Rackhost FTP szervere NEM támogatja az FTPS-t
     (`AUTH TLS` → `500`). A jelszó így titkosítatlanul utazik (lásd biztonsági TODO).
-  - **Az FTP-login a docrootba érkezik**, ezért a `server-dir` RELATÍV (`borozzak/`),
-    nem abszolút. Abszolút `/web/kissptrk.hu/...` duplikálná a könyvtárat.
-  - **Ideiglenes cím:** https://kissptrk.hu/borozzak/ (amíg a `holborozzak.hu` nem áll).
+  - **`server-dir`:** `/web/holborozzak.hu/` (abszolút út a document roothoz) — a
+    `public/` tartalma ide kerül, így a szép URL-ek, a `robots.txt` és a `sitemap`
+    a domain gyökeréből szolgálódnak.
+  - **Cím:** https://holborozzak.hu/
   - **Verziózás: szemantikus, git tag-es.** A `VERSION` fájl tartja a
     `major.minor`-t (pl. `1.0`); a patch automatikusan a meglévő tagek alapján +1.
     Minden sikeres deploy `vX.Y.Z` git taget hoz létre, és a verzió megjelenik

@@ -1,6 +1,5 @@
 # holborozzak.hu — robots.txt
-# Megjegyzés: a robots.txt a HOST gyökeréből szolgálódik (pl. holborozzak.hu/robots.txt).
-# Az ideiglenes almappás címen (kissptrk.hu/borozzak/) nincs hatása.
+# Megjegyzés: a robots.txt a HOST gyökeréből szolgálódik: holborozzak.hu/robots.txt.
 
 User-agent: *
 Allow: /

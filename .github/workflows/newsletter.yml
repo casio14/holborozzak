@@ -10,7 +10,7 @@ name: Hírlevél küldése
 # Szükséges secretek:
 #   NEWSLETTER_TOKEN — ugyanaz az érték, mint a config.php newsletter_token-je
 #                      (a deploy generálja ugyanebből a secretből).
-#   NEWSLETTER_URL   — opcionális; alapértelmezés az ideiglenes cím.
+#   NEWSLETTER_URL   — opcionális; alapértelmezés a holborozzak.hu végpont.
 
 on:
   schedule:
@@ -28,7 +28,7 @@ jobs:
     steps:
       - name: Token-védett küldő végpont meghívása
         env:
-          URL: ${{ secrets.NEWSLETTER_URL || 'https://kissptrk.hu/borozzak/newsletter-send.php' }}
+          URL: ${{ secrets.NEWSLETTER_URL || 'https://holborozzak.hu/newsletter-send.php' }}
           TOKEN: ${{ secrets.NEWSLETTER_TOKEN }}
           FORCE: ${{ github.event.inputs.force || '' }}
         run: |

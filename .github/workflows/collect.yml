@@ -35,7 +35,6 @@ jobs:
           # Keresés+szintézis: Sonnet 4.6 dinamikus szűrésű web search-csel (token-takarékos, megbízhatóbb)
           ANTHROPIC_MODEL: claude-sonnet-4-6
           # A weboldal token-védett fogadó végpontja (a DB-írás ott történik).
-          # Költözés után írd át a végleges domainre.
-          COLLECT_URL: https://kissptrk.hu/borozzak/collect-ingest.php
+          COLLECT_URL: https://holborozzak.hu/collect-ingest.php
           COLLECT_TOKEN: ${{ secrets.COLLECT_TOKEN }}
         run: php scripts/collect_events.php

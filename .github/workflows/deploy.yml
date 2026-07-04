@@ -137,16 +137,16 @@ jobs:
       - name: Feltöltés FTP-n a Rackhostra
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
-          server: wh11.rackhost.hu
+          server: wh28.rackhost.hu
           username: c105746ptrk
           password: ${{ secrets.FTP_PASSWORD }}
           # A Rackhost FTP szervere nem támogatja az FTPS-t (AUTH TLS -> 500),
           # ezért sima FTP. TODO: SFTP/SSH-ra váltani, ha elérhető (titkosítás).
           protocol: ftp
-          # Az FTP-login a kissptrk.hu document rootjába érkezik, ezért RELATÍV
-          # a server-dir: a 'borozzak/' almappa -> kissptrk.hu/borozzak/
+          # A holborozzak.hu document rootja: a public/ tartalma ide kerül,
+          # így a szép URL-ek, a robots.txt és a sitemap a domain gyökeréből szolgálódnak.
           local-dir: ./public/
-          server-dir: borozzak/
+          server-dir: /web/holborozzak.hu/
           exclude: |
             **/.git*
             **/.git*/**

@@ -28,7 +28,7 @@ function sendMailHtml(string $to, string $subject, string $html, array $extraHea
     $fromEmail = (string) ($cfg['from_email'] ?? '');
     if ($fromEmail === '') {
         $host = preg_replace('/^www\./', '', (string) ($_SERVER['HTTP_HOST'] ?? ''));
-        $fromEmail = 'no-reply@' . ($host !== '' ? $host : 'kissptrk.hu');
+        $fromEmail = 'no-reply@' . ($host !== '' ? $host : 'holborozzak.hu');
     }
     $fromName = (string) ($cfg['from_name'] ?? 'holborozzak.hu');
 

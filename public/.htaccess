@@ -1,12 +1,9 @@
 # holborozzak.hu — Apache beállítások
 #
-# Egyedi 404 oldal. A végleges domain gyökerén ez a helyes út (/404.php).
-# Az ideiglenes almappás címen (kissptrk.hu/borozzak/) a Rackhost alapértelmezett
-# 404-e jelenik meg helyette — a végleges domainen ez az oldal lép életbe.
+# Egyedi 404 oldal. A holborozzak.hu gyökerén ez a helyes út (/404.php).
 ErrorDocument 404 /404.php
 
 # Szép esemény-URL: /esemeny/<slug> → esemeny.php?slug=<slug>
-# Relatív minta (nincs RewriteBase), így az ideiglenes almappás címen
-# (kissptrk.hu/borozzak/) és a végleges domain gyökerén is működik.
+# Relatív minta (nincs RewriteBase), a domain gyökerén szolgálódik.
 RewriteEngine On
 RewriteRule ^esemeny/([a-z0-9-]+)/?$ esemeny.php?slug=$1 [L,QSA]
