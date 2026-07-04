@@ -41,9 +41,9 @@ A weboldal címe: **holborozzak.hu**
   (`SamKirkland/FTP-Deploy-Action`, csak a változott fájlok).
   - **Protokoll: sima `ftp`** — a Rackhost FTP szervere NEM támogatja az FTPS-t
     (`AUTH TLS` → `500`). A jelszó így titkosítatlanul utazik (lásd biztonsági TODO).
-  - **`server-dir`:** `/web/holborozzak.hu/` (abszolút út a document roothoz) — a
-    `public/` tartalma ide kerül, így a szép URL-ek, a `robots.txt` és a `sitemap`
-    a domain gyökeréből szolgálódnak.
+  - **Az FTP-login a `holborozzak.hu` docrootjába (chroot) érkezik**, ezért a
+    `server-dir` a gyökér: `./`. Abszolút `/web/holborozzak.hu/` egy felesleges
+    `web/holborozzak.hu/` alkönyvtárba tenné a fájlokat.
   - **Cím:** https://holborozzak.hu/
   - **Verziózás: szemantikus, git tag-es.** A `VERSION` fájl tartja a
     `major.minor`-t (pl. `1.0`); a patch automatikusan a meglévő tagek alapján +1.

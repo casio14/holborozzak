@@ -143,10 +143,11 @@ jobs:
           # A Rackhost FTP szervere nem támogatja az FTPS-t (AUTH TLS -> 500),
           # ezért sima FTP. TODO: SFTP/SSH-ra váltani, ha elérhető (titkosítás).
           protocol: ftp
-          # A holborozzak.hu document rootja: a public/ tartalma ide kerül,
-          # így a szép URL-ek, a robots.txt és a sitemap a domain gyökeréből szolgálódnak.
+          # Az FTP-login már a holborozzak.hu document rootjába (chroot) érkezik,
+          # ezért a server-dir maga a gyökér ('./'). Abszolút '/web/holborozzak.hu/'
+          # egy felesleges 'web/holborozzak.hu/' alkönyvtárba tenné a fájlokat.
           local-dir: ./public/
-          server-dir: /web/holborozzak.hu/
+          server-dir: ./
           exclude: |
             **/.git*
             **/.git*/**
