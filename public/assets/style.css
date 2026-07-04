@@ -1202,6 +1202,14 @@ main { flex: 1 0 auto; }
 }
 .site-footer__col a { color: #e3d6c8; text-decoration: none; font-size: .92rem; }
 .site-footer__col a:hover { color: #fff; }
+.site-footer__col a.site-footer__col-all {
+  color: var(--gold-200);
+  font-size: .85rem;
+  margin-top: .1rem;
+  padding-top: .55rem;
+  border-top: 1px solid rgba(255, 255, 255, .12);
+}
+.site-footer__col a.site-footer__col-all:hover { color: #fff; }
 .site-footer__bottom {
   display: flex;
   justify-content: space-between;

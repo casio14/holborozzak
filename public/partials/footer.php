@@ -41,6 +41,7 @@ if (is_file($versionFile)) {
           <a href="esemenyek.php?kategoria%5B%5D=szureti-rendezveny">Szüreti rendezvények</a>
           <a href="esemenyek.php?kategoria%5B%5D=gasztronomia">Gasztronómia</a>
           <a href="esemenyek.php?kategoria%5B%5D=koncert">Koncertek</a>
+          <a href="esemenyek.php#esemenyek-region" class="site-footer__col-all">Összes kategória →</a>
         </nav>
 
         <nav class="site-footer__col" aria-label="Borvidékek">
@@ -50,6 +51,7 @@ if (is_file($versionFile)) {
           <a href="esemenyek.php?borvidek%5B%5D=egri">Egri</a>
           <a href="esemenyek.php?borvidek%5B%5D=badacsonyi">Badacsonyi</a>
           <a href="esemenyek.php?borvidek%5B%5D=soproni">Soproni</a>
+          <a href="esemenyek.php#esemenyek-region" class="site-footer__col-all">Összes borvidék →</a>
         </nav>
 
         <nav class="site-footer__col site-footer__col--legal" aria-label="Jogi információk">
