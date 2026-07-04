@@ -1301,6 +1301,54 @@ main { flex: 1 0 auto; }
 .legal p, .legal li { color: #4a3b36; }
 .legal address { font-style: normal; line-height: 1.9; }
 
+/* ÁSZF („klasszikus szerződés"): középre zárt cím, dupla arany vonal,
+   keretes „Röviden" doboz, § jelöléses, középre zárt szakaszcímek */
+.aszf-title { text-align: center; }
+.aszf-effective {
+  text-align: center;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  font-size: .72rem;
+  color: var(--muted);
+  margin: .2rem 0 0;
+}
+.aszf-rule {
+  border: 0;
+  border-top: 1px solid var(--gold);
+  border-bottom: 1px solid var(--gold);
+  height: 4px;
+  width: 180px;
+  margin: 1.2rem auto 1.6rem;
+}
+.aszf-brief {
+  border: 1px solid var(--gold-200);
+  border-radius: 10px;
+  background: #fff6e6;
+  padding: .9rem 1.2rem;
+  font-size: .92rem;
+  color: #6b5630;
+  margin-bottom: .6rem;
+}
+.aszf-brief b { color: var(--wine-900); }
+.aszf-brief ul { margin: .35rem 0 0; padding-left: 1.15rem; }
+.aszf-brief li { margin: .18rem 0; }
+.aszf-sec { margin-top: 1.7rem; }
+.aszf-sec h2 {
+  font-family: Georgia, "Times New Roman", serif;
+  text-align: center;
+  color: var(--wine-900);
+  font-size: 1.08rem;
+  letter-spacing: .06em;
+  margin: 0 0 .6rem;
+}
+.aszf-par {
+  display: block;
+  color: var(--gold);
+  font-size: .85rem;
+  letter-spacing: .2em;
+  margin-bottom: .15rem;
+}
+
 /* Impresszum („letisztult dokumentum"): arany vonal a cím alatt,
    elválasztott szekciók, címke–érték rács az adatokhoz */
 .legal-rule { width: 64px; height: 3px; background: var(--gold); border: 0; margin: .9rem 0 1.6rem; }
