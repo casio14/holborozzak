@@ -108,10 +108,23 @@ require __DIR__ . '/partials/header.php';
 
       <section class="legal-sec">
         <h2>Milyen jogaid vannak?</h2>
-        <p>Bármikor megkérdezheted, milyen adatot tárolunk rólad, kérheted azok javítását
-          vagy törlését, korlátozhatod a kezelésüket, illetve tiltakozhatsz a kezelés ellen.
-          Ha korábban hozzájárultál valamihez (pl. a hírlevélhez), ezt a hozzájárulást
-          bármikor visszavonhatod. Írj nekünk az
+        <ul>
+          <li>Tájékoztatást kérhetsz arról, milyen adatot kezelünk rólad.</li>
+          <li>Kérheted az adataid helyesbítését vagy törlését.</li>
+          <li>Korlátozhatod az adatkezelést, vagy tiltakozhatsz ellene.</li>
+          <li>A hozzájárulásodat (pl. hírlevél, mérési süti) bármikor visszavonhatod.</li>
+        </ul>
+      </section>
+
+      <section class="legal-sec">
+        <h2>Leiratkozás</h2>
+        <p>A hírlevélről <a href="leiratkozas.php">egy kattintással, bármikor
+          leiratkozhatsz</a> — ekkor az adataidat azonnal töröljük.</p>
+      </section>
+
+      <section class="legal-sec">
+        <h2>Kapcsolat</h2>
+        <p>Kérdésed van, vagy élni szeretnél a jogaiddal? Írj nekünk az
           <a href="mailto:info@holborozzak.hu">info@holborozzak.hu</a> címre — legkésőbb
           30 napon belül válaszolunk. Ha úgy érzed, nem kaptál megfelelő választ, panasszal
           fordulhatsz a Nemzeti Adatvédelmi és Információszabadság Hatósághoz
