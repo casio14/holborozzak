@@ -44,8 +44,7 @@ require __DIR__ . '/partials/header.php';
           honlap-linkre, ezt naplózzuk: mit csináltál, mikor, honnan érkeztél az oldalra, és
           milyen böngészőt használtál. Az IP-címedet nem tároljuk közvetlenül — helyette egy
           olyan kódolt változatát mentjük el, amiből nem lehet visszafejteni, ki voltál, és
-          amely naponta megváltozik, így a napok között sem köthető össze. Ismert
-          keresőrobotokat (pl. a Google indexelőjét) nem számoljuk bele. Ha elfogadtad a
+          amely naponta megváltozik, így a napok között sem köthető össze. Ha elfogadtad a
           mérési sütit (lásd lentebb), a látogatásodhoz egy anonim azonosítót is hozzárendelünk,
           hogy pontosabban lássuk, ki tér vissza.</p>
 
@@ -60,24 +59,17 @@ require __DIR__ . '/partials/header.php';
         <p>Ha szervezőként eseményt küldesz be, elkérjük a neved és e-mail címed, hogy fel
           tudjuk venni veled a kapcsolatot, és ellenőrizni tudjuk az adatokat. Ezeket
           <strong>sosem tesszük közzé</strong> a weboldalon.</p>
-
-        <h3>Admin felület</h3>
-        <p>A weboldal adminisztrációs felülete egy belépési sütit használ — ez csak azokat
-          érinti, akik be tudnak lépni oda, a látogatókat nem.</p>
       </section>
 
       <section class="legal-sec">
         <h2>Miért kezeljük az adataidat?</h2>
         <ul>
-          <li><strong>Statisztika:</strong> hogy lássuk, hogyan használják az oldalt, javítani
-            tudjunk rajta, és kimutatást tudjunk adni a szervezőknek — ezt jogos érdekünkként
-            tesszük, az adatok senkihez nem köthetők.</li>
-          <li><strong>Mérési süti:</strong> csak akkor használjuk, ha ehhez a süti-sávon
-            hozzájárulsz; ezt a sütik törlésével bármikor visszavonhatod.</li>
           <li><strong>Hírlevél:</strong> csak akkor küldjük, ha erre feliratkozol; ezt a
             leiratkozással bármikor visszavonhatod.</li>
           <li><strong>Esemény-beküldés:</strong> azért kezeljük az adataidat, hogy fel tudjunk
             venni veled a kapcsolatot a beküldött eseménnyel kapcsolatban.</li>
+          <li>A többi adatot azért kezeljük, hogy biztosítani tudjuk a weboldal működését,
+            és fejleszteni tudjuk azt.</li>
         </ul>
       </section>
 
