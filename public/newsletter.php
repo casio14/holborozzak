@@ -73,7 +73,7 @@ if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
             $sent = sendMailHtml(
                 $email,
                 'Üdv a holborozzak.hu hírlevelén! 🍷',
-                nlWelcomeHtml($base . $dir . '/esemenyek.php', $unsub, $featured, $monthItems, $more),
+                nlWelcomeHtml($base . $dir . '/esemenyek', $unsub, $featured, $monthItems, $more),
                 ['List-Unsubscribe' => '<' . $unsub . '>']
             );
             if (!$sent) {

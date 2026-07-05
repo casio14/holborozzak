@@ -231,7 +231,7 @@ function listUrl(string $view, array $regions = [], array $cats = [], string $so
     if ($cats)               { $p['kategoria'] = array_values($cats); }
     if ($sort !== 'datum')   { $p['rendezes'] = $sort; }
     if ($q !== '')           { $p['q'] = $q; }
-    return 'esemenyek.php' . ($p ? ('?' . http_build_query($p)) : '');
+    return 'esemenyek' . ($p ? ('?' . http_build_query($p)) : '');
 }
 
 /** Esemény részletoldalának URL-je (relatív vagy abszolút, ha base/dir adott).

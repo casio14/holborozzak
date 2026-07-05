@@ -53,9 +53,9 @@ $facet = [];
 if ($regionFilters) { $facet['borvidek'] = $regionFilters; }
 if ($catFilters)    { $facet['kategoria'] = $catFilters; }
 $facetQs  = $facet ? ('&' . http_build_query($facet)) : '';
-$prevUrl  = 'naptar.php?ev=' . $prev->format('Y') . '&ho=' . $prev->format('n') . $facetQs;
-$nextUrl  = 'naptar.php?ev=' . $next->format('Y') . '&ho=' . $next->format('n') . $facetQs;
-$todayUrl = 'naptar.php' . ($facet ? ('?' . http_build_query($facet)) : '');
+$prevUrl  = 'naptar?ev=' . $prev->format('Y') . '&ho=' . $prev->format('n') . $facetQs;
+$nextUrl  = 'naptar?ev=' . $next->format('Y') . '&ho=' . $next->format('n') . $facetQs;
+$todayUrl = 'naptar' . ($facet ? ('?' . http_build_query($facet)) : '');
 
 // Hét-sorok (0 = hónapon kívüli üres cella) az átívelő sávos rácshoz
 $leading = (int) $first->format('N') - 1;
@@ -100,7 +100,7 @@ require __DIR__ . '/partials/header.php';
       <p class="page-head__sub">Böngészd Magyarország borrendezvényeit dátum szerint, hónapról hónapra.</p>
     </div>
 
-    <form class="facets" method="get" action="naptar.php" aria-label="Naptár szűrők">
+    <form class="facets" method="get" action="naptar" aria-label="Naptár szűrők">
       <input type="hidden" name="ev" value="<?= $year ?>">
       <input type="hidden" name="ho" value="<?= $month ?>">
       <div class="facets__filters">
@@ -138,7 +138,7 @@ require __DIR__ . '/partials/header.php';
 
         <button type="submit" class="facets__btn">Szűrés</button>
         <?php if ($hasFacets): ?>
-          <a class="facets__clear" href="naptar.php?ev=<?= $year ?>&amp;ho=<?= $month ?>">Szűrők törlése</a>
+          <a class="facets__clear" href="naptar?ev=<?= $year ?>&amp;ho=<?= $month ?>">Szűrők törlése</a>
         <?php endif; ?>
       </div>
     </form>
@@ -218,7 +218,7 @@ require __DIR__ . '/partials/header.php';
 
     <?php if (!$shown): ?>
       <p class="section-intro"><?= $monthEvents ? 'Nincs a szűrőnek megfelelő esemény ebben a hónapban.' : 'Ebben a hónapban nincs rögzített esemény.' ?>
-        <a href="esemenyek.php">Nézd meg az összeset →</a></p>
+        <a href="esemenyek">Nézd meg az összeset →</a></p>
     <?php endif; ?>
   </div>
 <?php

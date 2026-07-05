@@ -26,7 +26,7 @@ require __DIR__ . '/partials/header.php';
         <p>A holborozzak.hu weboldalt a Holborozzak üzemelteti (a továbbiakban:
           Szolgáltató). Elérhetőség:
           <a href="mailto:info@holborozzak.hu">info@holborozzak.hu</a>.
-          További adatok: <a href="impresszum.php">Impresszum</a>.</p>
+          További adatok: <a href="impresszum">Impresszum</a>.</p>
       </section>
 
       <section class="legal-formal-sec">
@@ -76,8 +76,8 @@ require __DIR__ . '/partials/header.php';
         <p>Ha kérdésed van a jelen ÁSZF-fel kapcsolatban, fordulj hozzánk bizalommal az
           <a href="mailto:info@holborozzak.hu">info@holborozzak.hu</a> címen — igyekszünk
           mielőbb válaszolni. Kapcsolódó dokumentumok:
-          <a href="adatvedelem.php">Adatkezelési tájékoztató</a> ·
-          <a href="impresszum.php">Impresszum</a></p>
+          <a href="adatvedelem">Adatkezelési tájékoztató</a> ·
+          <a href="impresszum">Impresszum</a></p>
       </section>
     </article>
   </div>

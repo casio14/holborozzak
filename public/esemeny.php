@@ -76,7 +76,7 @@ $ev = eventJsonLd($event, $base, $dir, $canonicalUrl);
 $ev['@context'] = 'https://schema.org';
 $jsonLd = [$ev, breadcrumbJsonLd([
     'Főoldal'   => $base . $dir . '/',
-    'Események' => $base . $dir . '/esemenyek.php',
+    'Események' => $base . $dir . '/esemenyek',
     $event['title'] => $canonicalUrl,
 ])];
 

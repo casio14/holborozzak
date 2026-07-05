@@ -104,7 +104,7 @@ try {
     unset($s);
 
     $subject = 'Közelgő borrendezvények — ' . date('Y. m. d.') . ' 🍷';
-    $listUrl = $base . $dir . '/esemenyek.php';
+    $listUrl = $base . $dir . '/esemenyek';
     $sent = 0;
     $failed = 0;
     foreach ($subs as $s) {

@@ -49,7 +49,7 @@ require __DIR__ . '/partials/header.php';
 
       <section class="legal-sec">
         <h2>Kapcsolódó dokumentum</h2>
-        <p><a href="adatvedelem.php">Adatkezelési tájékoztató →</a></p>
+        <p><a href="adatvedelem">Adatkezelési tájékoztató →</a></p>
       </section>
     </article>
   </div>
