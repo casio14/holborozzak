@@ -137,9 +137,15 @@ a { color: var(--wine-700); }
 .nav-burger__close { display: none; }
 
 @media (max-width: 760px) {
-  /* A középső menü mobilon abszolút pozíciós (kikerül a rácsból), ezért a
-     3 oszlopos rács a hamburgert középre húzná — 2 oszloppal teljesen jobbra ül. */
-  .site-header__inner { grid-template-columns: 1fr auto; }
+  /* A középső menü mobilon abszolút pozíciós (kikerül a rácsból). Flex space-between-nel
+     a márkanév egyértelműen balra, a hamburger jobbra ül. Mobilon vékonyabb és arányosan
+     kisebb elemek. */
+  .site-header__inner { display: flex; align-items: center; justify-content: space-between; padding: .5rem 1.1rem; }
+  .brand { justify-self: start; margin-right: auto; }
+  .brand__icon { width: 32px; height: 32px; }
+  .brand__name { font-size: 1.2rem; }
+  .brand__tag { font-size: .66rem; letter-spacing: .1em; }
+  .nav-burger { width: 36px; height: 36px; }
   .nav-burger { display: inline-grid; }
   /* Nyitott állapot: hamburger → X */
   #nav-toggle:checked ~ .site-header__actions .nav-burger__open { display: none; }
