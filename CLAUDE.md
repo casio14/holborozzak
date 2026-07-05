@@ -136,6 +136,13 @@ JSON-LD vázat (alap `WebSite`+`Organization`); `$jsonLd`-vel bővíthető oldal
       enélkül DMARC/SPF igazodási hiba → spam (lib/mail.php kezeli).
     - A 998+ karakteres sorokat az MTA kényszerrel tördeli (szó/attribútum
       közepén is) → a sendMailHtml küldés előtt 500 karakternél tördel.
+    - **E-mail hitelesítés (DNS, Rackhost DNS-kezelő — nem a repóban):**
+      SPF beállítva (`v=spf1 a mx include:_cspf.rackhost.hu ~all`), DMARC felvéve
+      (`_dmarc` TXT: `v=DMARC1; p=none; rua=mailto:info@holborozzak.hu; fo=1`).
+      A `p=none` megfigyelő mód; ha a jelentések tiszták, később `p=quarantine`.
+      **TODO:** DKIM bekapcsolása a Rackhost levelező-panelen (a legjobb Gmail-beérkezéshez).
+    - **Az üdvözlő e-mail CSAK új feliratkozónak megy** (`newsletter.php`: `rowCount() > 0`) —
+      ismételt feliratkozásra szándékosan nincs levél (nem a küldés hibája).
   - **`admin/feliratkozok.php`** — feliratkozó-lista, CSV-export, törlés (CSRF).
   - **`esemeny-bekuldes.php`** — nyilvános esemény **beküldő űrlap** (POST→PRG):
     validál, `draft` státuszú eseményt szúr be (slug auto, ütközésmentes), a kiválasztott
