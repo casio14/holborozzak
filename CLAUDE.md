@@ -141,6 +141,9 @@ JSON-LD vázat (alap `WebSite`+`Organization`); `$jsonLd`-vel bővíthető oldal
       (`_dmarc` TXT: `v=DMARC1; p=none; rua=mailto:info@holborozzak.hu; fo=1`).
       A `p=none` megfigyelő mód; ha a jelentések tiszták, később `p=quarantine`.
       **TODO:** DKIM bekapcsolása a Rackhost levelező-panelen (a legjobb Gmail-beérkezéshez).
+    - **A `MAIL_FROM` feladó MINDIG @holborozzak.hu legyen!** Idegen domain (pl.
+      korábban `hirlevel@kissptrk.hu`) SPF/DMARC-igazodási hibát ad → a levél spambe/eldobásra
+      kerül. A címet a GitHub `MAIL_FROM` secret adja, és csak ÚJRADEPLOY után frissül a config.php-ban.
     - **Az üdvözlő e-mail CSAK új feliratkozónak megy** (`newsletter.php`: `rowCount() > 0`) —
       ismételt feliratkozásra szándékosan nincs levél (nem a küldés hibája).
   - **`admin/feliratkozok.php`** — feliratkozó-lista, CSV-export, törlés (CSRF).
