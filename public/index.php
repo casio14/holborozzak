@@ -6,6 +6,8 @@ declare(strict_types=1);
 require __DIR__ . '/db.php';
 require __DIR__ . '/lib/events.php';
 
+logAiReferral(); // AI-asszisztensből (utm_source/referrer) érkező látogató naplózása
+
 $pageTitle = 'holborozzak.hu — Magyarország borrendezvényei egy helyen';
 $pageDescription = 'Fedezd fel Magyarország legjobb bor-eseményeit: fesztiválok, kóstolók '
     . 'és pincelátogatások Tokajtól Villányig — egy helyen, mindig naprakészen.';

@@ -39,20 +39,8 @@ $aiTotals = ['interactions' => 0, 'unique' => 0, 'clicks' => 0];
 $aiRows = [];
 $dbError = false;
 
-// Ismert AI-asszisztens hivatkozók (referrer). Ha valaki egy AI válaszából kattint
-// az oldalra, a böngésző ezt a hostot küldi — ez a mérhető „AI ajánlotta" jel.
-$AI_LIKE = "(i.referrer LIKE '%chatgpt.com%' OR i.referrer LIKE '%openai.com%'"
-    . " OR i.referrer LIKE '%perplexity.ai%' OR i.referrer LIKE '%gemini.google.com%'"
-    . " OR i.referrer LIKE '%bard.google.com%' OR i.referrer LIKE '%copilot.microsoft.com%'"
-    . " OR i.referrer LIKE '%claude.ai%')";
-// Platform-név normalizálás (megjelenítéshez)
-$AI_CASE = "CASE
-    WHEN i.referrer LIKE '%chatgpt.com%' OR i.referrer LIKE '%openai.com%' THEN 'ChatGPT'
-    WHEN i.referrer LIKE '%perplexity.ai%' THEN 'Perplexity'
-    WHEN i.referrer LIKE '%gemini.google.com%' OR i.referrer LIKE '%bard.google.com%' THEN 'Google Gemini'
-    WHEN i.referrer LIKE '%copilot.microsoft.com%' THEN 'Microsoft Copilot'
-    WHEN i.referrer LIKE '%claude.ai%' THEN 'Claude'
-    ELSE 'Egyéb AI' END";
+// AI-ajánlások forrása: az ai_referrals tábla (a fő oldalak logAiReferral() hívása
+// tölti — utm_source VAGY referrer alapján, a nyitóoldalt is beleértve).
 try {
     $pdo = db();
 
@@ -136,25 +124,33 @@ try {
          LIMIT 15"
     )->fetchAll();
 
-    // AI-ajánlások: hány látogató érkezett AI-asszisztensből (referrer alapján)
-    $whereAi = $where !== '' ? $where . ' AND ' . $AI_LIKE : 'WHERE ' . $AI_LIKE;
+    // AI-ajánlások: AI-asszisztensből érkező látogatók (ai_referrals — utm_source VAGY referrer).
+    ensureAiReferralsTable($pdo);
+    $whereAir = $days > 0 ? "WHERE a.created_at >= DATE_SUB(NOW(), INTERVAL {$days} DAY)" : '';
     $at = $pdo->query(
-        "SELECT COUNT(*) AS c, COUNT(DISTINCT {$UID}) AS u,
-                SUM(i.type IN ('click_website','click_ticket')) AS clk
-         FROM event_interactions i {$whereAi}"
+        "SELECT COUNT(*) AS c, COUNT(DISTINCT COALESCE(a.session_id, a.ip_hash)) AS u
+         FROM ai_referrals a {$whereAir}"
     )->fetch();
     if ($at) {
         $aiTotals['interactions'] = (int) $at['c'];
         $aiTotals['unique']       = (int) $at['u'];
-        $aiTotals['clicks']       = (int) ($at['clk'] ?? 0);
     }
+    // Továbbkattintás: AI-ból érkezett látogatók, akik utóbb a szervező oldalára kattintottak
+    // (azonos látogató-azonosító alapján; a napi sózott ip_hash miatt főleg aznapi kattintás).
+    $clkWhere = $days > 0 ? "AND i.created_at >= DATE_SUB(NOW(), INTERVAL {$days} DAY)" : '';
+    $aiTotals['clicks'] = (int) $pdo->query(
+        "SELECT COUNT(*) FROM event_interactions i
+         WHERE i.type IN ('click_website','click_ticket') {$clkWhere}
+           AND COALESCE(i.session_id, i.ip_hash) IN (
+             SELECT COALESCE(a.session_id, a.ip_hash) FROM ai_referrals a {$whereAir}
+           )"
+    )->fetchColumn();
     // Platformonkénti bontás
     $aiRows = $pdo->query(
-        "SELECT {$AI_CASE} AS ai, COUNT(*) AS c,
-                COUNT(DISTINCT {$UID}) AS u,
-                SUM(i.type IN ('click_website','click_ticket')) AS clk
-         FROM event_interactions i {$whereAi}
-         GROUP BY ai
+        "SELECT a.source AS ai, COUNT(*) AS c,
+                COUNT(DISTINCT COALESCE(a.session_id, a.ip_hash)) AS u
+         FROM ai_referrals a {$whereAir}
+         GROUP BY a.source
          ORDER BY c DESC"
     )->fetchAll();
 } catch (Throwable $e) {
@@ -230,7 +226,7 @@ $cssVer = @filemtime(__DIR__ . '/../assets/style.css') ?: time();
       <div class="admin-stat">
         <span class="admin-stat__num"><?= number_format($aiTotals['interactions'], 0, ',', ' ') ?></span>
         <span class="admin-stat__label">AI-ból érkezés</span>
-        <span class="admin-stat__sub">megtekintés + kattintás AI-linkből</span>
+        <span class="admin-stat__sub">látogatás AI-forrásból (bármely oldalra)</span>
       </div>
       <div class="admin-stat">
         <span class="admin-stat__num">~<?= number_format($aiTotals['unique'], 0, ',', ' ') ?></span>
@@ -250,7 +246,6 @@ $cssVer = @filemtime(__DIR__ . '/../assets/style.css') ?: time();
             <th>AI-asszisztens</th>
             <th class="admin-num">Érkezés</th>
             <th class="admin-num">Egyedi látogató</th>
-            <th class="admin-num">Továbbkatt.</th>
           </tr>
         </thead>
         <tbody>
@@ -259,7 +254,6 @@ $cssVer = @filemtime(__DIR__ . '/../assets/style.css') ?: time();
               <td><?= h($r['ai']) ?></td>
               <td class="admin-num"><?= number_format((int) $r['c'], 0, ',', ' ') ?></td>
               <td class="admin-num">~<?= number_format((int) $r['u'], 0, ',', ' ') ?></td>
-              <td class="admin-num"><?= number_format((int) $r['clk'], 0, ',', ' ') ?></td>
             </tr>
           <?php endforeach; ?>
         </tbody>
@@ -269,12 +263,13 @@ $cssVer = @filemtime(__DIR__ . '/../assets/style.css') ?: time();
         AI-asszisztensből. Ahogy a ChatGPT, Perplexity, Gemini stb. elkezdi ajánlani az
         oldalt és a felhasználók rákattintanak, itt fog megjelenni.</div>
     <?php endif; ?>
-    <p class="admin-note">Ez azt méri, hányan <strong>kattintottak át</strong> egy
-      AI-asszisztens (ChatGPT, Perplexity, Google Gemini, Microsoft Copilot, Claude)
-      válaszából az oldalra — ez a legmegbízhatóbb mérhető jele annak, hogy az AI ajánlotta
-      a holborozzak.hu-t. Amikor egy AI csak <em>megemlíti</em> az oldalt kattintás nélkül,
-      az technikailag nem mérhető. (A Google AI Overviews a sima <code>google.com</code>
-      hivatkozóként érkezik, ezért nem különíthető el.)</p>
+    <p class="admin-note">Ez azt méri, hányan <strong>érkeztek</strong> egy AI-asszisztens
+      (ChatGPT, Perplexity, Google Gemini, Microsoft Copilot, Claude) válaszából az oldalra —
+      a felismerés a link <code>?utm_source=…</code> paramétere VAGY a hivatkozó (referrer)
+      alapján történik, <strong>bármely oldalra</strong> (a nyitóoldalt is beleértve). A
+      „Továbbkattintás" azt mutatja, hányan léptek tovább a szervező oldalára. Amikor egy AI
+      csak <em>megemlíti</em> az oldalt kattintás nélkül, az technikailag nem mérhető. (A Google
+      AI Overviews a sima <code>google.com</code> hivatkozóként érkezik, ezért nem különíthető el.)</p>
 
     <h2 class="admin-h2">Sütis látogató-mérés <span class="admin-stat__sub">(csak a mérési sütit elfogadó látogatók — napokon átívelően pontos)</span></h2>
     <div class="admin-stats">

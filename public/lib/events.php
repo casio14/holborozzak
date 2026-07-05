@@ -637,3 +637,116 @@ function logInteraction(PDO $pdo, int $eventId, string $type): void
     );
     $st->execute([$eventId, $type, $sid, $referrer, $ipHash, $ua !== '' ? $ua : null]);
 }
+
+/**
+ * AI-asszisztens forrásának felismerése utm_source és/vagy referrer alapján.
+ * Visszatérés: normalizált platformnév, vagy null ha nem AI-forrás.
+ */
+function detectAiSource(string $utmSource, string $referrer): ?string
+{
+    $hay = strtolower(trim($utmSource . ' ' . $referrer));
+    if ($hay === '') {
+        return null;
+    }
+    if (strpos($hay, 'chatgpt') !== false || strpos($hay, 'openai') !== false) {
+        return 'ChatGPT';
+    }
+    if (strpos($hay, 'perplexity') !== false) {
+        return 'Perplexity';
+    }
+    if (strpos($hay, 'gemini') !== false || strpos($hay, 'bard') !== false) {
+        return 'Google Gemini';
+    }
+    if (strpos($hay, 'copilot') !== false) {
+        return 'Microsoft Copilot';
+    }
+    if (strpos($hay, 'claude') !== false) {
+        return 'Claude';
+    }
+    return null;
+}
+
+/** Létrehozza az ai_referrals táblát, ha még nincs (futásidőben, mint a subscribers). */
+function ensureAiReferralsTable(PDO $pdo): void
+{
+    $pdo->exec(
+        "CREATE TABLE IF NOT EXISTS ai_referrals (
+            id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+            source       VARCHAR(32)  NOT NULL,
+            landing_path VARCHAR(255) DEFAULT NULL,
+            utm_source   VARCHAR(128) DEFAULT NULL,
+            referrer     VARCHAR(255) DEFAULT NULL,
+            session_id   VARCHAR(64)  DEFAULT NULL,
+            ip_hash      CHAR(64)     DEFAULT NULL,
+            user_agent   VARCHAR(255) DEFAULT NULL,
+            created_at   TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (id),
+            KEY idx_air_time (created_at),
+            KEY idx_air_source_time (source, created_at)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
+    );
+}
+
+/**
+ * AI-asszisztensből érkező látogató naplózása (ChatGPT, Perplexity, Gemini, Claude,
+ * Copilot). Jelforrás: a ?utm_source query paraméter VAGY a HTTP Referer. CSAK akkor
+ * ír sort, ha AI-jel van — így a tábla kicsi és adatvédelmileg visszafogott marad.
+ * Botokat kihagy; a session_id csak érvényes hozzájárulással kerül tárolásra.
+ * Sosem dob kivételt: a mérés soha ne törje meg az oldal betöltését.
+ */
+function logAiReferral(): void
+{
+    $utm = isset($_GET['utm_source']) ? (string) $_GET['utm_source'] : '';
+    $ref = isset($_SERVER['HTTP_REFERER']) ? (string) $_SERVER['HTTP_REFERER'] : '';
+
+    $source = detectAiSource($utm, $ref);
+    if ($source === null) {
+        return; // nincs AI-jel → a DB-t sem érintjük
+    }
+
+    $ua = substr((string) ($_SERVER['HTTP_USER_AGENT'] ?? ''), 0, 255);
+    if (isLikelyBot($ua)) {
+        return;
+    }
+
+    try {
+        $pdo = db();
+        ensureAiReferralsTable($pdo);
+
+        // Mérési süti — csak érvényes hozzájárulással, szigorú formátum-ellenőrzéssel.
+        $sid = null;
+        if ((string) ($_COOKIE['hb_consent'] ?? '') === '1') {
+            $c = (string) ($_COOKIE['hb_sid'] ?? '');
+            if (preg_match('/^[a-f0-9]{32}$/', $c)) {
+                $sid = $c;
+            }
+        }
+
+        $ip = (string) ($_SERVER['HTTP_CF_CONNECTING_IP']
+            ?? $_SERVER['HTTP_X_FORWARDED_FOR']
+            ?? $_SERVER['REMOTE_ADDR']
+            ?? '');
+        if (strpos($ip, ',') !== false) {
+            $ip = trim(explode(',', $ip)[0]);
+        }
+        $ipHash = $ip !== '' ? hash('sha256', $ip . '|' . appSalt() . '|' . date('Y-m-d')) : null;
+
+        $path = substr((string) strtok((string) ($_SERVER['REQUEST_URI'] ?? '/'), '?'), 0, 255);
+
+        $st = $pdo->prepare(
+            'INSERT INTO ai_referrals (source, landing_path, utm_source, referrer, session_id, ip_hash, user_agent)
+             VALUES (?, ?, ?, ?, ?, ?, ?)'
+        );
+        $st->execute([
+            $source,
+            $path,
+            $utm !== '' ? substr($utm, 0, 128) : null,
+            $ref !== '' ? substr($ref, 0, 255) : null,
+            $sid,
+            $ipHash,
+            $ua !== '' ? $ua : null,
+        ]);
+    } catch (Throwable $e) {
+        error_log('logAiReferral hiba: ' . $e->getMessage());
+    }
+}

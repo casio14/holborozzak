@@ -199,6 +199,10 @@ Táblák:
 - **`event_interactions`** — analitika: nyers kattintás/megtekintés napló (időbélyeggel,
   hashelt IP-vel). Kimenő kattintások (`click_website`/`click_ticket`) + `view`.
 - **`event_impressions_daily`** — lista-megjelenések napi összesítésben (nagy volumen).
+- **`ai_referrals`** — AI-asszisztensből érkező látogatók naplója (ChatGPT, Perplexity,
+  Gemini, Claude, Copilot). Futásidőben jön létre (`ensureAiReferralsTable()`). A fő oldalak
+  (`index`, `esemenyek`, `naptar`, `terkep`, `esemeny`) `logAiReferral()`-t hívnak, ami CSAK
+  akkor ír sort, ha AI-jel van (`?utm_source=…` VAGY AI-host referrer) — a nyitóoldalt is beleértve.
 
 **Bevételi cél:** a kattintás-statisztikákból kimutatás a szervezőknek. Migráció:
 `db/migrations/001_add_analytics.sql` (élő DB-n is futtatható).
@@ -221,7 +225,9 @@ naplóz (ugyanazzal a `logInteraction()`-nel). Az impresszió-mérés (lista-meg
 összesítő csempék (megtekintés/honlap-katt./jegy-katt./CTR; egyedi =
 `COALESCE(session_id, ip_hash)`), „Sütis látogató-mérés" blokk (mért látogató,
 visszatérő, látogató-konverzió, esemény/látogató), eseményenkénti táblázat CTR-rel,
-napi bontás (14 nap), hivatkozó domainek (saját domain kiszűrve).
+napi bontás (14 nap), hivatkozó domainek (saját domain kiszűrve). **AI-ajánlások panel:**
+az `ai_referrals` táblából számol (érkezés + egyedi látogató + platformonkénti bontás;
+Továbbkattintás = az AI-látogató utóbb szervező-oldalra kattintott, azonos látogató-azonosítón).
 
 Karakterkészlet: `utf8mb4`. Ismétlődő (évente megrendezett) eseménynél évente
 új sort veszünk fel (évszám a slugban).
