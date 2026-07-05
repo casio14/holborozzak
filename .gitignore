@@ -12,6 +12,9 @@ build/
 public/version.php
 public/config.php
 
+# Claude Code helyi munkakönyvtár (worktree-k, helyi beállítások) — nem a repóé
+.claude/
+
 # OS / editor
 .DS_Store
 Thumbs.db
