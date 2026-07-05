@@ -140,7 +140,7 @@ a { color: var(--wine-700); }
   /* A középső menü mobilon abszolút pozíciós (kikerül a rácsból). Flex space-between-nel
      a márkanév egyértelműen balra, a hamburger jobbra ül. Mobilon vékonyabb és arányosan
      kisebb elemek. */
-  .site-header__inner { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.1rem; }
+  .site-header__inner { display: flex; align-items: center; justify-content: space-between; padding: 1.1rem 1.1rem; }
   .brand { justify-self: start; margin-right: auto; }
   .brand__icon { width: 32px; height: 32px; }
   .brand__name { font-size: 1.2rem; }
