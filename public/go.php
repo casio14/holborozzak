@@ -23,7 +23,7 @@ $MAP = [
 
 $eventId = (int) ($_GET['e'] ?? 0);
 $type    = (string) ($_GET['t'] ?? '');
-$fallback = 'esemenyek.php';
+$fallback = 'esemenyek';
 
 if ($eventId <= 0 || !isset($MAP[$type])) {
     header('Location: ' . $fallback, true, 302);

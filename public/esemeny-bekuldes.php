@@ -32,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($hpFilled || $tooFast) {
         error_log('esemeny-bekuldes.php spam-gyanu (hp=' . ($hpFilled ? '1' : '0')
             . ', tooFast=' . ($tooFast ? '1' : '0') . ')');
-        header('Location: esemeny-bekuldes.php?bekuldve=ok');
+        header('Location: esemeny-bekuldes?bekuldve=ok');
         exit;
     }
 
@@ -120,7 +120,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             }
 
-            header('Location: esemeny-bekuldes.php?bekuldve=ok');
+            header('Location: esemeny-bekuldes?bekuldve=ok');
             exit;
         } catch (Throwable $e) {
             error_log('esemeny-bekuldes.php mentés hiba: ' . $e->getMessage());
@@ -162,7 +162,7 @@ require __DIR__ . '/partials/header.php';
       </div>
     <?php endif; ?>
 
-    <form class="submit-form" method="post" action="esemeny-bekuldes.php" novalidate>
+    <form class="submit-form" method="post" action="esemeny-bekuldes" novalidate>
 
       <!-- Spam-védelem: idő-csapda + honeypot (ne töltsd ki / ne nevezd át) -->
       <input type="hidden" name="form_ts" value="<?= time() ?>">
@@ -283,7 +283,7 @@ require __DIR__ . '/partials/header.php';
 
       <div class="form-actions">
         <button type="submit" class="btn btn--primary">Esemény beküldése →</button>
-        <span class="form-note">A beküldéssel elfogadod az <a href="adatvedelem.php">adatkezelési tájékoztatót</a>.</span>
+        <span class="form-note">A beküldéssel elfogadod az <a href="adatvedelem">adatkezelési tájékoztatót</a>.</span>
       </div>
     </form>
   <?php endif; ?>

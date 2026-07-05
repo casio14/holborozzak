@@ -21,44 +21,44 @@ if (is_file($versionFile)) {
 
         <nav class="site-footer__col" aria-label="Felfedezés">
           <h3>Felfedezés</h3>
-          <a href="esemenyek.php">Összes esemény</a>
-          <a href="naptar.php">Eseménynaptár</a>
-          <a href="terkep.php">Eseménytérkép</a>
+          <a href="esemenyek">Összes esemény</a>
+          <a href="naptar">Eseménynaptár</a>
+          <a href="terkep">Eseménytérkép</a>
           <a href="./#hirlevel">Hírlevél</a>
         </nav>
 
         <nav class="site-footer__col" aria-label="Szervezőknek">
           <h3>Szervezőknek</h3>
-          <a href="esemeny-bekuldes.php">Esemény beküldése</a>
+          <a href="esemeny-bekuldes">Esemény beküldése</a>
           <a href="mailto:info@holborozzak.hu?subject=Esem%C3%A9ny%20kiemel%C3%A9se">Kiemelés &amp; hirdetés</a>
           <a href="mailto:info@holborozzak.hu?subject=Hi%C3%A1nyz%C3%B3%20esem%C3%A9ny">Hiányzó esemény jelzése</a>
         </nav>
 
         <nav class="site-footer__col" aria-label="Kategóriák">
           <h3>Kategóriák</h3>
-          <a href="esemenyek.php?kategoria%5B%5D=borfesztival">Borfesztiválok</a>
-          <a href="esemenyek.php?kategoria%5B%5D=kostolo">Kóstolók</a>
-          <a href="esemenyek.php?kategoria%5B%5D=szureti-rendezveny">Szüreti rendezvények</a>
-          <a href="esemenyek.php?kategoria%5B%5D=gasztronomia">Gasztronómia</a>
-          <a href="esemenyek.php?kategoria%5B%5D=koncert">Koncertek</a>
-          <a href="esemenyek.php#esemenyek-region" class="site-footer__col-all">Összes kategória →</a>
+          <a href="esemenyek?kategoria%5B%5D=borfesztival">Borfesztiválok</a>
+          <a href="esemenyek?kategoria%5B%5D=kostolo">Kóstolók</a>
+          <a href="esemenyek?kategoria%5B%5D=szureti-rendezveny">Szüreti rendezvények</a>
+          <a href="esemenyek?kategoria%5B%5D=gasztronomia">Gasztronómia</a>
+          <a href="esemenyek?kategoria%5B%5D=koncert">Koncertek</a>
+          <a href="esemenyek#esemenyek-region" class="site-footer__col-all">Összes kategória →</a>
         </nav>
 
         <nav class="site-footer__col" aria-label="Borvidékek">
           <h3>Borvidékek</h3>
-          <a href="esemenyek.php?borvidek%5B%5D=tokaji">Tokaji</a>
-          <a href="esemenyek.php?borvidek%5B%5D=villanyi">Villányi</a>
-          <a href="esemenyek.php?borvidek%5B%5D=egri">Egri</a>
-          <a href="esemenyek.php?borvidek%5B%5D=badacsonyi">Badacsonyi</a>
-          <a href="esemenyek.php?borvidek%5B%5D=soproni">Soproni</a>
-          <a href="esemenyek.php#esemenyek-region" class="site-footer__col-all">Összes borvidék →</a>
+          <a href="esemenyek?borvidek%5B%5D=tokaji">Tokaji</a>
+          <a href="esemenyek?borvidek%5B%5D=villanyi">Villányi</a>
+          <a href="esemenyek?borvidek%5B%5D=egri">Egri</a>
+          <a href="esemenyek?borvidek%5B%5D=badacsonyi">Badacsonyi</a>
+          <a href="esemenyek?borvidek%5B%5D=soproni">Soproni</a>
+          <a href="esemenyek#esemenyek-region" class="site-footer__col-all">Összes borvidék →</a>
         </nav>
 
         <nav class="site-footer__col site-footer__col--legal" aria-label="Jogi információk">
           <h3>Jogi</h3>
-          <a href="impresszum.php">Impresszum</a>
-          <a href="aszf.php">ÁSZF</a>
-          <a href="adatvedelem.php">Adatvédelem</a>
+          <a href="impresszum">Impresszum</a>
+          <a href="aszf">ÁSZF</a>
+          <a href="adatvedelem">Adatvédelem</a>
         </nav>
 
       </div>
@@ -76,7 +76,7 @@ if (is_file($versionFile)) {
   <div class="cookie-bar" id="cookieBar" role="region" aria-label="Süti tájékoztató">
     <p class="cookie-bar__text">🍪 Egyetlen anonim mérési sütit használnánk, hogy pontosabban
       lássuk a látogatottságot — személyes adatot nem tárol, harmadik fél nem fér hozzá.
-      Részletek: <a href="adatvedelem.php">Adatkezelési tájékoztató</a>.</p>
+      Részletek: <a href="adatvedelem">Adatkezelési tájékoztató</a>.</p>
     <div class="cookie-bar__actions">
       <button type="button" class="btn btn--primary cookie-bar__btn" id="cookieYes">Elfogadom</button>
       <button type="button" class="btn cookie-bar__btn cookie-bar__btn--no" id="cookieNo">Nem fogadom el</button>

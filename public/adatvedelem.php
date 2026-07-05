@@ -31,7 +31,7 @@ require __DIR__ . '/partials/header.php';
           <dl class="legal-kv">
             <dt>Szolgáltató neve</dt><dd>Holborozzak</dd>
             <dt>E-mail</dt><dd><a href="mailto:info@holborozzak.hu">info@holborozzak.hu</a></dd>
-            <dt>Bővebben</dt><dd><a href="impresszum.php">Impresszum</a></dd>
+            <dt>Bővebben</dt><dd><a href="impresszum">Impresszum</a></dd>
           </dl>
         </address>
       </section>

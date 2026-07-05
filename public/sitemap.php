@@ -17,13 +17,13 @@ $u = static fn(string $path): string => $root . '/' . ltrim($path, '/');
 
 $urls = [
     ['loc' => $root . '/',            'changefreq' => 'daily',   'priority' => '1.0'],
-    ['loc' => $u('esemenyek.php'),    'changefreq' => 'daily',   'priority' => '0.9'],
-    ['loc' => $u('naptar.php'),       'changefreq' => 'weekly',  'priority' => '0.7'],
-    ['loc' => $u('terkep.php'),       'changefreq' => 'weekly',  'priority' => '0.7'],
-    ['loc' => $u('esemeny-bekuldes.php'), 'changefreq' => 'monthly', 'priority' => '0.4'],
-    ['loc' => $u('impresszum.php'),   'changefreq' => 'yearly',  'priority' => '0.2'],
-    ['loc' => $u('aszf.php'),         'changefreq' => 'yearly',  'priority' => '0.2'],
-    ['loc' => $u('adatvedelem.php'),  'changefreq' => 'yearly',  'priority' => '0.2'],
+    ['loc' => $u('esemenyek'),        'changefreq' => 'daily',   'priority' => '0.9'],
+    ['loc' => $u('naptar'),           'changefreq' => 'weekly',  'priority' => '0.7'],
+    ['loc' => $u('terkep'),           'changefreq' => 'weekly',  'priority' => '0.7'],
+    ['loc' => $u('esemeny-bekuldes'), 'changefreq' => 'monthly', 'priority' => '0.4'],
+    ['loc' => $u('impresszum'),       'changefreq' => 'yearly',  'priority' => '0.2'],
+    ['loc' => $u('aszf'),             'changefreq' => 'yearly',  'priority' => '0.2'],
+    ['loc' => $u('adatvedelem'),      'changefreq' => 'yearly',  'priority' => '0.2'],
 ];
 
 try {

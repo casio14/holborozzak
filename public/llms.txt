@@ -10,10 +10,10 @@ naptárban is megnézhetik az eseményeket, és minden eseményhez tartozik egy
 részletoldal pontos időponttal, helyszínnel és linkekkel.
 
 ## Fő oldalak
-- [Összes esemény](/esemenyek.php): teljes, szűrhető lista (borvidék, kategória, időpont).
-- [Eseménynaptár](/naptar.php): havi naptárnézet az eseményekkel.
-- [Eseménytérkép](/terkep.php): interaktív térkép a rendezvények helyszíneivel.
-- [Esemény beküldése](/esemeny-bekuldes.php): szervezők ingyenesen feltüntethetik a rendezvényüket.
+- [Összes esemény](/esemenyek): teljes, szűrhető lista (borvidék, kategória, időpont).
+- [Eseménynaptár](/naptar): havi naptárnézet az eseményekkel.
+- [Eseménytérkép](/terkep): interaktív térkép a rendezvények helyszíneivel.
+- [Esemény beküldése](/esemeny-bekuldes): szervezők ingyenesen feltüntethetik a rendezvényüket.
 - [sitemap](/sitemap.php): az összes közzétett esemény és oldal.
 
 ## Kategóriák

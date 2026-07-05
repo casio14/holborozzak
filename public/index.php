@@ -42,7 +42,7 @@ require __DIR__ . '/partials/header.php';
         Fesztiválok, kóstolók és pincelátogatások Tokajtól Villányig
         — egy helyen, mindig naprakészen.
       </p>
-      <form class="hero__search" role="search" method="get" action="esemenyek.php">
+      <form class="hero__search" role="search" method="get" action="esemenyek">
         <input id="hero-kereso" type="search" name="q"
                placeholder="Keresés helyszín, borvidék vagy esemény szerint…"
                aria-label="Keresés helyszín, borvidék vagy esemény szerint">
@@ -64,7 +64,7 @@ require __DIR__ . '/partials/header.php';
     <section class="events-section">
       <div class="events-section__head">
         <h2>Kiemelt események</h2>
-        <a class="events-section__more" href="esemenyek.php">Összes esemény →</a>
+        <a class="events-section__more" href="esemenyek">Összes esemény →</a>
       </div>
       <div class="events-grid">
         <?php foreach ($featured as $e): $st = eventStatus($e['start_datetime'], $e['end_datetime']); ?>
@@ -95,7 +95,7 @@ require __DIR__ . '/partials/header.php';
     <section class="events-section">
       <div class="events-section__head">
         <h2>Közelgő események</h2>
-        <a class="events-section__more" href="esemenyek.php">Összes esemény →</a>
+        <a class="events-section__more" href="esemenyek">Összes esemény →</a>
       </div>
       <div class="events-list">
         <?php foreach ($preview as $e): $st = eventStatus($e['start_datetime'], $e['end_datetime']); ?>
@@ -129,7 +129,7 @@ require __DIR__ . '/partials/header.php';
       <p class="browse-eyebrow">Felfedezés</p>
       <div class="events-section__head"><h2>Böngéssz másképp</h2></div>
       <div class="browse-grid">
-        <a class="browse-tile" href="esemenyek.php">
+        <a class="browse-tile" href="esemenyek">
           <div class="browse-tile__head">
             <span class="browse-tile__icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -142,7 +142,7 @@ require __DIR__ . '/partials/header.php';
           <p class="browse-tile__desc">A teljes lista — szűrés borvidék, kategória és időpont szerint.</p>
           <span class="browse-tile__arrow" aria-hidden="true">→</span>
         </a>
-        <a class="browse-tile" href="terkep.php">
+        <a class="browse-tile" href="terkep">
           <div class="browse-tile__head">
             <span class="browse-tile__icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -155,7 +155,7 @@ require __DIR__ . '/partials/header.php';
           <p class="browse-tile__desc">Nézd meg, milyen rendezvények vannak a közeledben.</p>
           <span class="browse-tile__arrow" aria-hidden="true">→</span>
         </a>
-        <a class="browse-tile" href="naptar.php">
+        <a class="browse-tile" href="naptar">
           <div class="browse-tile__head">
             <span class="browse-tile__icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -179,7 +179,7 @@ require __DIR__ . '/partials/header.php';
         <p>Küldd be ingyenesen, vagy vedd fel velünk a kapcsolatot, ha ki szeretnéd emelni.</p>
       </div>
       <div class="cta-band__actions">
-        <a class="btn btn--gold" href="esemeny-bekuldes.php">Esemény beküldése →</a>
+        <a class="btn btn--gold" href="esemeny-bekuldes">Esemény beküldése →</a>
         <a class="btn btn--ghost-light" href="mailto:info@holborozzak.hu?subject=Esem%C3%A9ny%20kiemel%C3%A9se">Kiemelés iránt érdeklődöm</a>
       </div>
     </section>
@@ -204,7 +204,7 @@ require __DIR__ . '/partials/header.php';
           <li>🚫 Spam nélkül</li>
           <li>✅ Bármikor leiratkozhatsz</li>
         </ul>
-        <p class="news-band__note">A feliratkozással elfogadod az <a href="adatvedelem.php">adatkezelési tájékoztatót</a>. · <a href="leiratkozas.php">Leiratkozás</a></p>
+        <p class="news-band__note">A feliratkozással elfogadod az <a href="adatvedelem">adatkezelési tájékoztatót</a>. · <a href="leiratkozas.php">Leiratkozás</a></p>
       </div>
     </section>
 

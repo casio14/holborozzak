@@ -11,7 +11,7 @@ $host   = $_SERVER['HTTP_HOST'] ?? 'holborozzak.hu';
 $base   = $scheme . '://' . $host . rtrim(dirname($_SERVER['SCRIPT_NAME'] ?? '/'), '/');
 $asset  = $base . '/assets/style.css';
 $home   = $base . '/';
-$events = $base . '/esemenyek.php';
+$events = $base . '/esemenyek';
 ?>
 <!DOCTYPE html>
 <html lang="hu">

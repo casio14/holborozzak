@@ -57,7 +57,7 @@ $listHeading = $q !== ''
 $ld = eventsItemListJsonLd($events, $base, $dir);
 $jsonLd = array_merge($ld ?? [], [breadcrumbJsonLd([
     'Főoldal'   => $base . $dir . '/',
-    'Események' => $base . $dir . '/esemenyek.php',
+    'Események' => $base . $dir . '/esemenyek',
 ])]);
 
 require __DIR__ . '/partials/header.php';
@@ -79,7 +79,7 @@ require __DIR__ . '/partials/header.php';
       <?php endforeach; ?>
     </nav>
 
-    <form class="facets" method="get" action="esemenyek.php" aria-label="Keresés, szűrők és rendezés">
+    <form class="facets" method="get" action="esemenyek" aria-label="Keresés, szűrők és rendezés">
       <?php if ($view !== 'kozelgo'): ?><input type="hidden" name="nezet" value="<?= h($view) ?>"><?php endif; ?>
 
       <label class="facets__search">

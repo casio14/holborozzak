@@ -74,7 +74,7 @@ require __DIR__ . '/partials/header.php';
         </a>
       <?php endforeach; ?>
       <?php if (!$points): ?>
-        <p class="map-list__hint">Jelenleg nincs térképen megjeleníthető esemény. <a href="esemenyek.php">Nézd meg a listát →</a></p>
+        <p class="map-list__hint">Jelenleg nincs térképen megjeleníthető esemény. <a href="esemenyek">Nézd meg a listát →</a></p>
       <?php endif; ?>
     </aside>
     <div id="map" class="event-map" role="region" aria-label="Borrendezvények térképe"></div>

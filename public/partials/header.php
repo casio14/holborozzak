@@ -123,7 +123,7 @@ $jsVer  = @filemtime(__DIR__ . '/../assets/app.js') ?: time();
 
       <nav class="site-nav" aria-label="Fő navigáció">
         <!-- TODO: a Naptár és Térkép céloldal a következő inkrementumokban készül el -->
-        <a href="esemenyek.php"<?= $activeNav === 'esemenyek' ? ' class="is-active" aria-current="page"' : '' ?>>
+        <a href="esemenyek"<?= $activeNav === 'esemenyek' ? ' class="is-active" aria-current="page"' : '' ?>>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/>
             <circle cx="3.6" cy="6" r="1.3" fill="currentColor" stroke="none"/>
@@ -132,7 +132,7 @@ $jsVer  = @filemtime(__DIR__ . '/../assets/app.js') ?: time();
           </svg>
           Események
         </a>
-        <a href="naptar.php"<?= $activeNav === 'naptar' ? ' class="is-active" aria-current="page"' : '' ?>>
+        <a href="naptar"<?= $activeNav === 'naptar' ? ' class="is-active" aria-current="page"' : '' ?>>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <rect x="3" y="4.5" width="18" height="16" rx="2"/>
             <line x1="3" y1="9" x2="21" y2="9"/>
@@ -141,7 +141,7 @@ $jsVer  = @filemtime(__DIR__ . '/../assets/app.js') ?: time();
           </svg>
           Naptár
         </a>
-        <a href="terkep.php"<?= $activeNav === 'terkep' ? ' class="is-active" aria-current="page"' : '' ?>>
+        <a href="terkep"<?= $activeNav === 'terkep' ? ' class="is-active" aria-current="page"' : '' ?>>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <polygon points="3 6.5 9 3.5 15 6.5 21 3.5 21 17.5 15 20.5 9 17.5 3 20.5"/>
             <line x1="9" y1="3.5" x2="9" y2="17.5"/>
@@ -149,11 +149,11 @@ $jsVer  = @filemtime(__DIR__ . '/../assets/app.js') ?: time();
           </svg>
           Térkép
         </a>
-        <a class="site-nav__cta" href="esemeny-bekuldes.php">Esemény beküldése</a>
+        <a class="site-nav__cta" href="esemeny-bekuldes">Esemény beküldése</a>
       </nav>
 
       <div class="site-header__actions">
-        <a class="site-cta" href="esemeny-bekuldes.php">Esemény beküldése</a>
+        <a class="site-cta" href="esemeny-bekuldes">Esemény beküldése</a>
         <label class="nav-burger" for="nav-toggle" aria-label="Menü">
           <svg class="nav-burger__open" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
             <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>

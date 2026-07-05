@@ -23,7 +23,7 @@
     });
     // Az alap mindig az űrlap action-je (esemenyek.php) — üres szűrőnél is az
     // események oldalon maradunk, nem a könyvtár gyökerén (ami a főoldal lenne).
-    var base = form.getAttribute('action') || 'esemenyek.php';
+    var base = form.getAttribute('action') || 'esemenyek';
     var qs = clean.toString();
     return qs ? (base + '?' + qs) : base;
   }
