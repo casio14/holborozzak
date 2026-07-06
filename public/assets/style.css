@@ -1690,54 +1690,128 @@ main { flex: 1 0 auto; }
 .map-list { margin: 0; padding-left: 1.1rem; line-height: 1.9; }
 .map-list strong { color: var(--wine-900); }
 
-/* ---------- Admin (egyszerű, védett felület) ---------- */
-.admin-body { background: var(--cream); }
-.admin-bar {
-  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
-  background: var(--wine-900); color: var(--cream); padding: .8rem 1.25rem;
-}
-.admin-bar__title { font-weight: 800; }
-.admin-bar a { color: var(--gold-200); }
-.admin-bar a:hover { color: #fff; }
-.admin-main { max-width: 1100px; margin: 0 auto; padding: 1.75rem 1.25rem 4rem; }
-.admin-main h1 { margin: 0 0 .5rem; color: var(--wine-900); }
-.admin-stats { margin: 0 0 1.5rem; color: var(--muted); }
-.admin-stats strong { color: var(--wine-900); }
+/* ---------- Admin (modern, védett felület) ---------- */
+.admin-body { background: #f1ece3; color: var(--ink); }
 
-.admin-login {
-  max-width: 360px; margin: 4rem auto; background: var(--paper);
-  border: 1px solid var(--line); border-radius: 16px; padding: 2rem; box-shadow: var(--shadow);
+/* Felső navigáció — közös, ragadós, aktív menüpont-kiemeléssel */
+.adminnav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(255, 253, 249, .92);
+  -webkit-backdrop-filter: saturate(1.4) blur(8px);
+  backdrop-filter: saturate(1.4) blur(8px);
+  border-bottom: 1px solid var(--line);
+  box-shadow: 0 6px 18px rgba(74, 14, 28, .05);
 }
-.admin-login h1 { margin: 0 0 1.25rem; font-size: 1.3rem; color: var(--wine-900); }
-.admin-login label { display: block; font-weight: 700; font-size: .9rem; margin: .75rem 0 .3rem; }
+.adminnav__inner {
+  max-width: 1180px; margin: 0 auto; padding: .6rem 1.25rem;
+  display: flex; align-items: center; gap: 1rem;
+}
+.adminnav__brand {
+  display: inline-flex; align-items: center; gap: .5rem; white-space: nowrap;
+  font-weight: 800; color: var(--wine-900); text-decoration: none;
+  font-size: 1.02rem; letter-spacing: -.01em;
+}
+.adminnav__mark {
+  display: inline-grid; place-items: center; width: 26px; height: 26px; border-radius: 8px;
+  background: linear-gradient(140deg, var(--wine-700), var(--wine-900));
+  color: var(--gold-200); font-size: .7rem;
+}
+.adminnav__tag {
+  font-size: .6rem; text-transform: uppercase; letter-spacing: .12em; font-weight: 800;
+  color: var(--wine-700); background: #f3e7d0; padding: .15rem .4rem; border-radius: 5px;
+}
+.adminnav__menu { display: flex; align-items: center; gap: .25rem; flex: 1; min-width: 0; }
+.adminnav__link {
+  padding: .5rem .8rem; border-radius: 9px; text-decoration: none; white-space: nowrap;
+  color: var(--wine-700); font-weight: 700; font-size: .92rem;
+  transition: background .12s ease, color .12s ease;
+}
+.adminnav__link:hover { background: #f3ecdd; color: var(--wine-900); }
+.adminnav__link.is-active { background: var(--wine-700); color: #fff; }
+.adminnav__side { display: flex; align-items: center; gap: .5rem; white-space: nowrap; }
+.adminnav__ext, .adminnav__logout {
+  text-decoration: none; font-weight: 700; font-size: .86rem;
+  padding: .45rem .75rem; border-radius: 9px; border: 1px solid var(--line); background: #fff;
+}
+.adminnav__ext { color: var(--wine-700); }
+.adminnav__ext:hover { border-color: var(--gold); color: var(--wine-900); }
+.adminnav__logout { color: #8a2c12; border-color: #ecc9bd; }
+.adminnav__logout:hover { background: #fbeae5; border-color: #cd7a63; }
+@media (max-width: 760px) {
+  .adminnav__inner { flex-wrap: wrap; gap: .6rem; }
+  .adminnav__menu {
+    order: 3; width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch;
+    padding-bottom: .1rem; gap: .35rem;
+  }
+  .adminnav__side { margin-left: auto; }
+}
+
+/* Rész-oldalak (szerkesztő, előnézet) vissza-fejléce */
+.admin-bar {
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;
+  background: #fffdf9; border-bottom: 1px solid var(--line); color: var(--wine-900);
+  padding: .8rem 1.25rem;
+}
+.admin-bar__title { font-weight: 800; color: var(--wine-900); }
+.admin-bar a {
+  color: var(--wine-700); text-decoration: none; font-weight: 700; font-size: .88rem;
+  padding: .38rem .7rem; border-radius: 8px; border: 1px solid var(--line); background: #fff;
+}
+.admin-bar a:hover { border-color: var(--gold); color: var(--wine-900); }
+.admin-bar__links { display: inline-flex; gap: .5rem; flex-wrap: wrap; }
+
+.admin-main { max-width: 1180px; margin: 0 auto; padding: 2rem 1.25rem 4.5rem; }
+.admin-main > h1 {
+  margin: 0 0 1.25rem; color: var(--wine-900); font-size: 1.7rem; letter-spacing: -.01em;
+}
+.admin-lead { margin: -.5rem 0 1.5rem; color: var(--muted); font-size: .95rem; }
+.admin-lead strong { color: var(--wine-900); }
+
+/* Belépő kártya */
+.admin-login {
+  max-width: 380px; margin: 4.5rem auto; background: var(--paper);
+  border: 1px solid var(--line); border-radius: 18px; padding: 2.2rem 2rem;
+  box-shadow: 0 20px 50px rgba(74, 14, 28, .12);
+}
+.admin-login h1 {
+  margin: 0 0 1.5rem; font-size: 1.35rem; color: var(--wine-900);
+  display: flex; align-items: center; gap: .55rem;
+}
+.admin-login h1::before { content: "🍇"; font-size: 1.15rem; }
+.admin-login label { display: block; font-weight: 700; font-size: .85rem; color: var(--wine-900); margin: .9rem 0 .35rem; }
 .admin-login input {
   width: 100%; border: 1px solid var(--line); border-radius: 10px;
-  padding: .7rem .85rem; font: inherit; font-size: 1rem; background: #fff;
+  padding: .75rem .9rem; font: inherit; font-size: 1rem; background: #fff;
 }
-.admin-login button { margin-top: 1.5rem; width: 100%; }
+.admin-login input:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px rgba(200, 161, 75, .18); }
+.admin-login button { margin-top: 1.6rem; width: 100%; }
+
 .admin-error {
   background: #fbeae5; border: 1px solid #e9b8a8; color: #8a2c12;
-  border-radius: 10px; padding: .7rem .9rem; margin: 0 0 1rem; font-size: .9rem;
+  border-radius: 10px; padding: .8rem 1rem; margin: 0 0 1rem; font-size: .92rem;
 }
+
+/* Táblák */
 .admin-table {
-  width: 100%; border-collapse: collapse; background: var(--paper);
-  border: 1px solid var(--line); border-radius: 12px; overflow: hidden;
+  width: 100%; border-collapse: separate; border-spacing: 0; background: var(--paper);
+  border: 1px solid var(--line); border-radius: 14px; overflow: hidden; box-shadow: var(--shadow);
 }
 .admin-table th, .admin-table td {
-  text-align: left; padding: .7rem .9rem; border-bottom: 1px solid var(--line);
+  text-align: left; padding: .8rem 1rem; border-bottom: 1px solid var(--line);
   font-size: .92rem; vertical-align: top;
 }
 .admin-table th {
-  background: #f6efe1; color: var(--wine-900); font-size: .76rem;
-  text-transform: uppercase; letter-spacing: .05em;
+  background: #f6efe1; color: var(--wine-900); font-size: .72rem;
+  text-transform: uppercase; letter-spacing: .06em; font-weight: 800;
 }
+.admin-table tbody tr:hover { background: #faf6ee; }
 .admin-table tr:last-child td { border-bottom: none; }
 .admin-empty {
-  color: var(--muted); padding: 2rem; text-align: center; background: var(--paper);
-  border: 1px solid var(--line); border-radius: 12px;
+  color: var(--muted); padding: 2.5rem 2rem; text-align: center; background: var(--paper);
+  border: 1px dashed var(--line); border-radius: 14px; font-size: .95rem;
 }
 .admin-note { margin: 1rem 0 0; color: var(--muted); font-size: .85rem; }
-.admin-pill { display: inline-block; margin-left: .4rem; padding: .1rem .5rem; border-radius: 999px; font-size: .72rem; font-weight: 700; }
+.admin-pill { display: inline-block; margin-left: .4rem; padding: .12rem .5rem; border-radius: 999px; font-size: .72rem; font-weight: 700; }
 .admin-pill--draft { background: #f3ead6; color: #7a5a12; }
 
 /* Süti-sáv (consent) */
@@ -1756,19 +1830,24 @@ main { flex: 1 0 auto; }
 }
 .cookie-bar__btn--no:hover { border-color: var(--gold); color: var(--gold); }
 
-/* Admin: statisztika (csempék + számoszlopok) */
+/* Admin: statisztika-csempék */
 .admin-stats {
-  display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: .8rem; margin: 0 0 1.5rem;
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 1rem; margin: 0 0 1.75rem;
 }
 .admin-stat {
-  background: var(--paper); border: 1px solid var(--line); border-radius: 12px;
-  padding: .9rem 1rem; display: flex; flex-direction: column; gap: .15rem;
+  position: relative; overflow: hidden;
+  background: var(--paper); border: 1px solid var(--line); border-radius: 14px;
+  padding: 1.1rem 1.15rem; display: flex; flex-direction: column; gap: .2rem; box-shadow: var(--shadow);
 }
-.admin-stat__num { font-size: 1.6rem; font-weight: 800; color: var(--wine-900); line-height: 1.15; }
-.admin-stat__label { font-size: .78rem; text-transform: uppercase; letter-spacing: .05em; color: var(--wine-700); font-weight: 700; }
+.admin-stat::before {
+  content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+  background: linear-gradient(var(--gold), var(--gold-200));
+}
+.admin-stat__num { font-size: 1.8rem; font-weight: 800; color: var(--wine-900); line-height: 1.1; font-variant-numeric: tabular-nums; }
+.admin-stat__label { font-size: .74rem; text-transform: uppercase; letter-spacing: .06em; color: var(--wine-700); font-weight: 800; }
 .admin-stat__sub { font-size: .8rem; color: var(--muted); }
-.admin-h2 { margin: 1.6rem 0 .8rem; font-size: 1.1rem; color: var(--wine-900); }
+.admin-h2 { margin: 2rem 0 .9rem; font-size: 1.15rem; color: var(--wine-900); font-weight: 700; display: flex; align-items: baseline; gap: .5rem; flex-wrap: wrap; }
 .admin-num { text-align: right !important; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .admin-table--narrow { max-width: 560px; }
 
@@ -1779,36 +1858,39 @@ main { flex: 1 0 auto; }
 .admin-dedup-list li { margin: .15rem 0; }
 
 /* Admin: státusz-fülek, üzenet, művelet-gombok */
-.admin-tabs { display: flex; gap: .5rem; margin: 0 0 1.25rem; flex-wrap: wrap; }
+.admin-tabs { display: flex; gap: .5rem; margin: 0 0 1.5rem; flex-wrap: wrap; }
 .admin-tab {
-  padding: .5rem .9rem; border-radius: 999px; border: 1px solid var(--line);
+  padding: .5rem .95rem; border-radius: 999px; border: 1px solid var(--line);
   background: var(--paper); color: var(--wine-700); text-decoration: none; font-weight: 700; font-size: .9rem;
+  transition: border-color .12s ease, background .12s ease, box-shadow .12s ease;
 }
-.admin-tab:hover { border-color: var(--gold); }
-.admin-tab.is-active { background: var(--wine-700); color: #fff; border-color: var(--wine-700); }
-.admin-msg { background: #eef3e6; border: 1px solid #c9d6ad; color: #3c4a22; border-radius: 10px; padding: .7rem .9rem; margin: 0 0 1.25rem; font-size: .9rem; }
+.admin-tab:hover { border-color: var(--gold); background: #fff; }
+.admin-tab.is-active { background: var(--wine-700); color: #fff; border-color: var(--wine-700); box-shadow: 0 4px 12px rgba(114, 47, 55, .28); }
+.admin-msg { background: #eef3e6; border: 1px solid #c9d6ad; color: #3c4a22; border-radius: 12px; padding: .8rem 1rem; margin: 0 0 1.25rem; font-size: .92rem; }
 .admin-star { color: var(--gold); }
 .admin-actions-cell { white-space: nowrap; }
 .admin-actform { display: inline-block; margin: 0 .2rem .2rem 0; }
 .admin-btn {
   border: 1px solid var(--line); background: #fff; color: var(--wine-700);
-  border-radius: 8px; padding: .35rem .6rem; font: inherit; font-size: .8rem; font-weight: 700; cursor: pointer;
+  border-radius: 8px; padding: .4rem .7rem; font: inherit; font-size: .8rem; font-weight: 700; cursor: pointer;
+  transition: border-color .12s ease, background .12s ease;
 }
-.admin-btn:hover { border-color: var(--gold); }
+.admin-btn:hover { border-color: var(--gold); background: #fffdf7; }
 .admin-btn--go { background: var(--leaf); color: #fff; border-color: var(--leaf); }
 .admin-btn--go:hover { background: #4c5a32; border-color: #4c5a32; }
 .admin-btn--danger { background: #fff; color: #8a2c12; border-color: #e9b8a8; }
 .admin-btn--danger:hover { background: #fbeae5; border-color: #cd7a63; }
 .admin-link {
-  display: inline-block; margin: 0 .2rem .2rem 0; padding: .35rem .6rem;
+  display: inline-block; margin: 0 .2rem .2rem 0; padding: .4rem .7rem; background: #fff;
   border: 1px solid var(--line); border-radius: 8px; color: var(--wine-700);
   text-decoration: none; font-weight: 700; font-size: .8rem;
 }
 .admin-link:hover { border-color: var(--gold); }
 
 /* Admin: URL-import doboz + segédszöveg a jelölt-soroknál */
-.admin-import { background: var(--paper); border: 1px solid var(--line); border-radius: 12px; padding: 1.1rem 1.25rem; margin: 0 0 1.5rem; }
-.admin-import label { display: block; font-weight: 700; font-size: .9rem; color: var(--wine-900); margin-bottom: .5rem; }
+.admin-import { background: var(--paper); border: 1px solid var(--line); border-radius: 14px; padding: 1.25rem 1.35rem; margin: 0 0 1.5rem; box-shadow: var(--shadow); }
+.admin-import label { display: block; font-weight: 700; font-size: .9rem; color: var(--wine-900); margin-bottom: .6rem; }
 .admin-import__row { display: flex; gap: .5rem; flex-wrap: wrap; }
-.admin-import__row input { flex: 1; min-width: 240px; border: 1px solid var(--line); border-radius: 10px; padding: .7rem .85rem; font: inherit; font-size: 1rem; background: #fff; }
+.admin-import__row input { flex: 1; min-width: 240px; border: 1px solid var(--line); border-radius: 10px; padding: .75rem .9rem; font: inherit; font-size: 1rem; background: #fff; }
+.admin-import__row input:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px rgba(200, 161, 75, .18); }
 .admin-sub { color: var(--muted); font-size: .85rem; }

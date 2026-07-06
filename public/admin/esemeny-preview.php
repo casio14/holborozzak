@@ -67,7 +67,7 @@ function pimg(string $src): string
 <body class="admin-body">
   <div class="admin-bar">
     <span class="admin-bar__title">Esemény-előnézet — <?= h($STATUS_LABEL[$event['status']] ?? $event['status']) ?></span>
-    <span><a href="edit.php?id=<?= $id ?>">Szerkesztés</a> &nbsp;·&nbsp; <a href="index.php">← Vissza</a></span>
+    <span class="admin-bar__links"><a href="edit.php?id=<?= $id ?>">Szerkesztés</a> <a href="index.php">← Vissza</a></span>
   </div>
 
   <div class="container">

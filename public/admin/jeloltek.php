@@ -206,14 +206,11 @@ $cssVer = @filemtime(__DIR__ . '/../assets/style.css') ?: time();
   <link rel="stylesheet" href="../assets/style.css?v=<?= $cssVer ?>">
 </head>
 <body class="admin-body">
-  <div class="admin-bar">
-    <span class="admin-bar__title">holborozzak.hu — admin</span>
-    <span><a href="index.php">Események</a> &nbsp;·&nbsp; <a href="feliratkozok.php">Feliratkozók</a> &nbsp;·&nbsp; <a href="statisztika.php">Statisztika</a> &nbsp;·&nbsp; <a href="logout.php">Kilépés</a></span>
-  </div>
+  <?php require __DIR__ . '/partials/nav.php'; ?>
 
   <main class="admin-main">
     <h1>Esemény-jelöltek</h1>
-    <p class="admin-stats">
+    <p class="admin-lead">
       Jóváhagyásra vár: <strong><?= (int) $counts['new'] ?></strong> ·
       Jóváhagyott: <strong><?= (int) $counts['approved'] ?></strong> ·
       Elvetett: <strong><?= (int) $counts['rejected'] ?></strong> ·

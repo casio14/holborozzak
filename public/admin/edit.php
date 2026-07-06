@@ -178,7 +178,7 @@ $catSel = (array) ($event['cat_slugs'] ?? []);
 <body class="admin-body">
   <div class="admin-bar">
     <span class="admin-bar__title">holborozzak.hu — admin</span>
-    <span><a href="index.php">← Vissza a listához</a> &nbsp;·&nbsp; <a href="logout.php">Kilépés</a></span>
+    <span class="admin-bar__links"><a href="index.php">← Vissza a listához</a> <a href="logout.php">Kilépés</a></span>
   </div>
 
   <main class="admin-main">
