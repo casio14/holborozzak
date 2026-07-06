@@ -156,17 +156,31 @@ if ($collectUrl === '' || $collectToken === '') {
 $today = (new DateTimeImmutable('now', new DateTimeZone('Europe/Budapest')))->format('Y-m-d');
 
 $system = "Magyar borrendezvény-kutató vagy. A web_search eszközzel KERESS az interneten "
-    . "KÖZELGŐ (a mai naptól számított kb. 6 hónapon belüli) magyarországi, borhoz köthető "
-    . "eseményeket: borfesztiválok, bornapok, szüreti rendezvények, kóstolók, pincék programjai. "
-    . "Futtass több, változatos keresést (különböző borvidékek, hónapok, rendezvénytípusok).\n"
+    . "KÖZELGŐ (a mai naptól számított kb. 6 hónapon belüli) magyarországi, borhoz köthető eseményeket.\n"
+    . "KERESETT ESEMÉNYTÍPUSOK (mindegyikre fuss rá, ne csak a nagy fesztiválokra):\n"
+    . "- borfesztiválok, bornapok, szüreti rendezvények és felvonulások;\n"
+    . "- borkóstolók és PORTFÓLIÓ-KÓSTOLÓK, nagy fedett kóstolóestek (pl. Borjour, Winelovers Grand);\n"
+    . "- BORBÁROK és BORSZAKÜZLETEK kóstoló-estjei, borász-vendégestek (pl. WineHub / Wine Connects);\n"
+    . "- ÉTTERMI BORVACSORÁK és borestek (étterem × borászat), tematikus vacsorasorozatok;\n"
+    . "- nyitott pince napok, dűlőséták, pincefesztiválok; Márton-napi újbor-ünnepek.\n"
+    . "VISSZATÉRŐ SZERVEZŐK / HELYSZÍNEK, amiket érdemes célzottan is megnézni (nem kizárólag ezek): "
+    . "WineHub – Wine Connects (winehub.hu), Winelovers Rendezvények (wineloversrendezvenyek.hu), "
+    . "Budapest Borfesztivál (aborfesztival.hu), Borjour, Bortársaság; borvacsora-helyszínek: Jardinette "
+    . "(Budapest), ARAZ Étterem (Budapest), Laposa „Tűz és Kő” és Borbarátok Étterem (Badacsony), Villa "
+    . "Tolnay / Zenit Hotel (Vonyarcvashegy), Oinos (Budapest); gyűjtő-oldalak: programturizmus.hu "
+    . "(borvacsora/borkóstoló kategória), boraszportal.hu bornaptár, gotravel.hu, csodalatosmagyarorszag.hu, "
+    . "fesztivalportal.hu. Futtass több, VÁLTOZATOS keresést (különböző borvidékek, hónapok, típusok, helyszínek).\n"
     . "A végén KIZÁRÓLAG egyetlen JSON TÖMBÖT adj vissza (markdown és magyarázat nélkül), ahol minden elem: "
     . "{title, start_datetime, end_datetime, city, venue_name, region_name, website_url, source_url, short_description, image_url}.\n"
     . "Az image_url az eseményhez tartozó kép közvetlen URL-je, ha találsz ilyet (különben üres string).\n"
     . "Dátumformátum: 'YYYY-MM-DDTHH:MM:SS' (ismeretlen idő: 00:00:00); ha nincs adat, üres string. "
     . "A region_name a 22 magyar borvidék egyike legyen, ha azonosítható. A source_url az az oldal, ahol az "
-    . "esemény megerősítve szerepel. CSAK valós, forrással alátámasztott eseményeket adj vissza — soha ne találj ki adatot.";
+    . "esemény megerősítve szerepel. CSAK valós, forrással alátámasztott eseményeket adj vissza — soha ne találj ki adatot. "
+    . "A KONKRÉT DÁTUMMAL bíró eseményeket részesítsd előnyben; dátum nélküli, csak „visszatérő” sorozatot ne adj vissza.";
 
-$user = "Mai dátum: {$today}. Keress legalább 10-15 közelgő, valós magyar borrendezvényt, és add vissza a JSON tömböt.";
+$user = "Mai dátum: {$today}. Keress legalább 12-18 közelgő, valós magyar borrendezvényt — a nagy "
+    . "fesztiválok MELLETT borkóstolókat, borbár-kóstolóesteket (pl. WineHub) és éttermi borvacsorákat is —, "
+    . "és add vissza a JSON tömböt.";
 
 echo "[" . date('c') . "] Keresés indul (model={$model})…\n";
 
