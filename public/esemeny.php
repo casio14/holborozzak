@@ -7,6 +7,7 @@ require __DIR__ . '/db.php';
 require __DIR__ . '/lib/events.php';
 
 logAiReferral(); // AI-asszisztensből (utm_source/referrer) érkező látogató naplózása
+logSearchReferral(); // Keresőmotorból (referrer) érkező látogató naplózása
 
 $base = ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http')
     . '://' . ($_SERVER['HTTP_HOST'] ?? 'holborozzak.hu');

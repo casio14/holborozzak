@@ -7,6 +7,7 @@ require __DIR__ . '/db.php';
 require __DIR__ . '/lib/events.php';
 
 logAiReferral(); // AI-asszisztensből (utm_source/referrer) érkező látogató naplózása
+logSearchReferral(); // Keresőmotorból (referrer) érkező látogató naplózása
 
 $pageTitle = 'Eseménytérkép — Magyarország borrendezvényei a térképen | holborozzak.hu';
 $pageDescription = 'Magyarország borrendezvényei egy interaktív térképen — találd meg a '

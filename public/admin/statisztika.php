@@ -37,6 +37,8 @@ $daily = [];
 $referrers = [];
 $aiTotals = ['interactions' => 0, 'unique' => 0, 'clicks' => 0];
 $aiRows = [];
+$searchTotals = ['interactions' => 0, 'unique' => 0, 'clicks' => 0];
+$searchRows = [];
 $dbError = false;
 
 // AI-ajánlások forrása: az ai_referrals tábla (a fő oldalak logAiReferral() hívása
@@ -151,6 +153,34 @@ try {
                 COUNT(DISTINCT COALESCE(a.session_id, a.ip_hash)) AS u
          FROM ai_referrals a {$whereAir}
          GROUP BY a.source
+         ORDER BY c DESC"
+    )->fetchAll();
+
+    // Keresőforgalom: keresőmotorból (Google, Bing stb.) érkező látogatók (search_referrals — referrer).
+    ensureSearchReferralsTable($pdo);
+    $whereSr = $days > 0 ? "WHERE s.created_at >= DATE_SUB(NOW(), INTERVAL {$days} DAY)" : '';
+    $st = $pdo->query(
+        "SELECT COUNT(*) AS c, COUNT(DISTINCT COALESCE(s.session_id, s.ip_hash)) AS u
+         FROM search_referrals s {$whereSr}"
+    )->fetch();
+    if ($st) {
+        $searchTotals['interactions'] = (int) $st['c'];
+        $searchTotals['unique']       = (int) $st['u'];
+    }
+    // Továbbkattintás: keresőből érkezett látogatók, akik utóbb a szervező oldalára kattintottak.
+    $searchTotals['clicks'] = (int) $pdo->query(
+        "SELECT COUNT(*) FROM event_interactions i
+         WHERE i.type IN ('click_website','click_ticket') {$clkWhere}
+           AND COALESCE(i.session_id, i.ip_hash) IN (
+             SELECT COALESCE(s.session_id, s.ip_hash) FROM search_referrals s {$whereSr}
+           )"
+    )->fetchColumn();
+    // Keresőnkénti bontás
+    $searchRows = $pdo->query(
+        "SELECT s.source AS se, COUNT(*) AS c,
+                COUNT(DISTINCT COALESCE(s.session_id, s.ip_hash)) AS u
+         FROM search_referrals s {$whereSr}
+         GROUP BY s.source
          ORDER BY c DESC"
     )->fetchAll();
 } catch (Throwable $e) {
@@ -270,6 +300,56 @@ $cssVer = @filemtime(__DIR__ . '/../assets/style.css') ?: time();
       „Továbbkattintás" azt mutatja, hányan léptek tovább a szervező oldalára. Amikor egy AI
       csak <em>megemlíti</em> az oldalt kattintás nélkül, az technikailag nem mérhető. (A Google
       AI Overviews a sima <code>google.com</code> hivatkozóként érkezik, ezért nem különíthető el.)</p>
+
+    <h2 class="admin-h2">🔎 Keresőforgalom <span class="admin-stat__sub">(látogatók, akik egy keresőmotor találatából érkeztek)</span></h2>
+    <div class="admin-stats">
+      <div class="admin-stat">
+        <span class="admin-stat__num"><?= number_format($searchTotals['interactions'], 0, ',', ' ') ?></span>
+        <span class="admin-stat__label">Keresőből érkezés</span>
+        <span class="admin-stat__sub">látogatás keresőmotorból (bármely oldalra)</span>
+      </div>
+      <div class="admin-stat">
+        <span class="admin-stat__num">~<?= number_format($searchTotals['unique'], 0, ',', ' ') ?></span>
+        <span class="admin-stat__label">Egyedi kereső-látogató</span>
+        <span class="admin-stat__sub">különböző látogató keresőből</span>
+      </div>
+      <div class="admin-stat">
+        <span class="admin-stat__num"><?= number_format($searchTotals['clicks'], 0, ',', ' ') ?></span>
+        <span class="admin-stat__label">Továbbkattintás</span>
+        <span class="admin-stat__sub">kereső-látogatóból a szervező oldalára</span>
+      </div>
+    </div>
+    <?php if ($searchRows): ?>
+      <table class="admin-table admin-table--narrow">
+        <thead>
+          <tr>
+            <th>Kereső</th>
+            <th class="admin-num">Érkezés</th>
+            <th class="admin-num">Egyedi látogató</th>
+          </tr>
+        </thead>
+        <tbody>
+          <?php foreach ($searchRows as $r): ?>
+            <tr>
+              <td><?= h($r['se']) ?></td>
+              <td class="admin-num"><?= number_format((int) $r['c'], 0, ',', ' ') ?></td>
+              <td class="admin-num">~<?= number_format((int) $r['u'], 0, ',', ' ') ?></td>
+            </tr>
+          <?php endforeach; ?>
+        </tbody>
+      </table>
+    <?php else: ?>
+      <div class="admin-empty">Ebben az időszakban még nem érkezett látogató azonosítható
+        keresőmotorból. Ahogy az oldal feljebb kerül a Google/Bing találatok között és a
+        felhasználók rákattintanak, itt fog megjelenni.</div>
+    <?php endif; ?>
+    <p class="admin-note">Ez azt méri, hányan <strong>érkeztek</strong> egy keresőmotor
+      (Google, Bing, DuckDuckGo, Yahoo stb.) találatából az oldalra — a felismerés a hivatkozó
+      (referrer) hostja alapján történik, <strong>bármely oldalra</strong> (a nyitóoldalt is
+      beleértve). A „Továbbkattintás" azt mutatja, hányan léptek tovább a szervező oldalára. A
+      keresők egy része adatvédelmi okból nem küld hivatkozót — az ilyen érkezés nem
+      azonosítható, ezért a valós keresőforgalom ennél magasabb lehet. (A Google AI Overviews is
+      sima <code>google.com</code> hivatkozóként érkezik, így itt „Google"-ként számolódik.)</p>
 
     <h2 class="admin-h2">Sütis látogató-mérés <span class="admin-stat__sub">(csak a mérési sütit elfogadó látogatók — napokon átívelően pontos)</span></h2>
     <div class="admin-stats">

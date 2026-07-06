@@ -666,6 +666,122 @@ function detectAiSource(string $utmSource, string $referrer): ?string
     return null;
 }
 
+/**
+ * Keresőmotor-forrás felismerése a HTTP Referer alapján (a keresők ritkán adnak
+ * utm-et, a hivatkozó host az árulkodó jel). Visszatérés: normalizált keresőnév,
+ * vagy null ha nem keresőből jött. Megjegyzés: a Google AI Overviews is sima
+ * google.com hivatkozóként érkezik → itt „Google"-ként számolódik.
+ */
+function detectSearchSource(string $referrer): ?string
+{
+    $host = strtolower((string) parse_url($referrer, PHP_URL_HOST));
+    if ($host === '') {
+        return null;
+    }
+    // Sorrend számít: a specifikusabb minták előbb.
+    $map = [
+        'google.'      => 'Google',
+        'bing.'        => 'Bing',
+        'duckduckgo.'  => 'DuckDuckGo',
+        'search.yahoo' => 'Yahoo',
+        'yahoo.'       => 'Yahoo',
+        'yandex.'      => 'Yandex',
+        'ecosia.'      => 'Ecosia',
+        'startpage.'   => 'Startpage',
+        'qwant.'       => 'Qwant',
+        'search.brave' => 'Brave',
+        'baidu.'       => 'Baidu',
+        'seznam.'      => 'Seznam',
+    ];
+    foreach ($map as $needle => $name) {
+        if (strpos($host, $needle) !== false) {
+            return $name;
+        }
+    }
+    return null;
+}
+
+/** Létrehozza a search_referrals táblát, ha még nincs (futásidőben, mint az ai_referrals). */
+function ensureSearchReferralsTable(PDO $pdo): void
+{
+    $pdo->exec(
+        "CREATE TABLE IF NOT EXISTS search_referrals (
+            id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+            source       VARCHAR(32)  NOT NULL,
+            landing_path VARCHAR(255) DEFAULT NULL,
+            referrer     VARCHAR(255) DEFAULT NULL,
+            session_id   VARCHAR(64)  DEFAULT NULL,
+            ip_hash      CHAR(64)     DEFAULT NULL,
+            user_agent   VARCHAR(255) DEFAULT NULL,
+            created_at   TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (id),
+            KEY idx_sr_time (created_at),
+            KEY idx_sr_source_time (source, created_at)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
+    );
+}
+
+/**
+ * Keresőmotorból érkező látogató naplózása (Google, Bing, DuckDuckGo stb.).
+ * Jelforrás: a HTTP Referer hostja. CSAK akkor ír sort, ha kereső-jel van — így
+ * a tábla adatvédelmileg visszafogott marad. Botokat kihagy; a session_id csak
+ * érvényes hozzájárulással kerül tárolásra. Sosem dob kivételt.
+ */
+function logSearchReferral(): void
+{
+    $ref = isset($_SERVER['HTTP_REFERER']) ? (string) $_SERVER['HTTP_REFERER'] : '';
+
+    $source = detectSearchSource($ref);
+    if ($source === null) {
+        return; // nincs kereső-jel → a DB-t sem érintjük
+    }
+
+    $ua = substr((string) ($_SERVER['HTTP_USER_AGENT'] ?? ''), 0, 255);
+    if (isLikelyBot($ua)) {
+        return;
+    }
+
+    try {
+        $pdo = db();
+        ensureSearchReferralsTable($pdo);
+
+        // Mérési süti — csak érvényes hozzájárulással, szigorú formátum-ellenőrzéssel.
+        $sid = null;
+        if ((string) ($_COOKIE['hb_consent'] ?? '') === '1') {
+            $c = (string) ($_COOKIE['hb_sid'] ?? '');
+            if (preg_match('/^[a-f0-9]{32}$/', $c)) {
+                $sid = $c;
+            }
+        }
+
+        $ip = (string) ($_SERVER['HTTP_CF_CONNECTING_IP']
+            ?? $_SERVER['HTTP_X_FORWARDED_FOR']
+            ?? $_SERVER['REMOTE_ADDR']
+            ?? '');
+        if (strpos($ip, ',') !== false) {
+            $ip = trim(explode(',', $ip)[0]);
+        }
+        $ipHash = $ip !== '' ? hash('sha256', $ip . '|' . appSalt() . '|' . date('Y-m-d')) : null;
+
+        $path = substr((string) strtok((string) ($_SERVER['REQUEST_URI'] ?? '/'), '?'), 0, 255);
+
+        $st = $pdo->prepare(
+            'INSERT INTO search_referrals (source, landing_path, referrer, session_id, ip_hash, user_agent)
+             VALUES (?, ?, ?, ?, ?, ?)'
+        );
+        $st->execute([
+            $source,
+            $path,
+            $ref !== '' ? substr($ref, 0, 255) : null,
+            $sid,
+            $ipHash,
+            $ua !== '' ? $ua : null,
+        ]);
+    } catch (Throwable $e) {
+        error_log('logSearchReferral hiba: ' . $e->getMessage());
+    }
+}
+
 /** Létrehozza az ai_referrals táblát, ha még nincs (futásidőben, mint a subscribers). */
 function ensureAiReferralsTable(PDO $pdo): void
 {
