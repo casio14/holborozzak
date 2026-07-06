@@ -1171,12 +1171,8 @@ main { flex: 1 0 auto; }
 .event-row__title { display: block; font-size: 1.05rem; font-weight: 700; color: var(--ink); }
 .event-row__sub { display: block; margin-top: .15rem; color: var(--muted); font-size: .9rem; }
 .event-row__right { display: flex; align-items: center; gap: 1rem; white-space: nowrap; }
-.event-row__loc { color: var(--muted); font-size: .9rem; }
+.event-row__loc { color: var(--wine-700); font-weight: 600; white-space: nowrap; }
 .event-row__chev { color: var(--wine-700); font-size: 1.1rem; }
-
-@media (max-width: 640px) {
-  .event-row__loc { display: none; }
-}
 
 /* ---------- Lábléc ---------- */
 .site-footer {
