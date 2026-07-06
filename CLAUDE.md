@@ -181,7 +181,15 @@ JSON-LD vázat (alap `WebSite`+`Organization`); `$jsonLd`-vel bővíthető oldal
   `ANTHROPIC_API_KEY`, `ANTHROPIC_MODEL`, `COLLECT_URL`, `COLLECT_TOKEN`. A CI **nem** éri el
   közvetlenül a Rackhost MySQL-t ([2002] connection refused), ezért a találatokat HTTPS-en
   POST-olja a token-védett `public/collect-ingest.php`-ra, és a DB-írás (dedup + insert) ott,
-  a szerveren történik. A jóváhagyás kézi (admin → Jelöltek).
+  a szerveren történik. A jóváhagyás kézi (admin → Jelöltek). `import_sources.php`:
+  **célzott forrás-importáló** — a web_search-alapú gyűjtő KIEGÉSZÍTÉSE. Egy KURÁLT listányi
+  konkrét programoldalt (borvacsora-/kóstoló-helyszínek: Jardinette, Laposa, WineHub, Borbarátok,
+  Winelovers Rendezvények + programturizmus borvacsora/borkóstoló kategóriák) tölt le, és
+  MINDEGYIKBŐL több közelgő eseményt nyer ki a Claude-dal (csak jövőbeli, konkrét dátumúak),
+  majd ugyanarra a `collect-ingest.php`-ra POST-ol. Miért kell: a kis borbár-/étterem-kóstolók
+  dátumai gyakran csak a saját programoldalukon vannak fent. Új forrás = egy sor a `$SOURCES`
+  tömbben. Indítja: `.github/workflows/import-sources.yml` (heti cron). Env ugyanaz, mint a
+  gyűjtőnél (DB nélkül; szöveg-kinyerés Haiku-val).
 - `db/` — adatbázis séma (`schema.sql`), `seed.sql` (minta események), migrációk. NEM kerül a webszerverre.
 - `docs/` — tervdokumentumok (pl. `adatmodell.md`). NEM kerül a webszerverre.
 - `.github/workflows/` — CI/CD (deploy).
