@@ -115,8 +115,7 @@ require __DIR__ . '/partials/header.php';
               </span>
               <span class="event-row__sub">
                 <?= h(formatDateRange($e['start_datetime'], $e['end_datetime'])) ?>
-                <?php $loc = implode(' · ', array_filter([$e['city'], $e['region_name']])); ?>
-                <?php if ($loc !== ''): ?> · <span class="event-row__loc">📍 <?= h($loc) ?></span><?php endif; ?>
+                <?php if (!empty($e['city'])): ?> · <span class="event-row__loc">📍 <?= h($e['city']) ?></span><?php endif; ?>
                 <?php if (!empty($e['categories'])): ?> · <?= h(implode(', ', categoryNames($e))) ?><?php endif; ?>
               </span>
             </span>
