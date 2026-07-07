@@ -78,6 +78,10 @@ jobs:
           COLLECT_TOKEN: ${{ secrets.COLLECT_TOKEN }}
           NEWSLETTER_TOKEN: ${{ secrets.NEWSLETTER_TOKEN }}
           MAIL_FROM: ${{ secrets.MAIL_FROM }}
+          IMAP_HOST: ${{ secrets.IMAP_HOST }}
+          IMAP_USER: ${{ secrets.IMAP_USER }}
+          IMAP_PORT: ${{ secrets.IMAP_PORT }}
+          IMAP_PASSWORD: ${{ secrets.IMAP_PASSWORD }}
         run: |
           set -euo pipefail
           umask 077
@@ -102,6 +106,10 @@ jobs:
           CTOK=$(esc "${COLLECT_TOKEN:-}")
           NTOK=$(esc "${NEWSLETTER_TOKEN:-}")
           MFROM=$(esc "${MAIL_FROM:-}")
+          IHOST=$(esc "${IMAP_HOST:-mail.rackhost.hu}")
+          IUSER=$(esc "${IMAP_USER:-info@holborozzak.hu}")
+          IPORT="${IMAP_PORT:-993}"; case "$IPORT" in ''|*[!0-9]*) IPORT=993 ;; esac
+          IPASS=$(esc "${IMAP_PASSWORD:-}")
 
           {
             echo '<?php'
@@ -128,6 +136,12 @@ jobs:
             echo "    'mail' => ["
             printf "        'from_email' => '%s',\n" "$MFROM"
             echo "        'from_name' => 'holborozzak.hu',"
+            echo '    ],'
+            echo "    'imap' => ["
+            printf "        'host' => '%s',\n" "$IHOST"
+            printf "        'port' => %s,\n" "$IPORT"
+            printf "        'user' => '%s',\n" "$IUSER"
+            printf "        'pass' => '%s',\n" "$IPASS"
             echo '    ],'
             echo '];'
           } > public/config.php

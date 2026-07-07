@@ -6,6 +6,7 @@ $__items = [
     'index.php'        => 'Események',
     'jeloltek.php'     => 'Jelöltek',
     'feliratkozok.php' => 'Feliratkozók',
+    'beerkezo.php'     => 'Beérkező',
     'statisztika.php'  => 'Statisztika',
 ];
 ?>

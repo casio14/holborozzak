@@ -147,6 +147,13 @@ JSON-LD vázat (alap `WebSite`+`Organization`); `$jsonLd`-vel bővíthető oldal
     - **Az üdvözlő e-mail CSAK új feliratkozónak megy** (`newsletter.php`: `rowCount() > 0`) —
       ismételt feliratkozásra szándékosan nincs levél (nem a küldés hibája).
   - **`admin/feliratkozok.php`** — feliratkozó-lista, CSV-export, törlés (CSRF).
+  - **`admin/beerkezo.php`** — beérkező e-mailek nézete: az `info@holborozzak.hu` postafiókot
+    **IMAP**-on olvassa (csak olvasás, a szerveren semmit nem módosít), listázza az utolsó ~40
+    levelet (olvasatlan-jelzéssel), egy levél megnyitva a szöveges törzset mutatja + „Válasz
+    e-mailben" mailto. Config: `config.php` `imap` szekció (`host`/`port`/`user`/`pass`); éles:
+    `IMAP_PASSWORD` (kötelező) + `IMAP_HOST`/`IMAP_USER`/`IMAP_PORT` secretek (a host alap
+    `mail.rackhost.hu` — a Rackhost webmailban ellenőrizd). Ha nincs `ext-imap` vagy nincs
+    beállítva, a lap szép fallback-útmutatót mutat. `noindex`.
   - **`esemeny-bekuldes.php`** — nyilvános esemény **beküldő űrlap** (POST→PRG):
     validál, `draft` státuszú eseményt szúr be (slug auto, ütközésmentes), a kiválasztott
     kategóriákat az `event_categories`-be köti, a beküldő nevét/e-mailjét eltárolja

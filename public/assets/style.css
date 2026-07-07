@@ -1973,3 +1973,20 @@ main { flex: 1 0 auto; }
 .barlist__label b { color: var(--wine-900); font-variant-numeric: tabular-nums; font-weight: 800; white-space: nowrap; }
 .barlist__track { height: 10px; background: #efe7d8; border-radius: 999px; overflow: hidden; }
 .barlist__fill { height: 100%; border-radius: 999px; min-width: 2px; }
+
+/* Admin: beérkező e-mailek */
+.mail-badge {
+  display: inline-block; margin-left: .5rem; vertical-align: middle;
+  font-size: .72rem; font-weight: 800; color: #fff; background: var(--wine-700);
+  padding: .15rem .5rem; border-radius: 999px;
+}
+.mail-dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: var(--wine-700); }
+.mail-row--unread td { font-weight: 700; }
+.mail-link { color: var(--ink); text-decoration: none; }
+.mail-link:hover { color: var(--wine-700); }
+.mailview { background: var(--paper); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; box-shadow: var(--shadow); }
+.mailview__head { padding: 1.1rem 1.25rem; border-bottom: 1px solid var(--line); background: #faf6ee; }
+.mailview__subject { margin: 0 0 .6rem; font-size: 1.2rem; color: var(--wine-900); }
+.mailview__meta { display: flex; flex-direction: column; gap: .2rem; font-size: .9rem; color: var(--muted); margin-bottom: .8rem; }
+.mailview__meta strong { color: var(--ink); font-weight: 700; }
+.mailbody { padding: 1.2rem 1.35rem; white-space: pre-wrap; word-break: break-word; line-height: 1.65; color: var(--ink); }

@@ -46,4 +46,14 @@ return [
         'from_email' => '',
         'from_name'  => 'holborozzak.hu',
     ],
+
+    // Beérkező e-mailek olvasása (admin → Beérkező) IMAP-on. Éles: IMAP_* secretek.
+    // ÜRES jelszó = a funkció ki van kapcsolva (a lap beállítási útmutatót mutat).
+    // A host-ot ELLENŐRIZD a Rackhost webmail (Roundcube) IMAP-beállításainál!
+    'imap' => [
+        'host' => 'mail.rackhost.hu',
+        'port' => 993,
+        'user' => 'info@holborozzak.hu',
+        'pass' => '',
+    ],
 ];
