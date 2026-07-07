@@ -1919,6 +1919,29 @@ main { flex: 1 0 auto; }
 }
 .cookie-bar__btn--no:hover { border-color: var(--gold); color: var(--gold); }
 
+/* ---------- 18+ korellenőrző kapu (áttetsző, teljes képernyős) ---------- */
+body.agegate-lock { overflow: hidden; }
+.agegate {
+  position: fixed; inset: 0; z-index: 6000;
+  display: flex; align-items: center; justify-content: center; padding: 1.5rem;
+  background: rgba(43, 14, 20, .5);
+  -webkit-backdrop-filter: blur(5px) saturate(1.1);
+  backdrop-filter: blur(5px) saturate(1.1);
+}
+.agegate.is-blocked { background: var(--wine-900); -webkit-backdrop-filter: none; backdrop-filter: none; }
+.agegate__card {
+  width: 100%; max-width: 440px; text-align: center;
+  background: var(--paper); border: 1px solid var(--line); border-radius: 18px;
+  padding: 2.2rem 1.9rem; box-shadow: 0 30px 90px rgba(0, 0, 0, .45);
+}
+.agegate__mark { font-size: 2.4rem; line-height: 1; margin-bottom: .5rem; }
+.agegate__card h2 { margin: 0 0 .6rem; color: var(--wine-900); font-family: Georgia, "Times New Roman", serif; font-size: 1.5rem; }
+.agegate__card p { margin: 0 auto; color: var(--muted); max-width: 36ch; line-height: 1.55; }
+.agegate__actions { display: flex; gap: .6rem; justify-content: center; flex-wrap: wrap; margin: 1.4rem 0 1rem; }
+.agegate__actions .btn { min-width: 150px; }
+.agegate__law { font-size: .78rem; color: var(--muted); margin: .4rem 0 0; opacity: .85; }
+@media (max-width: 460px) { .agegate__actions .btn { min-width: 0; width: 100%; } }
+
 /* Admin: statisztika-csempék */
 .admin-stats {
   display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));

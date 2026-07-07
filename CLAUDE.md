@@ -191,6 +191,10 @@ JSON-LD vázat (alap `WebSite`+`Organization`); `$jsonLd`-vel bővíthető oldal
     `ItemList`+`Event` JSON-LD (SEO/AI). Cache-busting: `style.css?v=<filemtime>`.
   - `assets/style.css` — közös stíluslap (boros paletta CSS-változókban).
   - `partials/header.php`, `partials/footer.php` — közös layout váz (minden oldal ezt használja).
+    - **18+ korkapu:** a `header.php` a `<body>` után egy áttetsző, teljes képernyős korellenőrző
+      fátylat renderel (alatta látszik/blur a honlap), amíg nincs `hb_age=1` süti; a `footer.php`
+      inline JS-e kezeli („Igen" → 90 napos `hb_age` süti + feloldás; „Nem" → elutasító üzenet +
+      kilépés). Csak a `partials/header.php`-t használó publikus oldalakon jelenik meg (adminban nem).
     - **TODO (elnapolva):** a logó még nyitott — jelenleg ideiglenes szőlőfürt-SVG van.
       Felmerült irány: „A" koncepció = térkép-tű + borospohár (a „hol borozzak?" játék).
 - `scripts/` — CI-ben futó segédscriptek (NEM deployolódik FTP-n). `collect_events.php`:

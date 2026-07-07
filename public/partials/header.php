@@ -98,7 +98,23 @@ $jsVer  = @filemtime(__DIR__ . '/../assets/app.js') ?: time();
 <?php endforeach; ?>
 <?= $headExtra ?? '' ?>
 </head>
-<body>
+<body<?php if (($_COOKIE['hb_age'] ?? '') !== '1'): ?> class="agegate-lock"<?php endif; ?>>
+  <?php /* 18+ korellenőrző kapu — csak amíg nincs megerősítés (hb_age süti).
+           Áttetsző, teljes képernyős fátyol; alatta látszik a honlap. */ ?>
+  <?php if (($_COOKIE['hb_age'] ?? '') !== '1'): ?>
+  <div class="agegate" id="ageGate" role="dialog" aria-modal="true" aria-labelledby="ageGateTitle">
+    <div class="agegate__card" id="ageGateCard">
+      <div class="agegate__mark" aria-hidden="true">🍇</div>
+      <h2 id="ageGateTitle">Elmúltál 18 éves?</h2>
+      <p>A holborozzak.hu borhoz köthető rendezvényeket mutat be. A folytatáshoz erősítsd meg, hogy elmúltál 18 éves.</p>
+      <div class="agegate__actions">
+        <button type="button" class="btn btn--primary" id="ageYes">Igen, elmúltam 18</button>
+        <button type="button" class="btn btn--ghost" id="ageNo">Nem</button>
+      </div>
+      <p class="agegate__law">A túlzott alkoholfogyasztás károsítja az egészséget. 18 éven aluliaknak nem ajánlott.</p>
+    </div>
+  </div>
+  <?php endif; ?>
   <header class="site-header">
     <div class="site-header__inner">
       <input type="checkbox" id="nav-toggle" class="nav-toggle">

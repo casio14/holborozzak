@@ -104,6 +104,29 @@ if (is_file($versionFile)) {
       setCookie('hb_sid', h, 365);
     }
     if (getCookie('hb_consent') === '1') { ensureSid(); }
+
+    // 18+ korellenőrző kapu
+    var gate = document.getElementById('ageGate');
+    if (gate) {
+      var ageYes = document.getElementById('ageYes');
+      var ageNo = document.getElementById('ageNo');
+      if (ageYes) { ageYes.addEventListener('click', function () {
+        setCookie('hb_age', '1', 90);
+        document.body.classList.remove('agegate-lock');
+        gate.remove();
+      }); }
+      if (ageNo) { ageNo.addEventListener('click', function () {
+        gate.classList.add('is-blocked');
+        var card = document.getElementById('ageGateCard');
+        if (card) {
+          card.innerHTML = '<div class="agegate__mark" aria-hidden="true">🔞</div>'
+            + '<h2>Sajnáljuk!</h2>'
+            + '<p>Ez az oldal csak 18 éven felülieknek érhető el.</p>'
+            + '<div class="agegate__actions"><a class="btn btn--ghost" href="https://www.google.com/">Kilépés</a></div>';
+        }
+      }); }
+    }
+
     var bar = document.getElementById('cookieBar');
     if (!bar) { return; }
     document.getElementById('cookieYes').addEventListener('click', function () {
