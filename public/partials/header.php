@@ -61,6 +61,7 @@ $jsVer  = @filemtime(__DIR__ . '/../assets/app.js') ?: time();
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="google-site-verification" content="3c54DyHqtoMd1xfNvrquAnu1Phir5zD_q2AIrZEuaec">
   <base href="<?= htmlspecialchars($baseHref, ENT_QUOTES) ?>">
   <title><?= htmlspecialchars($pageTitle, ENT_QUOTES) ?></title>
   <meta name="description" content="<?= htmlspecialchars($pageDescription, ENT_QUOTES) ?>">
