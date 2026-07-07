@@ -56,7 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $f = [
         'title'             => trim((string) ($_POST['title'] ?? '')),
         'short_description' => trim((string) ($_POST['short_description'] ?? '')),
-        'description'       => trim((string) ($_POST['description'] ?? '')),
+        'description'       => sanitizeRichHtml((string) ($_POST['description'] ?? '')),
         'venue_name'        => trim((string) ($_POST['venue_name'] ?? '')),
         'address'           => trim((string) ($_POST['address'] ?? '')),
         'city'              => trim((string) ($_POST['city'] ?? '')),
@@ -67,6 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'image_url'         => trim((string) ($_POST['image_url'] ?? '')),
         'image_alt'         => trim((string) ($_POST['image_alt'] ?? '')),
     ];
+    if (trim(strip_tags($f['description'])) === '') { $f['description'] = ''; } // csak formázás → üres
     $start    = toMysqlDatetime($_POST['start_datetime'] ?? '');
     $end      = toMysqlDatetime($_POST['end_datetime'] ?? '');
     $regionId = (string) ($_POST['region_id'] ?? '');
@@ -234,8 +235,25 @@ $catSel = (array) ($event['cat_slugs'] ?? []);
           <input type="text" id="short_description" name="short_description" maxlength="500" value="<?= h($event['short_description'] ?? '') ?>">
         </div>
         <div class="field field--full">
+          <?php $descHtml = renderDescription($event['description'] ?? ''); ?>
           <label for="description">Részletes leírás</label>
-          <textarea id="description" name="description"><?= h($event['description'] ?? '') ?></textarea>
+          <div class="rte" data-rte="description" hidden>
+            <div class="rte__toolbar" role="toolbar" aria-label="Formázás">
+              <button type="button" class="rte__btn" data-cmd="bold" title="Félkövér"><b>F</b></button>
+              <button type="button" class="rte__btn" data-cmd="italic" title="Dőlt"><i>D</i></button>
+              <button type="button" class="rte__btn" data-cmd="underline" title="Aláhúzott"><u>A</u></button>
+              <span class="rte__sep"></span>
+              <button type="button" class="rte__btn" data-cmd="insertUnorderedList" title="Felsorolás">•&nbsp;—</button>
+              <button type="button" class="rte__btn" data-cmd="insertOrderedList" title="Számozott lista">1.</button>
+              <span class="rte__sep"></span>
+              <button type="button" class="rte__btn" data-cmd="createLink" title="Link beszúrása">🔗</button>
+              <button type="button" class="rte__btn" data-cmd="removeFormat" title="Formázás törlése">⌫</button>
+            </div>
+            <div class="rte__area" contenteditable="true" role="textbox" aria-multiline="true"
+                 aria-label="Részletes leírás" data-placeholder="Írd le a program részleteit — formázhatod is…"><?= $descHtml ?></div>
+          </div>
+          <textarea id="description" name="description" class="rte__source" rows="9"><?= h($descHtml) ?></textarea>
+          <span class="field__hint">Formázhatod: félkövér, dőlt, aláhúzott, listák, link.</span>
         </div>
         <div class="field field--full">
           <label>Kategóriák</label>
@@ -322,5 +340,42 @@ $catSel = (array) ($event['cat_slugs'] ?? []);
       </div>
     </form>
   </main>
+
+  <script>
+    // Progresszív rich-text szerkesztő: JS nélkül a sima <textarea> marad használatban.
+    (function () {
+      var wraps = document.querySelectorAll('[data-rte]');
+      Array.prototype.forEach.call(wraps, function (wrap) {
+        var area = wrap.querySelector('.rte__area');
+        var source = document.getElementById(wrap.getAttribute('data-rte'));
+        if (!area || !source) { return; }
+        source.hidden = true;
+        wrap.hidden = false;
+        function sync() { source.value = area.innerHTML; }
+        area.addEventListener('input', sync);
+        area.addEventListener('blur', sync);
+        Array.prototype.forEach.call(wrap.querySelectorAll('.rte__btn'), function (btn) {
+          btn.addEventListener('mousedown', function (e) { e.preventDefault(); });
+          btn.addEventListener('click', function () {
+            var cmd = btn.getAttribute('data-cmd');
+            area.focus();
+            try {
+              document.execCommand('styleWithCSS', false, false);
+              if (cmd === 'createLink') {
+                var url = window.prompt('Add meg a link címét (https://…):', 'https://');
+                if (url) { document.execCommand('createLink', false, url); }
+              } else {
+                document.execCommand(cmd, false, null);
+              }
+            } catch (err) { /* nem támogatott parancs — kihagyjuk */ }
+            sync();
+          });
+        });
+        var form = wrap.closest('form');
+        if (form) { form.addEventListener('submit', sync); }
+        sync();
+      });
+    })();
+  </script>
 </body>
 </html>
