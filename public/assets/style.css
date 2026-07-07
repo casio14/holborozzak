@@ -1665,13 +1665,16 @@ main { flex: 1 0 auto; }
 .rv-hero h1 { margin: 0; color: #fff; font-family: Georgia, "Times New Roman", serif; font-weight: 600; font-size: clamp(1.9rem, 5vw, 3.1rem); line-height: 1.05; text-shadow: 0 2px 16px rgba(0,0,0,.5); }
 .rv-lead { margin: 12px 0 0; max-width: 60ch; color: #f4e6d6; font-size: 1.05rem; text-shadow: 0 1px 10px rgba(0,0,0,.5); }
 
-.rv-facts { background: var(--cream); border-bottom: 1px solid var(--line); }
-.rv-facts__in { max-width: var(--maxw); margin: 0 auto; display: flex; flex-wrap: wrap; }
-.rv-fact { flex: 1; min-width: 150px; padding: 16px 22px; border-right: 1px solid var(--line); }
-.rv-fact:first-child { padding-left: 1.75rem; }
-.rv-fact:last-child { border-right: 0; }
-.rv-fact b { display: block; font-family: Georgia, "Times New Roman", serif; font-size: 1.4rem; color: var(--wine-700); line-height: 1.1; }
-.rv-fact span { font-size: .78rem; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); font-weight: 600; }
+/* Tények „pill"-ként a hero-képen (C dizájn) */
+.rv-pills { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px; }
+.rv-pill {
+  font-size: .8rem; font-weight: 700; color: #fff;
+  background: rgba(255, 255, 255, .16);
+  -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
+  border: 1px solid rgba(255, 255, 255, .28);
+  padding: 5px 12px; border-radius: 999px; text-shadow: 0 1px 4px rgba(0, 0, 0, .4);
+}
+.rv-pill b { color: var(--gold-200); }
 
 .rv-body { max-width: var(--maxw); margin: 0 auto; padding: 26px 1.75rem 46px; }
 .rv-sectitle { display: flex; align-items: baseline; gap: 12px; margin: 0 0 16px; }

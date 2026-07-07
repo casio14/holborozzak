@@ -108,11 +108,6 @@ $jsonLd = array_merge(
     ])]
 );
 
-// Tény-sáv
-$facts = [[(string) count($regionEvents), 'Közelgő esemény']];
-if (!empty($ri['grapes'])) { $facts[] = [$ri['grapes'], 'Fő szőlőfajta']; }
-if (!empty($ri['wines']))  { $facts[] = [$ri['wines'], 'Jellemző borok']; }
-
 require __DIR__ . '/partials/header.php';
 ?>
   <article class="rv">
@@ -152,14 +147,11 @@ require __DIR__ . '/partials/header.php';
         <p class="rv-eyebrow">Magyar borvidék</p>
         <h1><?= h($region['name']) ?> borvidék</h1>
         <p class="rv-lead"><?= h($intro) ?></p>
-      </div>
-    </div>
-
-    <div class="rv-facts">
-      <div class="rv-facts__in">
-        <?php foreach ($facts as [$val, $label]): ?>
-          <div class="rv-fact"><b><?= h($val) ?></b><span><?= h($label) ?></span></div>
-        <?php endforeach; ?>
+        <div class="rv-pills">
+          <span class="rv-pill"><b><?= (int) count($regionEvents) ?></b> közelgő esemény</span>
+          <?php if (!empty($ri['grapes'])): ?><span class="rv-pill">Fő szőlő: <b><?= h($ri['grapes']) ?></b></span><?php endif; ?>
+          <?php if (!empty($ri['wines'])): ?><span class="rv-pill"><b><?= h($ri['wines']) ?></b></span><?php endif; ?>
+        </div>
       </div>
     </div>
 
