@@ -19,6 +19,7 @@ function dtLocal(?string $dt): string
 }
 
 $id = (int) ($_GET['id'] ?? ($_POST['id'] ?? 0));
+$isNew = ($id <= 0);               // id nélkül = új esemény felvétele
 $errors = [];
 $saved = (($_GET['mentve'] ?? '') === 'ok');
 
@@ -34,17 +35,20 @@ try {
 }
 
 $event = null;
-if ($id > 0 && $pdo) {
+if (!$isNew && $pdo) {
     try {
         $event = fetchEventByIdAdmin($pdo, $id);
     } catch (Throwable $e) {
         error_log('admin/edit.php betöltés hiba: ' . $e->getMessage());
     }
+    if (!$event) {
+        http_response_code(404);
+        echo 'Esemény nem található. <a href="index.php">Vissza</a>';
+        exit;
+    }
 }
-if (!$event) {
-    http_response_code(404);
-    echo 'Esemény nem található. <a href="index.php">Vissza</a>';
-    exit;
+if ($isNew) {
+    $event = ['status' => 'draft']; // üres űrlap, alapértelmezett állapot
 }
 
 // --- Mentés ---
@@ -90,19 +94,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (!$errors) {
         try {
-            $st = $pdo->prepare(
-                "UPDATE events SET
-                    title = :title, short_description = :short_desc, description = :desc,
-                    start_datetime = :start, end_datetime = :end,
-                    venue_name = :venue, address = :address, city = :city, region_id = :region_id,
-                    latitude = :lat, longitude = :lng,
-                    website_url = :website, facebook_url = :facebook, ticket_url = :ticket,
-                    is_free = :is_free, price_info = :price,
-                    image_url = :image_url, image_alt = :image_alt,
-                    is_featured = :is_featured, status = :status
-                 WHERE id = :id"
-            );
-            $st->execute([
+            $params = [
                 ':title'      => $f['title'],
                 ':short_desc' => $f['short_description'] !== '' ? $f['short_description'] : null,
                 ':desc'       => $f['description'] !== '' ? $f['description'] : null,
@@ -123,10 +115,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ':image_alt'  => $f['image_alt'] !== '' ? $f['image_alt'] : null,
                 ':is_featured' => $isFeat,
                 ':status'     => $status,
-                ':id'         => $id,
-            ]);
+            ];
 
-            // Kategóriák újraírása
+            if ($isNew) {
+                // Új esemény: ütközésmentes slug a címből + évszám, majd beszúrás.
+                $year = (new DateTimeImmutable((string) $start))->format('Y');
+                $params[':slug'] = uniqueEventSlug($pdo, slugify($f['title']) . '-' . $year);
+                $pdo->prepare(
+                    "INSERT INTO events
+                        (slug, title, short_description, description, start_datetime, end_datetime,
+                         venue_name, address, city, region_id, latitude, longitude,
+                         website_url, facebook_url, ticket_url, is_free, price_info,
+                         image_url, image_alt, is_featured, status)
+                     VALUES
+                        (:slug, :title, :short_desc, :desc, :start, :end,
+                         :venue, :address, :city, :region_id, :lat, :lng,
+                         :website, :facebook, :ticket, :is_free, :price,
+                         :image_url, :image_alt, :is_featured, :status)"
+                )->execute($params);
+                $id = (int) $pdo->lastInsertId();
+            } else {
+                $params[':id'] = $id;
+                $pdo->prepare(
+                    "UPDATE events SET
+                        title = :title, short_description = :short_desc, description = :desc,
+                        start_datetime = :start, end_datetime = :end,
+                        venue_name = :venue, address = :address, city = :city, region_id = :region_id,
+                        latitude = :lat, longitude = :lng,
+                        website_url = :website, facebook_url = :facebook, ticket_url = :ticket,
+                        is_free = :is_free, price_info = :price,
+                        image_url = :image_url, image_alt = :image_alt,
+                        is_featured = :is_featured, status = :status
+                     WHERE id = :id"
+                )->execute($params);
+            }
+
+            // Kategóriák (újra)írása
             $pdo->prepare('DELETE FROM event_categories WHERE event_id = ?')->execute([$id]);
             if ($catSlugs && $categories) {
                 $idBySlug = [];
@@ -151,7 +175,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Hibánál a beküldött értékek visszatöltése a megjelenítéshez
     $event = array_merge($event, $f, [
-        'start_datetime' => $start ?? $event['start_datetime'],
+        'start_datetime' => $start ?? ($event['start_datetime'] ?? null),
         'end_datetime'   => $end,
         'region_id'      => $regionId !== '' ? (int) $regionId : null,
         'latitude'       => $lat,
@@ -173,7 +197,7 @@ $catSel = (array) ($event['cat_slugs'] ?? []);
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex,nofollow">
-  <title>Szerkesztés — admin</title>
+  <title><?= $isNew ? 'Új esemény' : 'Szerkesztés' ?> — admin</title>
   <link rel="stylesheet" href="../assets/style.css?v=<?= $cssVer ?>">
 </head>
 <body class="admin-body">
@@ -183,7 +207,7 @@ $catSel = (array) ($event['cat_slugs'] ?? []);
   </div>
 
   <main class="admin-main">
-    <h1>Esemény szerkesztése</h1>
+    <h1><?= $isNew ? 'Új esemény hozzáadása' : 'Esemény szerkesztése' ?></h1>
 
     <?php if ($saved): ?>
       <div class="admin-msg">Mentve. ✓</div>
@@ -195,7 +219,7 @@ $catSel = (array) ($event['cat_slugs'] ?? []);
       </div>
     <?php endif; ?>
 
-    <form class="submit-form" method="post" action="edit.php?id=<?= $id ?>">
+    <form class="submit-form" method="post" action="edit.php<?= $isNew ? '' : '?id=' . $id ?>">
       <input type="hidden" name="csrf" value="<?= h($csrf) ?>">
       <input type="hidden" name="id" value="<?= $id ?>">
 
@@ -220,7 +244,7 @@ $catSel = (array) ($event['cat_slugs'] ?? []);
         <div class="field field--full">
           <label for="title">Esemény neve <span class="req">*</span></label>
           <input type="text" id="title" name="title" required maxlength="255" value="<?= h($event['title'] ?? '') ?>">
-          <span class="field__hint">URL-slug (nem módosul): <code><?= h($event['slug'] ?? '') ?></code></span>
+          <span class="field__hint"><?php if ($isNew): ?>Az URL-slug mentéskor a címből generálódik.<?php else: ?>URL-slug (nem módosul): <code><?= h($event['slug'] ?? '') ?></code><?php endif; ?></span>
         </div>
         <div class="field">
           <label for="start_datetime">Kezdés <span class="req">*</span></label>
@@ -335,7 +359,7 @@ $catSel = (array) ($event['cat_slugs'] ?? []);
       </div>
 
       <div class="form-actions">
-        <button type="submit" class="btn btn--primary">Mentés</button>
+        <button type="submit" class="btn btn--primary"><?= $isNew ? 'Esemény létrehozása' : 'Mentés' ?></button>
         <a class="form-note" href="index.php">Mégse</a>
       </div>
     </form>

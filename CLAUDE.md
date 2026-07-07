@@ -157,7 +157,9 @@ JSON-LD vázat (alap `WebSite`+`Organization`); `$jsonLd`-vel bővíthető oldal
     események kezelése). `index.php`: státusz-fülek (Beérkezett/Közzétett/Lemondott) +
     művelet-gombok; `action.php`: státuszváltás (publish/cancel/draft) + kiemelés-kapcsoló
     (POST+CSRF, PRG); `edit.php`: teljes szerkesztő (mezők, állapot, kiemelés, kép,
-    kategóriák újraírása). `jeloltek.php`: **esemény-jelöltek** (automatikus gyűjtés 1. fázis) —
+    kategóriák újraírása) — **kézi esemény-felvétel is**: id nélkül hívva üres űrlap +
+    INSERT (a listaoldal „+ Új esemény" gombjáról). A részletes leírás **rich-text
+    szerkesztő** (félkövér/dőlt/listák/link), mentéskor `sanitizeRichHtml()` fertőtlenít. `jeloltek.php`: **esemény-jelöltek** (automatikus gyűjtés 1. fázis) —
     „Import URL-ből" (a `lib/ai.php` Claude-hívással kinyeri az esemény adatait egy
     weboldalból), dedup (`lib/candidates.php`), jóváhagyás → `draft` event / elvetés.
     Jelöltek külön táblában (`event_candidates`, migráció `005`), NEM az `events`-ben.

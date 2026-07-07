@@ -58,7 +58,10 @@ $cssVer = @filemtime(__DIR__ . '/../assets/style.css') ?: time();
   <?php require __DIR__ . '/partials/nav.php'; ?>
 
   <main class="admin-main">
-    <h1>Események kezelése</h1>
+    <div class="admin-head">
+      <h1>Események kezelése</h1>
+      <a class="btn btn--primary" href="edit.php">+ Új esemény</a>
+    </div>
 
     <?php if ($msg === 'ok'): ?>
       <div class="admin-msg">A művelet sikeres. ✓</div>

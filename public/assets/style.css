@@ -1803,6 +1803,8 @@ main { flex: 1 0 auto; }
 .admin-main > h1 {
   margin: 0 0 1.25rem; color: var(--wine-900); font-size: 1.7rem; letter-spacing: -.01em;
 }
+.admin-head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin: 0 0 1.25rem; }
+.admin-head h1 { margin: 0; color: var(--wine-900); font-size: 1.7rem; letter-spacing: -.01em; }
 .admin-lead { margin: -.5rem 0 1.5rem; color: var(--muted); font-size: .95rem; }
 .admin-lead strong { color: var(--wine-900); }
 
