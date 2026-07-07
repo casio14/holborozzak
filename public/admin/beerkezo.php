@@ -168,7 +168,7 @@ if ($hasExt && $configured) {
                     . ' — ellenőrizd a felhasználónevet (IMAP_USER) és a jelszót (IMAP_PASSWORD).';
                 @imap_errors();
             } else {
-                $ids = @imap_sort($mc, SORTDATE, 1) ?: []; // dátum szerint csökkenő
+                $ids = @imap_sort($mc, SORTDATE, true) ?: []; // dátum szerint csökkenő (reverse=bool!)
                 foreach (array_slice($ids, 0, 40) as $num) {
                     $ov = @imap_fetch_overview($mc, (string) $num, 0);
                     if (!$ov || !isset($ov[0])) { continue; }
