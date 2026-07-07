@@ -30,6 +30,12 @@ RewriteRule ^borvidek/([a-z0-9-]+)/?$ borvidek.php?slug=$1 [L,QSA]
 # Console és a legtöbb eszköz ezt várja) — belül a sitemap.php szolgálja ki.
 RewriteRule ^sitemap\.xml$ sitemap.php [L]
 
+# A robots.txt-t is DINAMIKUSAN (robots.php) szolgáljuk ki. A Rackhost proxy anti-bot
+# rétege a STATIKUS /robots.txt-nél a Googlebot UA-t átirányítás-hurokba lökte
+# (Search Console „redirect error"); a PHP-válasznál nincs ETag/Last-Modified static
+# fejléc, ami reményeink szerint elkerüli ezt a viselkedést.
+RewriteRule ^robots\.txt$ robots.php [L]
+
 # 2) Belül a kiterjesztés nélküli /oldal kérést a megfelelő /oldal.php fájl szolgálja ki.
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME}\.php -f
