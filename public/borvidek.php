@@ -156,7 +156,7 @@ require __DIR__ . '/partials/header.php';
     </div>
 
     <div class="rv-body">
-      <div class="rv-sectitle"><h2>Közelgő események</h2><span class="rv-rule"></span></div>
+      <div class="rv-sectitle"><h2>Közelgő események</h2></div>
 
       <?php if (!$regionEvents): ?>
         <div class="rv-empty">
