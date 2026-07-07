@@ -20,6 +20,7 @@ $urls = [
     ['loc' => $u('esemenyek'),        'changefreq' => 'daily',   'priority' => '0.9'],
     ['loc' => $u('naptar'),           'changefreq' => 'weekly',  'priority' => '0.7'],
     ['loc' => $u('terkep'),           'changefreq' => 'weekly',  'priority' => '0.7'],
+    ['loc' => $u('borvidekek'),       'changefreq' => 'weekly',  'priority' => '0.7'],
     ['loc' => $u('esemeny-bekuldes'), 'changefreq' => 'monthly', 'priority' => '0.4'],
     ['loc' => $u('impresszum'),       'changefreq' => 'yearly',  'priority' => '0.2'],
     ['loc' => $u('aszf'),             'changefreq' => 'yearly',  'priority' => '0.2'],
@@ -38,6 +39,18 @@ try {
     }
 } catch (Throwable $e) {
     error_log('sitemap.php DB hiba: ' . $e->getMessage());
+}
+
+try {
+    foreach (db()->query('SELECT slug FROM wine_regions ORDER BY name') as $r) {
+        $urls[] = [
+            'loc'        => $u('borvidek/' . rawurlencode((string) $r['slug'])),
+            'changefreq' => 'weekly',
+            'priority'   => '0.6',
+        ];
+    }
+} catch (Throwable $e) {
+    error_log('sitemap.php borvidék hiba: ' . $e->getMessage());
 }
 
 echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";

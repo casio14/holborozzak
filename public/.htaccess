@@ -16,12 +16,15 @@ RewriteRule ^(.*)$ https://holborozzak.hu/$1 [R=301,L]
 #    hogy ne legyen duplikált tartalom és a régi linkek is a szép URL-re jöjjenek.
 #    Csak GET-re fut (űrlap-POST-ot nem törünk el); a query stringet megőrzi.
 RewriteCond %{REQUEST_METHOD} =GET
-RewriteCond %{THE_REQUEST} \s/+(esemenyek|naptar|terkep|esemeny-bekuldes|impresszum|aszf|adatvedelem)\.php[\s?] [NC]
+RewriteCond %{THE_REQUEST} \s/+(esemenyek|naptar|terkep|borvidekek|esemeny-bekuldes|impresszum|aszf|adatvedelem)\.php[\s?] [NC]
 RewriteRule ^ /%1 [R=301,L]
 
 # Szép esemény-URL: /esemeny/<slug> → esemeny.php?slug=<slug>
 # Relatív minta (nincs RewriteBase), a domain gyökerén szolgálódik.
 RewriteRule ^esemeny/([a-z0-9-]+)/?$ esemeny.php?slug=$1 [L,QSA]
+
+# Szép borvidék-URL: /borvidek/<slug> → borvidek.php?slug=<slug>
+RewriteRule ^borvidek/([a-z0-9-]+)/?$ borvidek.php?slug=$1 [L,QSA]
 
 # A dinamikus sitemap a szabványos /sitemap.xml címen is elérhető (a Google Search
 # Console és a legtöbb eszköz ezt várja) — belül a sitemap.php szolgálja ki.
@@ -30,7 +33,7 @@ RewriteRule ^sitemap\.xml$ sitemap.php [L]
 # 2) Belül a kiterjesztés nélküli /oldal kérést a megfelelő /oldal.php fájl szolgálja ki.
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME}\.php -f
-RewriteRule ^(esemenyek|naptar|terkep|esemeny-bekuldes|impresszum|aszf|adatvedelem)/?$ $1.php [L,QSA]
+RewriteRule ^(esemenyek|naptar|terkep|borvidekek|esemeny-bekuldes|impresszum|aszf|adatvedelem)/?$ $1.php [L,QSA]
 
 # Statikus assetek böngésző-gyorsítótárazása (gyorsabb ismétléses betöltés → jobb
 # Core Web Vitals). A CSS/JS ?v=<filemtime> cache-buster miatt biztonságos a hosszú

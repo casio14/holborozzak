@@ -177,6 +177,15 @@ JSON-LD vázat (alap `WebSite`+`Organization`); `$jsonLd`-vel bővíthető oldal
   - **`esemenyek.php` = teljes lista:** tabok + multiselect szűrők (borvidék/kategória) +
     rendezés + hónapokra bontott sor-lista. Az „Események" menü ide mutat. Itt él az
     AJAX-os `#esemenyek-region` (részleges szűrés, `app.js`). `listUrl()` ide mutat.
+  - **`borvidekek.php` = Borvidékek áttekintő** (`/borvidekek`, menüpont): mind a 22 magyar
+    borvidék csempeként, közelgő esemény-számmal → linkel a borvidék-oldalakra. `ItemList` JSON-LD.
+  - **`borvidek.php` = borvidék-oldal**, szép URL: **`/borvidek/<slug>`** (`.htaccess` rewrite;
+    a `borvidek.php?slug=…` 301-gyel ide). Immerzív hero (a borvidék `image_url` fotója halvány
+    sötét fátyollal, vagy dekoratív szőlőhegy-SVG fallback) + tény-sáv (közelgő esemény / fő
+    szőlőfajta / jellemző borok) + a borvidék közelgő eseményei (`event-row`). SEO: egyedi
+    title/description/canonical, `ItemList`+`BreadcrumbList` JSON-LD, OG-kép. A borvidék-leírás/
+    szőlőfajták statikus adatfájlból: **`lib/regions_info.php`** (slug szerint; NINCS DB-migráció).
+    Belső linkelés: az `esemeny.php` a borvidéket ide linkeli. Sitemapban minden borvidék benne van.
   - Közös: kártya (`event-card`) / sor (`event-row`) naptár-dátumkockával, státusz-pirulákkal,
     `ItemList`+`Event` JSON-LD (SEO/AI). Cache-busting: `style.css?v=<filemtime>`.
   - `assets/style.css` — közös stíluslap (boros paletta CSS-változókban).

@@ -143,7 +143,7 @@ require __DIR__ . '/partials/header.php';
             <?php if (!empty($event['region_name'])): ?>
             <div class="ed-info__row">
               <span class="ed-info__ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 6.5 9 3.5 15 6.5 21 3.5 21 17.5 15 20.5 9 17.5 3 20.5"/><line x1="9" y1="3.5" x2="9" y2="17.5"/><line x1="15" y1="6.5" x2="15" y2="20.5"/></svg></span>
-              <span><span class="ed-info__k">Borvidék</span><span class="ed-info__v"><?= h($event['region_name']) ?></span></span>
+              <span><span class="ed-info__k">Borvidék</span><span class="ed-info__v"><?php if (!empty($event['region_slug'])): ?><a href="borvidek/<?= h($event['region_slug']) ?>"><?= h($event['region_name']) ?></a><?php else: ?><?= h($event['region_name']) ?><?php endif; ?></span></span>
             </div>
             <?php endif; ?>
             <?php if ($priceText !== ''): ?>
