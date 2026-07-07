@@ -2,7 +2,7 @@
 declare(strict_types=1);
 
 // Jelölt-előnézet: hogyan nézne ki az esemény a publikus részletoldalon.
-// A valódi részletoldal CSS-osztályait használja (event-detail--hero, ed-*).
+// A valódi részletoldal V2 elrendezését használja (edh hero + edh-layout + edh-card).
 
 require __DIR__ . '/auth.php';
 require __DIR__ . '/../lib/events.php';
@@ -68,37 +68,39 @@ function pimg(string $src): string
     <span><a href="jeloltek.php">← Vissza a jelöltekhez</a></span>
   </div>
 
-  <div class="container">
-    <article class="event-detail event-detail--hero">
-      <div class="ed-hero">
-        <div class="ed-hero__img">
-          <img src="<?= h(pimg(eventImage($ev))) ?>" alt="<?= h($cand['title']) ?>">
+  <article class="edh-detail">
+    <div class="edh">
+      <div class="edh__img">
+        <img src="<?= h(pimg(eventImage($ev))) ?>" alt="<?= h($cand['title']) ?>">
+      </div>
+      <div class="edh__inner">
+        <a class="edh__back" href="jeloltek.php">← Vissza a jelöltekhez</a>
+        <h1><?= h($cand['title']) ?></h1>
+        <?php if ($cand['start_datetime']): ?>
+        <div class="edh__when">
+          <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="3" x2="8" y2="7"/><line x1="16" y1="3" x2="16" y2="7"/></svg>
+          <time datetime="<?= h(isoDate($cand['start_datetime'])) ?>"><?= h(formatDateRange($cand['start_datetime'], $cand['end_datetime'])) ?></time>
+          <?php if ($st): ?><span class="status <?= h($st['class']) ?>"><?= h($st['label']) ?></span><?php endif; ?>
         </div>
-        <div class="ed-hero__band">
-          <h1><?= h($cand['title']) ?></h1>
-          <?php if ($cand['start_datetime']): ?>
-          <div class="ed-hero__when">
-            <time datetime="<?= h(isoDate($cand['start_datetime'])) ?>"><?= h(formatDateRange($cand['start_datetime'], $cand['end_datetime'])) ?></time>
-            <?php if ($st): ?><span class="status <?= h($st['class']) ?>"><?= h($st['label']) ?></span><?php endif; ?>
-          </div>
-          <?php endif; ?>
-        </div>
+        <?php endif; ?>
+      </div>
+    </div>
+
+    <div class="edh-layout">
+      <div class="edh-main">
+        <?php if (!empty($cand['short_description'])): ?>
+          <p class="edh-lead"><?= h($cand['short_description']) ?></p>
+        <?php endif; ?>
+        <?php if (!empty($cand['description'])): ?>
+          <div class="event-detail__desc"><?= renderDescription($cand['description']) ?></div>
+        <?php else: ?>
+          <p class="event-detail__desc admin-sub">(Nincs részletes leírás — jóváhagyás után a szerkesztőben pótolható.)</p>
+        <?php endif; ?>
       </div>
 
-      <div class="ed-grid">
-        <div class="ed-main">
-          <?php if (!empty($cand['short_description'])): ?>
-            <p class="event-detail__lead"><?= h($cand['short_description']) ?></p>
-          <?php endif; ?>
-          <?php if (!empty($cand['description'])): ?>
-            <div class="event-detail__desc"><?= nl2br(h($cand['description'])) ?></div>
-          <?php else: ?>
-            <p class="event-detail__desc admin-sub">(Nincs részletes leírás — jóváhagyás után a szerkesztőben pótolható.)</p>
-          <?php endif; ?>
-        </div>
-
-        <aside class="ed-aside">
-          <div class="ed-info">
+      <aside class="edh-aside">
+        <div class="edh-card">
+          <div class="ed-info ed-info--flat">
             <?php if ($locText !== ''): ?>
             <div class="ed-info__row">
               <span class="ed-info__ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.3 7-12a7 7 0 1 0-14 0c0 5.7 7 12 7 12z"/><circle cx="12" cy="9" r="2.5"/></svg></span>
@@ -130,9 +132,9 @@ function pimg(string $src): string
               <a class="btn btn--ghost" href="<?= h($cand['facebook_url']) ?>" target="_blank" rel="noopener nofollow">Facebook-esemény →</a>
             <?php endif; ?>
           </div>
-        </aside>
-      </div>
-    </article>
-  </div>
+        </div>
+      </aside>
+    </div>
+  </article>
 </body>
 </html>
