@@ -1453,6 +1453,10 @@ main { flex: 1 0 auto; }
   background: #e9e4da;
   border-top: 1px solid var(--line);
   border-bottom: 1px solid var(--line);
+  /* Saját, alacsony rétegkontextus: a Leaflet magas z-indexű rétegei (panes/kontrollok,
+     akár 1000) így NEM lógnak a sticky fejléc (z-index:100) fölé — a mobil menü látszik. */
+  position: relative;
+  z-index: 0;
 }
 
 /* Szőlőfürt jelölő (Leaflet divIcon) + darabszám-jelvény */
@@ -1761,7 +1765,7 @@ main { flex: 1 0 auto; }
   padding: 1.1rem 1.2rem; box-shadow: 0 14px 40px rgba(74, 14, 28, .16);
 }
 .ed-info--flat { background: transparent; border: none; border-radius: 0; padding: 0; box-shadow: none; }
-.edh-map { height: 170px; border-radius: 12px; border: 1px solid var(--line); overflow: hidden; margin-top: 1rem; }
+.edh-map { height: 170px; border-radius: 12px; border: 1px solid var(--line); overflow: hidden; margin-top: 1rem; position: relative; z-index: 0; }
 
 @media (min-width: 901px) {
   /* A cím ne fusson a belelógó kártya alá */
