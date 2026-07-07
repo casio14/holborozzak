@@ -73,8 +73,17 @@ $info = require __DIR__ . '/lib/regions_info.php';
 $ri   = $info[$region['slug']] ?? [];
 $intro = $ri['intro'] ?? ('A(z) ' . $region['name'] . ' borvidék közelgő borrendezvényei egy helyen — fesztiválok, bornapok, kóstolók, szüreti programok.');
 
-// Hero-kép: a borvidék saját fotója, ha van; egyébként dekoratív illusztráció (lentebb).
+// Hero-kép forrása, prioritás szerint:
+//  1) a DB wine_regions.image_url (ha be van állítva),
+//  2) konvenció: assets/borvidek/<slug>.(webp|jpg|jpeg|png) — elég ide feltölteni a képet,
+//  3) különben a lenti dekoratív szőlőhegy-SVG.
 $regImg = trim((string) ($region['image_url'] ?? ''));
+if ($regImg === '') {
+    foreach (['webp', 'jpg', 'jpeg', 'png'] as $ext) {
+        $rel = 'assets/borvidek/' . $region['slug'] . '.' . $ext;
+        if (is_file(__DIR__ . '/' . $rel)) { $regImg = $rel; break; }
+    }
+}
 $hasImg = $regImg !== '';
 
 // SEO

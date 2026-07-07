@@ -180,8 +180,9 @@ JSON-LD vázat (alap `WebSite`+`Organization`); `$jsonLd`-vel bővíthető oldal
   - **`borvidekek.php` = Borvidékek áttekintő** (`/borvidekek`, menüpont): mind a 22 magyar
     borvidék csempeként, közelgő esemény-számmal → linkel a borvidék-oldalakra. `ItemList` JSON-LD.
   - **`borvidek.php` = borvidék-oldal**, szép URL: **`/borvidek/<slug>`** (`.htaccess` rewrite;
-    a `borvidek.php?slug=…` 301-gyel ide). Immerzív hero (a borvidék `image_url` fotója halvány
-    sötét fátyollal, vagy dekoratív szőlőhegy-SVG fallback) + tény-sáv (közelgő esemény / fő
+    a `borvidek.php?slug=…` 301-gyel ide). Immerzív hero halvány sötét fátyollal — a kép forrása
+    prioritás szerint: (1) `wine_regions.image_url`, (2) **konvenció:** `public/assets/borvidek/<slug>.(webp|jpg|jpeg|png)`
+    (elég ide feltölteni, nincs DB-szerkesztés), (3) dekoratív szőlőhegy-SVG fallback. + tény-sáv (közelgő esemény / fő
     szőlőfajta / jellemző borok) + a borvidék közelgő eseményei (`event-row`). SEO: egyedi
     title/description/canonical, `ItemList`+`BreadcrumbList` JSON-LD, OG-kép. A borvidék-leírás/
     szőlőfajták statikus adatfájlból: **`lib/regions_info.php`** (slug szerint; NINCS DB-migráció).
