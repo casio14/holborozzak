@@ -78,10 +78,12 @@ $intro = $ri['intro'] ?? ('A(z) ' . $region['name'] . ' borvidék közelgő borr
 //  2) konvenció: assets/borvidek/<slug>.(webp|jpg|jpeg|png) — elég ide feltölteni a képet,
 //  3) különben a lenti dekoratív szőlőhegy-SVG.
 $regImg = trim((string) ($region['image_url'] ?? ''));
+$regImgVer = ''; // cache-buster a konvenciós helyi képhez (?v=<mtime>) — képcsere után frissül
 if ($regImg === '') {
     foreach (['webp', 'jpg', 'jpeg', 'png'] as $ext) {
         $rel = 'assets/borvidek/' . $region['slug'] . '.' . $ext;
-        if (is_file(__DIR__ . '/' . $rel)) { $regImg = $rel; break; }
+        $abs = __DIR__ . '/' . $rel;
+        if (is_file($abs)) { $regImg = $rel; $regImgVer = '?v=' . (@filemtime($abs) ?: '1'); break; }
     }
 }
 $hasImg = $regImg !== '';
@@ -92,7 +94,7 @@ $pageTitle = $region['name'] . ' borvidék — borrendezvények és programok | 
 $pageDescription = mb_substr($intro, 0, 155);
 $ogType = 'website';
 if ($hasImg) {
-    $ogImage = preg_match('#^https?://#i', $regImg) ? $regImg : ($base . $dir . '/' . ltrim($regImg, '/'));
+    $ogImage = (preg_match('#^https?://#i', $regImg) ? $regImg : ($base . $dir . '/' . ltrim($regImg, '/'))) . $regImgVer;
 }
 $activeNav = 'borvidekek';
 
@@ -117,7 +119,7 @@ require __DIR__ . '/partials/header.php';
     <div class="rv-hero<?= $hasImg ? '' : ' rv-hero--art' ?>">
       <div class="rv-hero__photo">
         <?php if ($hasImg): ?>
-          <img src="<?= h($regImg) ?>" alt="<?= h($region['image_alt'] ?: ($region['name'] . ' borvidék')) ?>">
+          <img src="<?= h($regImg . $regImgVer) ?>" alt="<?= h($region['image_alt'] ?: ($region['name'] . ' borvidék')) ?>">
         <?php else: ?>
           <svg viewBox="0 0 1200 520" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
             <defs>
