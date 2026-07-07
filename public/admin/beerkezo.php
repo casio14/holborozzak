@@ -9,6 +9,12 @@ require __DIR__ . '/auth.php';
 require __DIR__ . '/../lib/events.php'; // h()
 require_admin();
 
+// Diagnosztika: belépett admin a ?debug=1-gyel láthatja a pontos hibaüzenetet.
+if (($_GET['debug'] ?? '') === '1') {
+    ini_set('display_errors', '1');
+    error_reporting(E_ALL);
+}
+
 /** IMAP config a config.php-ból. */
 function imapConfig(): array
 {
@@ -138,49 +144,72 @@ $openUid     = (int) ($_GET['uid'] ?? 0);
 $openMsg     = null;
 
 if ($hasExt && $configured) {
-    @imap_timeout(IMAP_OPENTIMEOUT, 12); // ne akadjon be rossz/elérhetetlen host esetén
-    @imap_timeout(IMAP_READTIMEOUT, 12);
-    $mbox = '{' . $host . ':' . $port . '/imap/ssl/novalidate-cert}INBOX';
-    $mc = @imap_open($mbox, $user, $pass, 0, 1);
-    if ($mc === false) {
-        $error = 'Nem sikerült csatlakozni a postafiókhoz: ' . (string) imap_last_error();
-        @imap_errors(); // hibapuffer ürítése
-    } else {
-        $ids = @imap_sort($mc, SORTDATE, 1) ?: []; // dátum szerint csökkenő
-        foreach (array_slice($ids, 0, 40) as $num) {
-            $ov = @imap_fetch_overview($mc, (string) $num, 0);
-            if (!$ov || !isset($ov[0])) { continue; }
-            $o = $ov[0];
-            $seen = !empty($o->seen);
-            if (!$seen) { $unreadCount++; }
-            $messages[] = [
-                'uid'     => (int) ($o->uid ?? 0),
-                'from'    => decodeMime((string) ($o->from ?? '')),
-                'subject' => decodeMime((string) ($o->subject ?? '')),
-                'date'    => (string) ($o->date ?? ''),
-                'seen'    => $seen,
-            ];
-        }
-
-        if ($openUid > 0) {
-            $msgno = @imap_msgno($mc, $openUid);
-            if ($msgno) {
-                $hi = @imap_headerinfo($mc, $msgno);
-                $openMsg = [
-                    'from'    => decodeMime((string) ($hi->fromaddress ?? '')),
-                    'to'      => decodeMime((string) ($hi->toaddress ?? '')),
-                    'subject' => decodeMime((string) ($hi->subject ?? '')),
-                    'date'    => (string) ($hi->date ?? ''),
-                    'reply'   => extractEmail((string) ($hi->fromaddress ?? '')),
-                    'body'    => imapPlainBody($mc, $msgno),
-                ];
-            } else {
-                $error = 'A megnyitni kívánt üzenet nem található.';
-            }
-        }
-        @imap_close($mc);
+    // 1) Gyors elérhetőség-ellenőrzés, hogy rossz/elérhetetlen host NE fusson
+    //    időtúllépésbe (ami 500-at okozna). Ha az fsockopen tiltott, kihagyjuk.
+    $reachable = true; $reachErr = '';
+    if (function_exists('fsockopen')) {
+        $sock = @fsockopen($host, $port, $errno, $errstr, 6);
+        if ($sock === false) { $reachable = false; $reachErr = (string) $errstr; }
+        else { fclose($sock); }
     }
-    @imap_errors();
+
+    if (!$reachable) {
+        $error = 'Nem érhető el az IMAP-kiszolgáló (' . $host . ':' . $port . '). '
+            . 'Ellenőrizd az IMAP_HOST / IMAP_PORT beállítást a Rackhost webmail adatai alapján.'
+            . ($reachErr !== '' ? ' (' . $reachErr . ')' : '');
+    } else {
+        try {
+            @imap_timeout(IMAP_OPENTIMEOUT, 10);
+            @imap_timeout(IMAP_READTIMEOUT, 10);
+            $mbox = '{' . $host . ':' . $port . '/imap/ssl/novalidate-cert}INBOX';
+            $mc = @imap_open($mbox, $user, $pass, 0, 0);
+            if ($mc === false) {
+                $error = 'Nem sikerült belépni a postafiókba: ' . (string) imap_last_error()
+                    . ' — ellenőrizd a felhasználónevet (IMAP_USER) és a jelszót (IMAP_PASSWORD).';
+                @imap_errors();
+            } else {
+                $ids = @imap_sort($mc, SORTDATE, 1) ?: []; // dátum szerint csökkenő
+                foreach (array_slice($ids, 0, 40) as $num) {
+                    $ov = @imap_fetch_overview($mc, (string) $num, 0);
+                    if (!$ov || !isset($ov[0])) { continue; }
+                    $o = $ov[0];
+                    $seen = !empty($o->seen);
+                    if (!$seen) { $unreadCount++; }
+                    $messages[] = [
+                        'uid'     => (int) ($o->uid ?? 0),
+                        'from'    => decodeMime((string) ($o->from ?? '')),
+                        'subject' => decodeMime((string) ($o->subject ?? '')),
+                        'date'    => (string) ($o->date ?? ''),
+                        'seen'    => $seen,
+                    ];
+                }
+
+                if ($openUid > 0) {
+                    $msgno = @imap_msgno($mc, $openUid);
+                    if ($msgno) {
+                        $hi = @imap_headerinfo($mc, $msgno);
+                        $openMsg = [
+                            'from'    => decodeMime((string) ($hi->fromaddress ?? '')),
+                            'to'      => decodeMime((string) ($hi->toaddress ?? '')),
+                            'subject' => decodeMime((string) ($hi->subject ?? '')),
+                            'date'    => (string) ($hi->date ?? ''),
+                            'reply'   => extractEmail((string) ($hi->fromaddress ?? '')),
+                            'body'    => imapPlainBody($mc, $msgno),
+                        ];
+                    } else {
+                        $error = 'A megnyitni kívánt üzenet nem található.';
+                    }
+                }
+                @imap_close($mc);
+            }
+            @imap_errors();
+        } catch (Throwable $e) {
+            // Bármilyen váratlan IMAP-hiba: 500 helyett érthető üzenet.
+            error_log('beerkezo.php IMAP hiba: ' . $e->getMessage());
+            $error = 'IMAP hiba történt: ' . $e->getMessage();
+            @imap_errors();
+        }
+    }
 }
 
 $cssVer = @filemtime(__DIR__ . '/../assets/style.css') ?: time();
