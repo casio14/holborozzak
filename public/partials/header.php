@@ -110,7 +110,6 @@ $jsVer  = @filemtime(__DIR__ . '/../assets/app.js') ?: time();
         <button type="button" class="btn btn--primary" id="ageYes">Igen, elmúltam 18</button>
         <button type="button" class="btn btn--ghost" id="ageNo">Nem</button>
       </div>
-      <p class="agegate__law">A túlzott alkoholfogyasztás károsítja az egészséget. 18 éven aluliaknak nem ajánlott.</p>
     </div>
   </div>
   <?php endif; ?>
