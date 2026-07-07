@@ -78,14 +78,18 @@ require __DIR__ . '/partials/header.php';
         <div class="region-grid">
           <?php foreach ($regions as $r):
               $c = (int) ($counts[$r['slug']] ?? 0);
-              $g = $info[$r['slug']]['grapes'] ?? ''; ?>
-            <a class="region-tile" href="borvidek/<?= h($r['slug']) ?>">
-              <span class="region-tile__top">
+              $g = $info[$r['slug']]['grapes'] ?? '';
+              $img = regionImage($r['slug'], $r['image_url'] ?? null);
+              $himg = $img['src'] !== ''; ?>
+            <a class="region-tile<?= $himg ? '' : ' region-tile--noimg' ?>" href="borvidek/<?= h($r['slug']) ?>">
+              <?php if ($himg): ?><img class="region-tile__bg" src="<?= h($img['src'] . $img['ver']) ?>" alt="" loading="lazy"><?php endif; ?>
+              <span class="region-tile__body">
                 <span class="region-tile__name"><?= h($r['name']) ?></span>
-                <span class="region-tile__count<?= $c > 0 ? ' is-live' : '' ?>"><?= $c > 0 ? $c . ' esemény' : 'nincs esemény' ?></span>
+                <span class="region-tile__meta">
+                  <span class="region-tile__count<?= $c > 0 ? ' is-live' : '' ?>"><?= $c > 0 ? $c . ' esemény' : 'nincs esemény' ?></span>
+                  <?php if ($g !== ''): ?><span class="region-tile__grapes">🍇 <?= h($g) ?></span><?php endif; ?>
+                </span>
               </span>
-              <?php if ($g !== ''): ?><span class="region-tile__grapes">🍇 <?= h($g) ?></span><?php endif; ?>
-              <span class="region-tile__go">Megnézem →</span>
             </a>
           <?php endforeach; ?>
         </div>

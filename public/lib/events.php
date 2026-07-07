@@ -509,6 +509,27 @@ function eventImage(array $e): string
     return 'assets/hero.jpg';
 }
 
+/**
+ * Borvidék hero-kép forrása: (1) a DB image_url, ha van; (2) konvenció szerinti fájl
+ * assets/borvidek/<slug>.(webp|jpg|jpeg|png). Visszaad: ['src' => út vagy '', 'ver' => '?v=<mtime>' vagy ''].
+ * A konvenciós fájlt a public/ gyökérhez képest keresi (a lib/ egy szinttel lejjebb van).
+ */
+function regionImage(string $slug, ?string $dbImageUrl = null): array
+{
+    $img = trim((string) $dbImageUrl);
+    if ($img !== '') {
+        return ['src' => $img, 'ver' => ''];
+    }
+    $pub = dirname(__DIR__); // public/
+    foreach (['webp', 'jpg', 'jpeg', 'png'] as $ext) {
+        $rel = 'assets/borvidek/' . $slug . '.' . $ext;
+        if (is_file($pub . '/' . $rel)) {
+            return ['src' => $rel, 'ver' => '?v=' . (@filemtime($pub . '/' . $rel) ?: '1')];
+        }
+    }
+    return ['src' => '', 'ver' => ''];
+}
+
 /** Rövid HTML-escape segéd. */
 function h(?string $s): string
 {

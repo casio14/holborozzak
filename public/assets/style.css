@@ -1681,16 +1681,31 @@ main { flex: 1 0 auto; }
 .rv-back a:hover { color: var(--gold); }
 .status.is-featured { background: var(--gold); color: var(--wine-900); }
 
-/* Borvidékek áttekintő rács */
+/* Borvidékek áttekintő rács — képes csempék elmosott borvidék-háttérrel */
 .region-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 14px; margin-top: 1.25rem; }
-.region-tile { display: flex; flex-direction: column; gap: .5rem; background: var(--paper); border: 1px solid var(--line); border-radius: 14px; padding: 1rem 1.1rem 1.05rem; text-decoration: none; color: var(--ink); box-shadow: var(--shadow); transition: transform .12s ease, border-color .12s ease; }
-.region-tile:hover { transform: translateY(-2px); border-color: var(--gold); }
-.region-tile__top { display: flex; align-items: baseline; justify-content: space-between; gap: .6rem; }
-.region-tile__name { font-family: Georgia, "Times New Roman", serif; font-size: 1.2rem; font-weight: 600; color: var(--wine-900); }
-.region-tile__count { font-size: .72rem; font-weight: 700; color: var(--muted); background: #f0e7d8; padding: 3px 8px; border-radius: 999px; white-space: nowrap; }
+.region-tile {
+  position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end;
+  min-height: 172px; border-radius: 14px; text-decoration: none; color: #fff;
+  border: 1px solid var(--line); box-shadow: var(--shadow); background: var(--wine-900);
+  transition: transform .14s ease, box-shadow .14s ease;
+}
+.region-tile:hover { transform: translateY(-3px); box-shadow: 0 16px 34px rgba(74, 14, 28, .24); }
+.region-tile--noimg { background: linear-gradient(150deg, #7c2e3a, var(--wine-900)); }
+.region-tile__bg {
+  position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0;
+  transform: scale(1.08); filter: blur(2px) saturate(1.05); transition: transform .35s ease;
+}
+.region-tile:hover .region-tile__bg { transform: scale(1.14); }
+.region-tile::after {
+  content: ""; position: absolute; inset: 0; z-index: 1;
+  background: linear-gradient(180deg, rgba(43,14,20,.2) 0%, rgba(43,14,20,.4) 45%, rgba(40,12,18,.86) 100%);
+}
+.region-tile__body { position: relative; z-index: 2; padding: 1rem 1.05rem 1.05rem; display: flex; flex-direction: column; gap: .5rem; }
+.region-tile__name { font-family: Georgia, "Times New Roman", serif; font-size: 1.25rem; font-weight: 600; color: #fff; text-shadow: 0 1px 8px rgba(0, 0, 0, .55); }
+.region-tile__meta { display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; }
+.region-tile__count { font-size: .72rem; font-weight: 800; color: #fff; background: rgba(255, 255, 255, .2); padding: 3px 9px; border-radius: 999px; white-space: nowrap; }
 .region-tile__count.is-live { color: var(--wine-900); background: var(--gold-200); }
-.region-tile__grapes { font-size: .85rem; color: var(--muted); }
-.region-tile__go { margin-top: auto; font-size: .82rem; font-weight: 700; color: var(--gold); }
+.region-tile__grapes { font-size: .8rem; color: rgba(255, 255, 255, .92); text-shadow: 0 1px 6px rgba(0, 0, 0, .5); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 @media (max-width: 760px) {
   .ed-grid { grid-template-columns: 1fr; grid-template-areas: "main" "map" "aside"; }
