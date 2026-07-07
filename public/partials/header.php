@@ -104,7 +104,6 @@ $jsVer  = @filemtime(__DIR__ . '/../assets/app.js') ?: time();
   <?php if (($_COOKIE['hb_age'] ?? '') !== '1'): ?>
   <div class="agegate" id="ageGate" role="dialog" aria-modal="true" aria-labelledby="ageGateTitle">
     <div class="agegate__card" id="ageGateCard">
-      <div class="agegate__mark" aria-hidden="true">🍇</div>
       <h2 id="ageGateTitle">Elmúltál 18 éves?</h2>
       <p>A holborozzak.hu borhoz köthető rendezvényeket mutat be. A folytatáshoz erősítsd meg, hogy elmúltál 18 éves.</p>
       <div class="agegate__actions">
