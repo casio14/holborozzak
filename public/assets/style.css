@@ -1706,6 +1706,7 @@ main { flex: 1 0 auto; }
 .region-tile__count { font-size: .72rem; font-weight: 800; color: #fff; background: rgba(255, 255, 255, .2); padding: 3px 9px; border-radius: 999px; white-space: nowrap; }
 .region-tile__count.is-live { color: var(--wine-900); background: var(--gold-200); }
 .region-tile__grapes { font-size: .8rem; color: rgba(255, 255, 255, .92); text-shadow: 0 1px 6px rgba(0, 0, 0, .5); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.region-tile__ic { width: 13px; height: 13px; display: inline-block; vertical-align: -2px; margin-right: 5px; color: var(--gold-200); flex: none; filter: drop-shadow(0 1px 2px rgba(0, 0, 0, .45)); }
 
 @media (max-width: 760px) {
   .ed-grid { grid-template-columns: 1fr; grid-template-areas: "main" "map" "aside"; }

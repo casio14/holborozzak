@@ -87,7 +87,7 @@ require __DIR__ . '/partials/header.php';
                 <span class="region-tile__name"><?= h($r['name']) ?></span>
                 <span class="region-tile__meta">
                   <span class="region-tile__count<?= $c > 0 ? ' is-live' : '' ?>"><?= $c > 0 ? $c . ' esemény' : 'nincs esemény' ?></span>
-                  <?php if ($g !== ''): ?><span class="region-tile__grapes">🍇 <?= h($g) ?></span><?php endif; ?>
+                  <?php if ($g !== ''): ?><span class="region-tile__grapes"><svg class="region-tile__ic" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 6.4V4.2c.8-1.1 2.2-1.2 2.9-.8" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/><g fill="currentColor"><circle cx="6.2" cy="8" r="1.9"/><circle cx="10" cy="8" r="1.9"/><circle cx="13.8" cy="8" r="1.9"/><circle cx="8.1" cy="11.4" r="1.9"/><circle cx="11.9" cy="11.4" r="1.9"/><circle cx="10" cy="14.8" r="1.9"/></g></svg><?= h($g) ?></span><?php endif; ?>
                 </span>
               </span>
             </a>
