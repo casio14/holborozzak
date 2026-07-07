@@ -23,6 +23,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         session_regenerate_id(true);          // session fixation ellen
         $_SESSION['admin_ok'] = true;
         $_SESSION['admin_login_at'] = time();
+        // „Ne mérj engem" süti: a saját (admin) forgalom ne hígítsa a statisztikát.
+        // Tartós (1 év), a publikus oldalakon is látszik; a naplózók kihagyják.
+        setcookie('hb_notrack', '1', [
+            'expires'  => time() + 31536000,
+            'path'     => '/',
+            'secure'   => (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off'),
+            'httponly' => true,
+            'samesite' => 'Lax',
+        ]);
         header('Location: index.php');
         exit;
     }

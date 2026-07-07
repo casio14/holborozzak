@@ -687,6 +687,15 @@ function isLikelyBot(string $ua): bool
 }
 
 /**
+ * Kizárta-e magát a látogató a mérésből? Az admin belépéskor kap egy tartós
+ * `hb_notrack=1` sütit, hogy a saját (teszt) forgalma ne hígítsa a statisztikát.
+ */
+function trackingOptedOut(): bool
+{
+    return (string) ($_COOKIE['hb_notrack'] ?? '') === '1';
+}
+
+/**
  * Interakció (view/kattintás) naplózása. GDPR: nyers IP-t NEM tárolunk, csak napi
  * sóval hashelt értéket (napon belüli dedup-hoz, napok közt nem összeköthető).
  * Ha a látogató hozzájárult a mérési sütihez (hb_consent=1), az anonim
@@ -696,6 +705,9 @@ function isLikelyBot(string $ua): bool
  */
 function logInteraction(PDO $pdo, int $eventId, string $type): void
 {
+    if (trackingOptedOut()) {
+        return; // saját (admin) forgalom — nem mérjük
+    }
     $ua = substr((string) ($_SERVER['HTTP_USER_AGENT'] ?? ''), 0, 255);
     if (isLikelyBot($ua)) {
         return;
@@ -821,6 +833,9 @@ function ensureSearchReferralsTable(PDO $pdo): void
  */
 function logSearchReferral(): void
 {
+    if (trackingOptedOut()) {
+        return; // saját (admin) forgalom — nem mérjük
+    }
     $ref = isset($_SERVER['HTTP_REFERER']) ? (string) $_SERVER['HTTP_REFERER'] : '';
 
     $source = detectSearchSource($ref);
@@ -904,6 +919,9 @@ function ensureAiReferralsTable(PDO $pdo): void
  */
 function logAiReferral(): void
 {
+    if (trackingOptedOut()) {
+        return; // saját (admin) forgalom — nem mérjük
+    }
     $utm = isset($_GET['utm_source']) ? (string) $_GET['utm_source'] : '';
     $ref = isset($_SERVER['HTTP_REFERER']) ? (string) $_SERVER['HTTP_REFERER'] : '';
 

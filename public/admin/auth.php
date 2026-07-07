@@ -53,6 +53,20 @@ function require_admin(): void
         exit;
     }
     header('X-Robots-Tag: noindex, nofollow');
+
+    // A saját (admin) forgalom kizárása a mérésből: tartós „ne mérj engem" süti,
+    // hogy a fejlesztés/tesztelés közbeni böngészés ne hígítsa a statisztikát.
+    if ((string) ($_COOKIE['hb_notrack'] ?? '') !== '1' && !headers_sent()) {
+        $https = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off');
+        setcookie('hb_notrack', '1', [
+            'expires'  => time() + 31536000,
+            'path'     => '/',
+            'httponly' => true,
+            'samesite' => 'Lax',
+            'secure'   => $https,
+        ]);
+        $_COOKIE['hb_notrack'] = '1'; // az aktuális kérésben is érvényes legyen
+    }
 }
 
 /** CSRF token (a módosító műveletekhez). */
