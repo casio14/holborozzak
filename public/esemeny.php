@@ -127,7 +127,7 @@ require __DIR__ . '/partials/header.php';
         <?php endif; ?>
 
         <?php if (!empty($event['description'])): ?>
-          <div class="event-detail__desc"><?= nl2br(h($event['description'])) ?></div>
+          <div class="event-detail__desc"><?= renderDescription($event['description']) ?></div>
         <?php endif; ?>
       </div>
 

@@ -40,7 +40,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $title      = trim((string) ($_POST['title'] ?? ''));
     $shortDesc  = trim((string) ($_POST['short_description'] ?? ''));
-    $desc       = trim((string) ($_POST['description'] ?? ''));
+    $desc       = sanitizeRichHtml((string) ($_POST['description'] ?? ''));
+    if (trim(strip_tags($desc)) === '') { $desc = ''; } // csak formázás, szöveg nélkül → üres
     $startRaw   = (string) ($_POST['start_datetime'] ?? '');
     $endRaw     = (string) ($_POST['end_datetime'] ?? '');
     $venue      = trim((string) ($_POST['venue_name'] ?? ''));
@@ -195,8 +196,25 @@ require __DIR__ . '/partials/header.php';
         </div>
 
         <div class="field field--full">
+          <?php $oldDesc = sanitizeRichHtml((string) ($old['description'] ?? '')); ?>
           <label for="description">Részletes leírás</label>
-          <textarea id="description" name="description"><?= h($old['description'] ?? '') ?></textarea>
+          <div class="rte" data-rte="description" hidden>
+            <div class="rte__toolbar" role="toolbar" aria-label="Formázás">
+              <button type="button" class="rte__btn" data-cmd="bold" title="Félkövér"><b>F</b></button>
+              <button type="button" class="rte__btn" data-cmd="italic" title="Dőlt"><i>D</i></button>
+              <button type="button" class="rte__btn" data-cmd="underline" title="Aláhúzott"><u>A</u></button>
+              <span class="rte__sep"></span>
+              <button type="button" class="rte__btn" data-cmd="insertUnorderedList" title="Felsorolás">•&nbsp;—</button>
+              <button type="button" class="rte__btn" data-cmd="insertOrderedList" title="Számozott lista">1.</button>
+              <span class="rte__sep"></span>
+              <button type="button" class="rte__btn" data-cmd="createLink" title="Link beszúrása">🔗</button>
+              <button type="button" class="rte__btn" data-cmd="removeFormat" title="Formázás törlése">⌫</button>
+            </div>
+            <div class="rte__area" contenteditable="true" role="textbox" aria-multiline="true"
+                 aria-label="Részletes leírás" data-placeholder="Írd le a program részleteit — formázhatod is…"><?= $oldDesc ?></div>
+          </div>
+          <textarea id="description" name="description" class="rte__source" rows="9"><?= h($oldDesc) ?></textarea>
+          <span class="field__hint">Formázhatod a szöveget: félkövér, dőlt, aláhúzott, listák, link.</span>
         </div>
 
         <div class="field field--full">
@@ -288,5 +306,44 @@ require __DIR__ . '/partials/header.php';
     </form>
   <?php endif; ?>
   </div>
+
+  <script>
+    // Progresszív rich-text szerkesztő: JS nélkül a sima <textarea> marad használatban.
+    (function () {
+      var wraps = document.querySelectorAll('[data-rte]');
+      Array.prototype.forEach.call(wraps, function (wrap) {
+        var area = wrap.querySelector('.rte__area');
+        var source = document.getElementById(wrap.getAttribute('data-rte'));
+        if (!area || !source) { return; }
+        source.hidden = true;
+        wrap.hidden = false;
+        function sync() { source.value = area.innerHTML; }
+        area.addEventListener('input', sync);
+        area.addEventListener('blur', sync);
+        Array.prototype.forEach.call(wrap.querySelectorAll('.rte__btn'), function (btn) {
+          // a lenyomás ne vegye el a fókuszt a szerkesztőterületről
+          btn.addEventListener('mousedown', function (e) { e.preventDefault(); });
+          btn.addEventListener('click', function () {
+            var cmd = btn.getAttribute('data-cmd');
+            area.focus();
+            try {
+              // tageket adjon (pl. <b>), ne inline style-t — a fertőtlenítő így megtartja
+              document.execCommand('styleWithCSS', false, false);
+              if (cmd === 'createLink') {
+                var url = window.prompt('Add meg a link címét (https://…):', 'https://');
+                if (url) { document.execCommand('createLink', false, url); }
+              } else {
+                document.execCommand(cmd, false, null);
+              }
+            } catch (err) { /* nem támogatott parancs — kihagyjuk */ }
+            sync();
+          });
+        });
+        var form = wrap.closest('form');
+        if (form) { form.addEventListener('submit', sync); }
+        sync();
+      });
+    })();
+  </script>
 <?php
 require __DIR__ . '/partials/footer.php';

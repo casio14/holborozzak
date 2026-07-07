@@ -515,6 +515,98 @@ function h(?string $s): string
     return htmlspecialchars((string) $s, ENT_QUOTES, 'UTF-8');
 }
 
+/**
+ * Gazdag szöveg (részletes leírás) fertőtlenítése allowlist alapján — XSS ellen.
+ * Csak biztonságos formázó tageket enged; minden mást „kicsomagol" (a szöveg marad),
+ * a szövegcsomópontokat escape-eli. Az <a> csak http/https/mailto href-et tarthat,
+ * és biztonsági rel/target attribútumot kap. DOMDocument-alapú, külső függőség nélkül.
+ */
+function sanitizeRichHtml(string $html): string
+{
+    $html = trim($html);
+    if ($html === '') {
+        return '';
+    }
+    if (!class_exists('DOMDocument')) {
+        return nl2br(h($html)); // nincs dom kiterjesztés → biztonságos visszaesés
+    }
+    $doc = new DOMDocument('1.0', 'UTF-8');
+    libxml_use_internal_errors(true);
+    $doc->loadHTML(
+        '<?xml encoding="UTF-8"><div>' . $html . '</div>',
+        LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD
+    );
+    libxml_clear_errors();
+    $root = $doc->getElementsByTagName('div')->item(0);
+    return $root ? sanitizeRichNodes($root) : '';
+}
+
+/** A sanitizeRichHtml rekurzív segédje: egy csomópont gyermekeit tisztítja. */
+function sanitizeRichNodes(DOMNode $parent): string
+{
+    static $allowed = [
+        'p' => true, 'br' => true, 'strong' => true, 'b' => true, 'em' => true,
+        'i' => true, 'u' => true, 'ul' => true, 'ol' => true, 'li' => true,
+        'h3' => true, 'h4' => true, 'blockquote' => true, 'a' => true,
+    ];
+    $out = '';
+    foreach ($parent->childNodes as $node) {
+        if ($node->nodeType === XML_TEXT_NODE) {
+            $out .= h($node->nodeValue);
+            continue;
+        }
+        if ($node->nodeType !== XML_ELEMENT_NODE) {
+            continue;
+        }
+        $tag = strtolower($node->nodeName);
+        if ($tag === 'div') {
+            $tag = 'p'; // a szerkesztő sortörései → bekezdés
+        }
+        $inner = sanitizeRichNodes($node);
+        if (!isset($allowed[$tag])) {
+            $out .= $inner; // nem engedélyezett tag → kicsomagolás
+            continue;
+        }
+        if ($tag === 'br') {
+            $out .= '<br>';
+            continue;
+        }
+        if ($tag === 'a') {
+            $href = $node->getAttribute('href');
+            if ($href !== '' && preg_match('#^(https?:|mailto:)#i', $href)) {
+                $out .= '<a href="' . h($href) . '" target="_blank" rel="noopener nofollow">' . $inner . '</a>';
+            } else {
+                $out .= $inner; // rossz/hiányzó href → csak a szöveg marad
+            }
+            continue;
+        }
+        // Üres blokk-bekezdés eldobása (a szerkesztő gyakran hagy <p></p>-t).
+        if (in_array($tag, ['p', 'h3', 'h4', 'blockquote'], true)
+            && trim(strip_tags($inner)) === '' && strpos($inner, '<br') === false) {
+            continue;
+        }
+        $out .= '<' . $tag . '>' . $inner . '</' . $tag . '>';
+    }
+    return $out;
+}
+
+/**
+ * Részletes leírás megjelenítése. Ha (engedélyezett) HTML-formázást tartalmaz,
+ * fertőtlenítve HTML-ként; egyébként sima szöveg escape-elve, sortöréssel.
+ * Így a régi, sima szöveges leírások változatlanul jelennek meg, az újak formázottan.
+ */
+function renderDescription(?string $text): string
+{
+    $text = (string) $text;
+    if (trim($text) === '') {
+        return '';
+    }
+    if (preg_match('/<(p|div|br|ul|ol|li|strong|b|em|i|u|a|h3|h4|blockquote)\b/i', $text)) {
+        return sanitizeRichHtml($text);
+    }
+    return nl2br(h($text));
+}
+
 /** Slug képzése szövegből: kisbetű, ékezetek nélkül, kötőjelekkel (beküldéshez). */
 function slugify(string $s): string
 {

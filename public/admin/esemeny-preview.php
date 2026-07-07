@@ -97,7 +97,7 @@ function pimg(string $src): string
             <p class="event-detail__lead"><?= h($event['short_description']) ?></p>
           <?php endif; ?>
           <?php if (!empty($event['description'])): ?>
-            <div class="event-detail__desc"><?= nl2br(h($event['description'])) ?></div>
+            <div class="event-detail__desc"><?= renderDescription($event['description']) ?></div>
           <?php endif; ?>
         </div>
 
