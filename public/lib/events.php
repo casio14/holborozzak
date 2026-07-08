@@ -716,6 +716,72 @@ function trackingOptedOut(): bool
     return (string) ($_COOKIE['hb_notrack'] ?? '') === '1';
 }
 
+/** Létrehozza a page_views táblát, ha még nincs (futásidőben, mint az ai_referrals). */
+function ensurePageViewsTable(PDO $pdo): void
+{
+    $pdo->exec(
+        "CREATE TABLE IF NOT EXISTS page_views (
+            id         BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+            path       VARCHAR(255) DEFAULT NULL,
+            session_id VARCHAR(64)  DEFAULT NULL,
+            ip_hash    CHAR(64)     DEFAULT NULL,
+            referrer   VARCHAR(255) DEFAULT NULL,
+            user_agent VARCHAR(255) DEFAULT NULL,
+            created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (id),
+            KEY idx_pv_time (created_at),
+            KEY idx_pv_sid (session_id),
+            KEY idx_pv_ip (ip_hash)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
+    );
+}
+
+/**
+ * Oldalmegnyitás naplózása MINDEN publikus oldalon (általános látogatottság —
+ * „hányan tekintették meg a honlapot"). Bot- és admin-szűrt; GDPR: nyers IP helyett
+ * napi sóval hashelt ip_hash, session_id csak hozzájárulással. Sosem dob kivételt.
+ */
+function logPageView(): void
+{
+    if (trackingOptedOut()) {
+        return; // saját (admin) forgalom — nem mérjük
+    }
+    $ua = substr((string) ($_SERVER['HTTP_USER_AGENT'] ?? ''), 0, 255);
+    if (isLikelyBot($ua)) {
+        return;
+    }
+    try {
+        $pdo = db();
+        ensurePageViewsTable($pdo);
+
+        $sid = null;
+        if ((string) ($_COOKIE['hb_consent'] ?? '') === '1') {
+            $c = (string) ($_COOKIE['hb_sid'] ?? '');
+            if (preg_match('/^[a-f0-9]{32}$/', $c)) {
+                $sid = $c;
+            }
+        }
+        $ip = (string) ($_SERVER['HTTP_CF_CONNECTING_IP']
+            ?? $_SERVER['HTTP_X_FORWARDED_FOR']
+            ?? $_SERVER['REMOTE_ADDR']
+            ?? '');
+        if (strpos($ip, ',') !== false) {
+            $ip = trim(explode(',', $ip)[0]);
+        }
+        $ipHash = $ip !== '' ? hash('sha256', $ip . '|' . appSalt() . '|' . date('Y-m-d')) : null;
+        $path = substr((string) strtok((string) ($_SERVER['REQUEST_URI'] ?? '/'), '?'), 0, 255);
+        $ref  = isset($_SERVER['HTTP_REFERER']) ? substr((string) $_SERVER['HTTP_REFERER'], 0, 255) : null;
+
+        $st = $pdo->prepare(
+            'INSERT INTO page_views (path, session_id, ip_hash, referrer, user_agent)
+             VALUES (?, ?, ?, ?, ?)'
+        );
+        $st->execute([$path, $sid, $ipHash, $ref, $ua !== '' ? $ua : null]);
+    } catch (Throwable $e) {
+        error_log('logPageView hiba: ' . $e->getMessage());
+    }
+}
+
 /**
  * Interakció (view/kattintás) naplózása. GDPR: nyers IP-t NEM tárolunk, csak napi
  * sóval hashelt értéket (napon belüli dedup-hoz, napok közt nem összeköthető).

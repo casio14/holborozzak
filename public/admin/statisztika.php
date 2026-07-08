@@ -39,6 +39,7 @@ $aiTotals = ['interactions' => 0, 'unique' => 0, 'clicks' => 0];
 $aiRows = [];
 $searchTotals = ['interactions' => 0, 'unique' => 0, 'clicks' => 0];
 $searchRows = [];
+$pv = ['opens' => 0, 'home' => 0, 'unique' => 0, 'cookie' => 0, 'nocookie' => 0];
 $dbError = false;
 
 // AI-ajánlások forrása: az ai_referrals tábla (a fő oldalak logAiReferral() hívása
@@ -183,6 +184,27 @@ try {
          GROUP BY s.source
          ORDER BY c DESC"
     )->fetchAll();
+
+    // Honlap-látogatottság (page_views): összes oldalmegnyitás + sütis/süti nélküli bontás
+    ensurePageViewsTable($pdo);
+    $wherePv = $days > 0 ? "WHERE created_at >= DATE_SUB(NOW(), INTERVAL {$days} DAY)" : '';
+    $pvr = $pdo->query(
+        "SELECT COUNT(*) AS opens,
+                SUM(path = '/' OR path = '') AS home,
+                COUNT(DISTINCT COALESCE(session_id, ip_hash)) AS uniq,
+                COUNT(DISTINCT session_id) AS ck,
+                COUNT(DISTINCT CASE WHEN session_id IS NULL THEN ip_hash END) AS nock
+         FROM page_views {$wherePv}"
+    )->fetch();
+    if ($pvr) {
+        $pv = [
+            'opens'    => (int) $pvr['opens'],
+            'home'     => (int) $pvr['home'],
+            'unique'   => (int) $pvr['uniq'],
+            'cookie'   => (int) $pvr['ck'],
+            'nocookie' => (int) $pvr['nock'],
+        ];
+    }
 } catch (Throwable $e) {
     error_log('admin statisztika DB hiba: ' . $e->getMessage());
     $dbError = true;
@@ -613,6 +635,33 @@ $cssVer = @filemtime(__DIR__ . '/../assets/style.css') ?: time();
 
     <!-- ===== LÁTOGATÓK ===== -->
     <section class="stat-panel" id="tab-latogatok">
+      <h2 class="admin-h2">🏠 Honlap-látogatottság <span class="admin-stat__sub">(összes oldalmegnyitás — botok és a saját forgalmad nélkül)</span></h2>
+      <div class="admin-stats">
+        <div class="admin-stat">
+          <span class="admin-stat__num"><?= number_format($pv['opens'], 0, ',', ' ') ?></span>
+          <span class="admin-stat__label">Oldalmegnyitás</span>
+          <span class="admin-stat__sub">ebből főoldal: <?= number_format($pv['home'], 0, ',', ' ') ?></span>
+        </div>
+        <div class="admin-stat">
+          <span class="admin-stat__num">~<?= number_format($pv['unique'], 0, ',', ' ') ?></span>
+          <span class="admin-stat__label">Egyedi látogató</span>
+          <span class="admin-stat__sub">különböző böngésző (becslés)</span>
+        </div>
+        <div class="admin-stat">
+          <span class="admin-stat__num"><?= number_format($pv['cookie'], 0, ',', ' ') ?></span>
+          <span class="admin-stat__label">Sütivel mért</span>
+          <span class="admin-stat__sub">elfogadta a mérési sütit</span>
+        </div>
+        <div class="admin-stat">
+          <span class="admin-stat__num">~<?= number_format($pv['nocookie'], 0, ',', ' ') ?></span>
+          <span class="admin-stat__label">Süti nélkül</span>
+          <span class="admin-stat__sub">nem fogadta el (IP-becslés)</span>
+        </div>
+      </div>
+      <p class="admin-note">Ez azt méri, <strong>hányszor nyitották meg a honlapot</strong> (bármely aloldalt),
+        a botokat és a saját (admin) forgalmadat kihagyva. A „Sütivel mért" pontos, napokon átívelő; a
+        „Süti nélkül" a napi sóval hashelt IP alapján becslés (több napos időszakon a napi egyediek összege).</p>
+
       <h2 class="admin-h2">Sütis látogató-mérés <span class="admin-stat__sub">(csak a mérési sütit elfogadó látogatók — napokon átívelően pontos)</span></h2>
       <div class="admin-stats">
         <div class="admin-stat">

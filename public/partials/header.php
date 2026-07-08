@@ -7,6 +7,14 @@
  */
 $siteName = 'holborozzak.hu';
 
+// Látogatottság-mérés: MINDEN publikus oldalmegnyitás naplózása (bot- és admin-szűrt,
+// GDPR-barát). Idempotens require: a legtöbb oldal már betöltötte ezeket.
+require_once __DIR__ . '/../db.php';
+require_once __DIR__ . '/../lib/events.php';
+if (function_exists('logPageView')) {
+    logPageView();
+}
+
 $pageTitle = $pageTitle
     ?? 'holborozzak.hu — Magyarország borhoz köthető eseményei';
 $pageDescription = $pageDescription
