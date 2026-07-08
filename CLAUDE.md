@@ -197,22 +197,18 @@ JSON-LD vázat (alap `WebSite`+`Organization`); `$jsonLd`-vel bővíthető oldal
       kilépés). Csak a `partials/header.php`-t használó publikus oldalakon jelenik meg (adminban nem).
     - **TODO (elnapolva):** a logó még nyitott — jelenleg ideiglenes szőlőfürt-SVG van.
       Felmerült irány: „A" koncepció = térkép-tű + borospohár (a „hol borozzak?" játék).
-- `scripts/` — CI-ben futó segédscriptek (NEM deployolódik FTP-n). `collect_events.php`:
-  napi esemény-gyűjtő — a Claude `web_search` eszközével közelgő magyar borrendezvényeket
-  KERES az interneten (nem fix oldalakat néz), dedupál, és `event_candidates`-be ír `new`
-  jelöltként. Indítja: `.github/workflows/collect.yml` (napi cron). Env: `DB_PASSWORD`,
-  `ANTHROPIC_API_KEY`, `ANTHROPIC_MODEL`, `COLLECT_URL`, `COLLECT_TOKEN`. A CI **nem** éri el
-  közvetlenül a Rackhost MySQL-t ([2002] connection refused), ezért a találatokat HTTPS-en
-  POST-olja a token-védett `public/collect-ingest.php`-ra, és a DB-írás (dedup + insert) ott,
-  a szerveren történik. A jóváhagyás kézi (admin → Jelöltek). `import_sources.php`:
-  **célzott forrás-importáló** — a web_search-alapú gyűjtő KIEGÉSZÍTÉSE. Egy KURÁLT listányi
+- `scripts/` — CI-ben futó segédscriptek (NEM deployolódik FTP-n). `import_sources.php`:
+  **célzott forrás-importáló.** Egy KURÁLT listányi
   konkrét programoldalt (borvacsora-/kóstoló-helyszínek: Jardinette, Laposa, WineHub, Borbarátok,
   Winelovers Rendezvények + programturizmus borvacsora/borkóstoló kategóriák) tölt le, és
   MINDEGYIKBŐL több közelgő eseményt nyer ki a Claude-dal (csak jövőbeli, konkrét dátumúak),
-  majd ugyanarra a `collect-ingest.php`-ra POST-ol. Miért kell: a kis borbár-/étterem-kóstolók
-  dátumai gyakran csak a saját programoldalukon vannak fent. Új forrás = egy sor a `$SOURCES`
-  tömbben. Indítja: `.github/workflows/import-sources.yml` (heti cron). Env ugyanaz, mint a
-  gyűjtőnél (DB nélkül; szöveg-kinyerés Haiku-val).
+  majd a token-védett `public/collect-ingest.php`-ra POST-ol (a DB-írás — dedup + insert — ott,
+  a szerveren történik, mert a CI nem éri el közvetlenül a Rackhost MySQL-t). A jóváhagyás kézi
+  (admin → Jelöltek). Miért kell: a kis borbár-/étterem-kóstolók dátumai gyakran csak a saját
+  programoldalukon vannak fent. Új forrás = egy sor a `$SOURCES` tömbben. Indítja:
+  `.github/workflows/import-sources.yml` (heti cron). Env: `ANTHROPIC_API_KEY`, `ANTHROPIC_MODEL`,
+  `COLLECT_URL`, `COLLECT_TOKEN` (szöveg-kinyerés Haiku-val). *(A korábbi napi, web_search-alapú
+  `collect_events.php` + `collect.yml` gyűjtő eltávolítva — helyette ez a célzott importáló van.)*
 - `db/` — adatbázis séma (`schema.sql`), `seed.sql` (minta események), migrációk. NEM kerül a webszerverre.
 - `docs/` — tervdokumentumok (pl. `adatmodell.md`). NEM kerül a webszerverre.
 - `.github/workflows/` — CI/CD (deploy).
