@@ -197,18 +197,12 @@ JSON-LD vázat (alap `WebSite`+`Organization`); `$jsonLd`-vel bővíthető oldal
       kilépés). Csak a `partials/header.php`-t használó publikus oldalakon jelenik meg (adminban nem).
     - **TODO (elnapolva):** a logó még nyitott — jelenleg ideiglenes szőlőfürt-SVG van.
       Felmerült irány: „A" koncepció = térkép-tű + borospohár (a „hol borozzak?" játék).
-- `scripts/` — CI-ben futó segédscriptek (NEM deployolódik FTP-n). `import_sources.php`:
-  **célzott forrás-importáló.** Egy KURÁLT listányi
-  konkrét programoldalt (borvacsora-/kóstoló-helyszínek: Jardinette, Laposa, WineHub, Borbarátok,
-  Winelovers Rendezvények + programturizmus borvacsora/borkóstoló kategóriák) tölt le, és
-  MINDEGYIKBŐL több közelgő eseményt nyer ki a Claude-dal (csak jövőbeli, konkrét dátumúak),
-  majd a token-védett `public/collect-ingest.php`-ra POST-ol (a DB-írás — dedup + insert — ott,
-  a szerveren történik, mert a CI nem éri el közvetlenül a Rackhost MySQL-t). A jóváhagyás kézi
-  (admin → Jelöltek). Miért kell: a kis borbár-/étterem-kóstolók dátumai gyakran csak a saját
-  programoldalukon vannak fent. Új forrás = egy sor a `$SOURCES` tömbben. Indítja:
-  `.github/workflows/import-sources.yml` (heti cron). Env: `ANTHROPIC_API_KEY`, `ANTHROPIC_MODEL`,
-  `COLLECT_URL`, `COLLECT_TOKEN` (szöveg-kinyerés Haiku-val). *(A korábbi napi, web_search-alapú
-  `collect_events.php` + `collect.yml` gyűjtő eltávolítva — helyette ez a célzott importáló van.)*
+- `scripts/` — üres. Az automatikus esemény-gyűjtő workflow-kat (napi `collect.yml` +
+  `collect_events.php`, heti `import-sources.yml` + `import_sources.php`) **eltávolítottuk**
+  (nem kell automata gyűjtés). Az események kézzel kerülnek fel: admin → **+ Új esemény**, vagy
+  admin → Jelöltek → **„Import URL-ből"** (a `lib/ai.php` Claude-hívásával — `ANTHROPIC_API_KEY`
+  kell hozzá). A `public/collect-ingest.php` token-védett fogadó végpont megmaradt, de jelenleg
+  nem használt.
 - `db/` — adatbázis séma (`schema.sql`), `seed.sql` (minta események), migrációk. NEM kerül a webszerverre.
 - `docs/` — tervdokumentumok (pl. `adatmodell.md`). NEM kerül a webszerverre.
 - `.github/workflows/` — CI/CD (deploy).
