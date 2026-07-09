@@ -30,6 +30,14 @@ try {
 
 $info = require __DIR__ . '/lib/regions_info.php';
 
+// Magazin-mozaik: a legtöbb közelgő eseményt kínáló (max 2) borvidék nagy, 2×2-es csempét kap
+$featured = [];
+if ($counts) {
+    $live = array_filter($counts);
+    arsort($live);
+    $featured = array_slice(array_keys($live), 0, 2);
+}
+
 $pageTitle = 'Magyar borvidékek — események borvidékenként | holborozzak.hu';
 $pageDescription = 'Magyarország 22 borvidéke egy helyen: válaszd ki a borvidéket, és nézd meg '
     . 'a közelgő borrendezvényeit — Tokaji, Egri, Villányi, Badacsonyi és a többi.';
@@ -80,15 +88,15 @@ require __DIR__ . '/partials/header.php';
               $c = (int) ($counts[$r['slug']] ?? 0);
               $g = $info[$r['slug']]['grapes'] ?? '';
               $img = regionImage($r['slug'], $r['image_url'] ?? null);
-              $himg = $img['src'] !== ''; ?>
-            <a class="region-tile<?= $himg ? '' : ' region-tile--noimg' ?>" href="borvidek/<?= h($r['slug']) ?>">
+              $himg = $img['src'] !== '';
+              $isFeat = in_array($r['slug'], $featured, true); ?>
+            <a class="region-tile<?= $isFeat ? ' region-tile--feat' : '' ?><?= $himg ? '' : ' region-tile--noimg' ?>" href="borvidek/<?= h($r['slug']) ?>">
               <?php if ($himg): ?><img class="region-tile__bg" src="<?= h($img['src'] . $img['ver']) ?>" alt="" loading="lazy"><?php endif; ?>
+              <?php if ($c > 0): ?><span class="region-tile__count"><?= $c ?> esemény</span><?php endif; ?>
               <span class="region-tile__body">
+                <span class="region-tile__rule"></span>
                 <span class="region-tile__name"><?= h($r['name']) ?></span>
-                <span class="region-tile__meta">
-                  <span class="region-tile__count<?= $c > 0 ? ' is-live' : '' ?>"><?= $c > 0 ? $c . ' esemény' : 'nincs esemény' ?></span>
-                  <?php if ($g !== ''): ?><span class="region-tile__grapes"><svg class="region-tile__ic" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 6.4V4.2c.8-1.1 2.2-1.2 2.9-.8" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/><g fill="currentColor"><circle cx="6.2" cy="8" r="1.9"/><circle cx="10" cy="8" r="1.9"/><circle cx="13.8" cy="8" r="1.9"/><circle cx="8.1" cy="11.4" r="1.9"/><circle cx="11.9" cy="11.4" r="1.9"/><circle cx="10" cy="14.8" r="1.9"/></g></svg><?= h($g) ?></span><?php endif; ?>
-                </span>
+                <?php if ($isFeat && $g !== ''): ?><span class="region-tile__grapes"><?= h($g) ?></span><?php endif; ?>
               </span>
             </a>
           <?php endforeach; ?>
