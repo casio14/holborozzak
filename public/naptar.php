@@ -84,6 +84,36 @@ foreach ($shown as $e) {
 // Kezdőnap szerint növekvő, azonos kezdésnél a hosszabb esemény előre (szebb rétegződés)
 usort($bars, static fn(array $a, array $b) => [$a['sd'], $b['ed']] <=> [$b['sd'], $a['ed']]);
 
+// Mobil „Lista" (agenda) nézet: a hónapra vágott kezdőnap szerint napokba csoportosítva.
+// (Asztali gépen rejtett — a rácsnézet marad az alapértelmezett.)
+$huDays = [1 => 'Hétfő', 2 => 'Kedd', 3 => 'Szerda', 4 => 'Csütörtök', 5 => 'Péntek', 6 => 'Szombat', 7 => 'Vasárnap'];
+$agenda = [];
+foreach ($shown as $e) {
+    $s  = new DateTimeImmutable($e['start_datetime']);
+    $gd = ($s < $monthStart) ? 1 : (int) $s->format('j');
+    $agenda[$gd][] = $e;
+}
+ksort($agenda);
+
+// Mobil „Rács" nézet nap-lapjához: napszám → az adott napra eső események (JS-nek JSON-ban).
+$daysMap = [];
+foreach ($bars as $bar) {
+    $e = $bar['e'];
+    [$bg, ] = categoryColor($e);
+    $loc  = trim(($e['venue_name'] ? $e['venue_name'] . ', ' : '') . ($e['city'] ?? ''));
+    $item = [
+        't' => $e['title'],
+        'u' => eventUrl($e),
+        'c' => $bg,
+        'd' => formatDateRange($e['start_datetime'], $e['end_datetime']),
+        'l' => $loc,
+        'f' => (int) $e['is_free'] === 1 ? 1 : 0,
+    ];
+    for ($d = $bar['sd']; $d <= $bar['ed']; $d++) {
+        $daysMap[$d][] = $item;
+    }
+}
+
 $pageTitle = "Eseménynaptár — {$monthTitle} | holborozzak.hu";
 $pageDescription = "Borrendezvények naptára ({$monthTitle}): nézd meg, mely napokon vannak "
     . "borfesztiválok, bornapok és kóstolók Magyarországon.";
@@ -146,7 +176,7 @@ require __DIR__ . '/partials/header.php';
       </div>
     </form>
 
-    <div class="cal">
+    <div class="cal is-list">
       <div class="cal-toolbar">
         <span class="cal-toolbar__title">
           <span class="cal-toolbar__month"><?= h($monthTitle) ?></span>
@@ -159,6 +189,18 @@ require __DIR__ . '/partials/header.php';
         </div>
       </div>
 
+      <?php /* Nézetváltó — csak mobilon látszik (asztali gépen a rács marad). */ ?>
+      <div class="cal-viewtoggle" role="group" aria-label="Naptár nézet">
+        <button type="button" class="cal-viewtoggle__btn is-active" data-calview="list" aria-pressed="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+          Lista
+        </button>
+        <button type="button" class="cal-viewtoggle__btn" data-calview="grid" aria-pressed="false">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          Rács
+        </button>
+      </div>
+
       <?php if ($catOptions): ?>
       <div class="cal-legend">
         <?php foreach ($catOptions as $slug => $name): [$bg, ] = categoryColorBySlug($slug); ?>
@@ -166,6 +208,31 @@ require __DIR__ . '/partials/header.php';
         <?php endforeach; ?>
       </div>
       <?php endif; ?>
+
+      <?php /* Agenda-lista — mobil alapnézet (napra bontva, esemény-nevekkel). */ ?>
+      <div class="cal-agenda">
+        <?php if (!$agenda): ?>
+          <p class="cal-agenda__empty">Ebben a hónapban nincs esemény. <a href="esemenyek">Nézd meg az összeset →</a></p>
+        <?php endif; ?>
+        <?php foreach ($agenda as $day => $dayEvents):
+            $wd = (int) $first->setDate($year, $month, $day)->format('N'); ?>
+          <div class="cal-agenda__day">
+            <span class="cal-agenda__daynum"><?= $day ?>.</span>
+            <span class="cal-agenda__dow"><?= h($huDays[$wd]) ?></span>
+          </div>
+          <?php foreach ($dayEvents as $e):
+              [$bg, ] = categoryColor($e);
+              $loc = trim(($e['venue_name'] ? $e['venue_name'] . ', ' : '') . ($e['city'] ?? '')); ?>
+            <a class="cal-agenda__ev" href="<?= h(eventUrl($e)) ?>">
+              <span class="cal-agenda__stripe" style="background: <?= h($bg) ?>"></span>
+              <span class="cal-agenda__body">
+                <span class="cal-agenda__t"><?= h($e['title']) ?><?php if ((int) $e['is_free'] === 1): ?><span class="cal-agenda__free">Ingyenes</span><?php endif; ?></span>
+                <span class="cal-agenda__sub"><?= h(formatDateRange($e['start_datetime'], $e['end_datetime'])) ?><?php if ($loc !== ''): ?> · <?= h($loc) ?><?php endif; ?></span>
+              </span>
+            </a>
+          <?php endforeach; ?>
+        <?php endforeach; ?>
+      </div>
 
       <div class="cal__dow"><span aria-label="Hétfő"><span class="dow-full" aria-hidden="true">Hétfő</span><span class="dow-abbr" aria-hidden="true">H</span></span><span aria-label="Kedd"><span class="dow-full" aria-hidden="true">Kedd</span><span class="dow-abbr" aria-hidden="true">K</span></span><span aria-label="Szerda"><span class="dow-full" aria-hidden="true">Szerda</span><span class="dow-abbr" aria-hidden="true">Sze</span></span><span aria-label="Csütörtök"><span class="dow-full" aria-hidden="true">Csüt</span><span class="dow-abbr" aria-hidden="true">Cs</span></span><span aria-label="Péntek"><span class="dow-full" aria-hidden="true">Péntek</span><span class="dow-abbr" aria-hidden="true">P</span></span><span aria-label="Szombat"><span class="dow-full" aria-hidden="true">Szombat</span><span class="dow-abbr" aria-hidden="true">Szo</span></span><span aria-label="Vasárnap"><span class="dow-full" aria-hidden="true">Vasárnap</span><span class="dow-abbr" aria-hidden="true">V</span></span></div>
 
@@ -215,9 +282,21 @@ require __DIR__ . '/partials/header.php';
               </span>
             </a>
           <?php endforeach; ?>
+
+          <?php /* Nap-koppintó felületek (csak mobil „Rács" nézetben aktívak) — az adott
+                   nap eseményeit felugró nap-lapban mutatják. Csak eseményes napra. */ ?>
+          <?php foreach ($week as $i => $d):
+              if (!$d || empty($daysMap[$d])) { continue; } ?>
+            <button type="button" class="cal__hit" data-day="<?= $d ?>"
+                    style="left: calc(<?= $i ?> * 100% / 7)"
+                    aria-label="<?= $d ?>. nap eseményei"></button>
+          <?php endforeach; ?>
         </div>
       <?php endforeach; ?>
     </div>
+
+    <?php /* A nap-lap adatai (napszám → események) a mobil „Rács" nézethez. */ ?>
+    <script type="application/json" id="cal-days" data-month="<?= h(HU_MONTHS[$month]) ?>"><?= json_encode($daysMap, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) ?></script>
 
     <?php if (!$shown): ?>
       <p class="section-intro"><?= $monthEvents ? 'Nincs a szűrőnek megfelelő esemény ebben a hónapban.' : 'Ebben a hónapban nincs rögzített esemény.' ?>

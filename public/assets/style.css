@@ -729,6 +729,7 @@ main { flex: 1 0 auto; }
 /* Esemény-sáv (több napos: átívelő; hét/hónap-határon "levágott" sarok) */
 .cal__bar {
   position: relative;
+  z-index: 2; /* a mobil nap-koppintó felület (.cal__hit) fölött marad kattinthatónak */
   display: block;
   margin: 2px 5px;
   padding: .22rem .6rem;
@@ -789,12 +790,46 @@ main { flex: 1 0 auto; }
 /* Nap-fejléc: hosszú név asztali, rövidítés mobil nézetben */
 .cal__dow .dow-abbr { display: none; }
 
+/* Nézetváltó, agenda-lista és nap-koppintó felület — alapból REJTVE (csak mobilon
+   kapcsolódnak be, lásd a @media (max-width: 760px) blokkot). A base szabályoknak
+   MEG KELL előzniük a media blokkot, mert a nézetváltó láthatósága azonos
+   specifikusságú (source-order dönt). */
+.cal-viewtoggle { display: none; }
+.cal-agenda { display: none; }
+.cal__hit { display: none; }
+
+/* Agenda-kártyák stílusa (csak mobilon jelennek meg, de itt írjuk le egyszer). */
+.cal-agenda { padding: .35rem 0 .7rem; }
+.cal-agenda__empty { padding: 1.4rem 1rem; text-align: center; color: var(--muted); }
+.cal-agenda__day {
+  display: flex; align-items: baseline; gap: .5rem;
+  padding: .85rem .9rem .3rem;
+}
+.cal-agenda__daynum { font-family: Georgia, serif; font-weight: 700; font-size: 1.1rem; color: var(--wine-700); }
+.cal-agenda__dow { font-size: .74rem; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+.cal-agenda__ev {
+  display: flex; gap: .65rem;
+  margin: .3rem .8rem; padding: .6rem .7rem;
+  background: #fff; border: 1px solid var(--line); border-radius: 12px;
+  box-shadow: 0 1px 4px rgba(74, 14, 28, .05);
+  text-decoration: none; color: var(--ink);
+}
+.cal-agenda__ev:active { background: var(--cream); }
+.cal-agenda__stripe { width: 5px; flex: none; border-radius: 3px; }
+.cal-agenda__body { min-width: 0; }
+.cal-agenda__t { display: block; font-weight: 700; font-size: .98rem; line-height: 1.25; color: var(--wine-900); }
+.cal-agenda__sub { display: block; font-size: .82rem; color: var(--muted); margin-top: .15rem; }
+.cal-agenda__free {
+  display: inline-block; font-size: .68rem; font-weight: 800; color: #2e421c;
+  background: #cfe0c0; padding: .05em .5em; border-radius: 999px; margin-left: .4rem; vertical-align: middle;
+}
+
 /* Hover-kártya csak hoverképes eszközön (touch-on koppintás = navigáció) */
 @media (hover: none) {
   .cal__bar:hover .cal-tip { display: none; }
 }
 
-/* Mobil: kompakt rács — a sávok szöveg nélküli színes csíkok (régi nézet) */
+/* Mobil: kompakt rács — a sávok szöveg nélküli színes csíkok (a „Rács" nézetben) */
 @media (max-width: 760px) {
   .cal__dow .dow-full { display: none; }
   .cal__dow .dow-abbr { display: inline; }
@@ -808,6 +843,43 @@ main { flex: 1 0 auto; }
   .cal__d--today b { width: 20px; height: 20px; }
   .cal__bar { height: 12px; min-height: 12px; padding: 0; margin: 2px 3px; border-radius: 4px; }
   .cal__bar-t { display: none; }
+
+  /* Nézetváltó megjelenítése (szegmentált vezérlő) */
+  .cal-viewtoggle {
+    display: flex; gap: .35rem;
+    padding: .55rem .7rem;
+    background: var(--cream);
+    border-bottom: 1px solid var(--line);
+  }
+  .cal-viewtoggle__btn {
+    flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: .4rem;
+    padding: .5rem .6rem;
+    border: 1px solid var(--line); background: #fff;
+    color: var(--wine-700); font-weight: 700; font-size: .85rem;
+    border-radius: 9px; cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .cal-viewtoggle__btn svg { width: 15px; height: 15px; flex: none; }
+  .cal-viewtoggle__btn.is-active {
+    background: var(--wine-700); color: #fff; border-color: var(--wine-700);
+  }
+
+  /* Lista („Agenda") nézet: az agenda látszik, a rács rejtve */
+  .cal.is-list .cal-agenda { display: block; }
+  .cal.is-list .cal__dow,
+  .cal.is-list .cal__week { display: none; }
+
+  /* Rács nézet: az agenda rejtve, a nap-koppintó felületek aktívak */
+  .cal.is-grid .cal-agenda { display: none; }
+  .cal.is-grid .cal__hit {
+    display: block;
+    position: absolute; top: 0; bottom: 0;
+    width: calc(100% / 7);
+    margin: 0; padding: 0; border: 0;
+    background: transparent; cursor: pointer;
+    z-index: 1; /* a színes sávok (z-index: 2) fölöttük maradnak kattinthatónak */
+    -webkit-tap-highlight-color: rgba(114, 47, 55, .12);
+  }
 }
 
 /* ---------- Nap-lap (felugró napi eseménylista) ---------- */
@@ -827,10 +899,17 @@ main { flex: 1 0 auto; }
 .day-sheet__head { display: flex; align-items: center; justify-content: space-between; margin-bottom: .4rem; }
 .day-sheet__title { font-family: Georgia, "Times New Roman", serif; font-weight: 700; font-size: 1.15rem; color: var(--wine-900); }
 .day-sheet__close { border: none; background: #f0e7d8; color: var(--wine-700); width: 34px; height: 34px; border-radius: 50%; font-size: 1.3rem; line-height: 1; cursor: pointer; }
-.day-sheet__item { display: flex; align-items: center; gap: .6rem; padding: .75rem .3rem; border-top: 1px solid var(--line); color: var(--ink); text-decoration: none; }
+.day-sheet__item { display: flex; align-items: flex-start; gap: .6rem; padding: .75rem .3rem; border-top: 1px solid var(--line); color: var(--ink); text-decoration: none; }
 .day-sheet__item:first-child { border-top: none; }
 .day-sheet__item:hover { color: var(--wine-700); }
-.day-sheet__dot { width: 12px; height: 12px; border-radius: 3px; flex: none; }
+.day-sheet__dot { width: 12px; height: 12px; border-radius: 3px; flex: none; margin-top: .28rem; }
+.day-sheet__body { min-width: 0; }
+.day-sheet__name { display: block; font-weight: 700; color: var(--wine-900); line-height: 1.25; }
+.day-sheet__sub { display: block; font-size: .82rem; color: var(--muted); margin-top: .1rem; }
+.day-sheet__free {
+  display: inline-block; font-size: .68rem; font-weight: 800; color: #2e421c;
+  background: #cfe0c0; padding: .05em .5em; border-radius: 999px; margin-left: .4rem; vertical-align: middle;
+}
 @media (min-width: 561px) {
   .day-sheet__panel {
     left: 50%; right: auto; bottom: auto; top: 50%;

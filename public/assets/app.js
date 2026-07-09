@@ -89,7 +89,46 @@
     load(buildQuery(form), true);
   });
 
-  // ----- Naptár: napra koppintva felugró napi eseménylista -----
+  // ----- Naptár: nézetváltó (Lista/Rács) — csak mobilon látszik -----
+  var CAL_VIEW_KEY = 'hb_cal_view';
+  var cal = document.querySelector('.cal');
+
+  function applyCalView(view) {
+    if (!cal) { return; }
+    var grid = view === 'grid';
+    cal.classList.toggle('is-grid', grid);
+    cal.classList.toggle('is-list', !grid);
+    var btns = cal.querySelectorAll('.cal-viewtoggle__btn');
+    Array.prototype.forEach.call(btns, function (b) {
+      var on = b.getAttribute('data-calview') === view;
+      b.classList.toggle('is-active', on);
+      b.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+  }
+
+  if (cal) {
+    var savedView = null;
+    try { savedView = localStorage.getItem(CAL_VIEW_KEY); } catch (e) { /* privát mód */ }
+    if (savedView === 'grid' || savedView === 'list') { applyCalView(savedView); }
+
+    cal.addEventListener('click', function (e) {
+      var btn = e.target.closest('.cal-viewtoggle__btn');
+      if (!btn) { return; }
+      var view = btn.getAttribute('data-calview');
+      applyCalView(view);
+      try { localStorage.setItem(CAL_VIEW_KEY, view); } catch (err) { /* privát mód */ }
+    });
+  }
+
+  // ----- Naptár: napra koppintva felugró napi eseménylista (Rács nézet) -----
+  var calDays = null, calMonth = '';
+  (function () {
+    var el = document.getElementById('cal-days');
+    if (!el) { return; }
+    try { calDays = JSON.parse(el.textContent || '{}'); } catch (e) { calDays = {}; }
+    calMonth = el.getAttribute('data-month') || '';
+  })();
+
   var sheet = null;
 
   function closeSheet() {
@@ -114,27 +153,47 @@
     return sheet;
   }
 
-  function openDaySheet(cell, events) {
+  function openDaySheet(day) {
+    var items = calDays && calDays[day];
+    if (!items || !items.length) { return; }
     ensureSheet();
-    var dayEl = cell.querySelector('.cal__day');
-    var monthEl = document.querySelector('.cal-toolbar__month');
-    var day = dayEl ? dayEl.textContent.trim() : '';
-    var month = monthEl ? monthEl.textContent.trim() : '';
-    sheet.querySelector('.day-sheet__title').textContent = (month + ' ' + day + '.').trim();
+    sheet.querySelector('.day-sheet__title').textContent = (calMonth + ' ' + day + '.').trim();
 
     var list = sheet.querySelector('.day-sheet__list');
     list.innerHTML = '';
-    Array.prototype.forEach.call(events, function (a) {
+    items.forEach(function (it) {
       var row = document.createElement('a');
       row.className = 'day-sheet__item';
-      row.href = a.getAttribute('href');
+      row.href = it.u;
+
       var dot = document.createElement('span');
       dot.className = 'day-sheet__dot';
-      dot.style.background = a.style.backgroundColor || a.style.background;
-      var txt = document.createElement('span');
-      txt.textContent = a.getAttribute('title') || a.textContent.trim();
+      dot.style.background = it.c;
+
+      var body = document.createElement('span');
+      body.className = 'day-sheet__body';
+
+      var name = document.createElement('span');
+      name.className = 'day-sheet__name';
+      name.textContent = it.t;
+      if (it.f) {
+        var free = document.createElement('span');
+        free.className = 'day-sheet__free';
+        free.textContent = 'Ingyenes';
+        name.appendChild(free);
+      }
+      body.appendChild(name);
+
+      var subText = [it.d, it.l].filter(Boolean).join(' · ');
+      if (subText) {
+        var sub = document.createElement('span');
+        sub.className = 'day-sheet__sub';
+        sub.textContent = subText;
+        body.appendChild(sub);
+      }
+
       row.appendChild(dot);
-      row.appendChild(txt);
+      row.appendChild(body);
       list.appendChild(row);
     });
 
@@ -143,16 +202,10 @@
   }
 
   document.addEventListener('click', function (e) {
-    var cell = e.target.closest('.cal__grid .cal__cell');
-    if (!cell) { return; }
-    var events = cell.querySelectorAll('.cal__event');
-    if (!events.length) { return; }
-    var isMobile = window.matchMedia('(max-width: 560px)').matches;
-    var moreClick = e.target.closest('.cal__more');
-    if (isMobile || moreClick) {
-      e.preventDefault();
-      openDaySheet(cell, events);
-    }
+    var hit = e.target.closest('.cal__hit');
+    if (!hit) { return; }
+    e.preventDefault();
+    openDaySheet(hit.getAttribute('data-day'));
   });
 
   document.addEventListener('keydown', function (e) {
