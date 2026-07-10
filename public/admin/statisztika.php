@@ -129,14 +129,14 @@ try {
         ];
     }
 
-    // Napi bontás — az utolsó 14 nap trendje (az időszak-fültől független)
+    // Napi bontás — kattintás-trend az időszak-fül ablakában (mint a látogató-diagram)
     $daily = $pdo->query(
         "SELECT DATE(created_at) AS d,
                 SUM(type = 'view')          AS v,
                 SUM(type = 'click_website') AS cw,
                 SUM(type = 'click_ticket')  AS ct
          FROM event_interactions
-         WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL 13 DAY)
+         WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL " . ($pvDays - 1) . " DAY)
          GROUP BY DATE(created_at)
          ORDER BY d DESC"
     )->fetchAll();
@@ -251,8 +251,6 @@ try {
     $dbError = true;
 }
 
-$clicksTotal = $totals['click_website'] + $totals['click_ticket'];
-
 // Kiemelt-összehasonlítás származtatott értékei: eseményenkénti átlagok + kattintás-szorzó.
 $fF = $featCmp[1];
 $fN = $featCmp[0];
@@ -266,39 +264,28 @@ if ($fF['events'] > 0 && $fN['events'] > 0 && $fN['clicks'] > 0) {
 }
 
 // --- Diagram-adatok előkészítése ---
-// Napi sorozat: 14 nap kronológikus sorrendben, a hiányzó napok 0-val feltöltve.
+// Napi sorozatok az időszak-fül ablakában ($pvDays nap), kronológikusan,
+// a hiányzó napok 0-val feltöltve. Látogató: page_views; kattintás: event_interactions.
 $dailyMap = [];
 foreach ($daily as $r) {
     $dailyMap[$r['d']] = $r;
 }
-$dailyCats = $dailyDates = $sViews = $sCw = $sCt = [];
-$today0 = new DateTimeImmutable('today');
-for ($i = 13; $i >= 0; $i--) {
-    $d = $today0->sub(new DateInterval("P{$i}D"))->format('Y-m-d');
-    $row = $dailyMap[$d] ?? null;
-    $dailyCats[]  = (int) substr($d, 8, 2);
-    $dailyDates[] = substr($d, 5); // MM-DD (tooltip)
-    $sViews[] = $row ? (int) $row['v'] : 0;
-    $sCw[]    = $row ? (int) $row['cw'] : 0;
-    $sCt[]    = $row ? (int) $row['ct'] : 0;
-}
-$dailyHasData = (array_sum($sViews) + array_sum($sCw) + array_sum($sCt)) > 0;
-
-// Napi látogató-sorozat: az időszak minden napja kronológikusan, hiányzók 0-val.
 $pvMap = [];
 foreach ($pvDaily as $r) {
     $pvMap[$r['d']] = $r;
 }
-$pvCats = $pvDates = $sPvUniq = [];
+$pvCats = $pvDates = $sPvUniq = $sCw = [];
+$today0 = new DateTimeImmutable('today');
 for ($i = $pvDays - 1; $i >= 0; $i--) {
     $d = $today0->sub(new DateInterval("P{$i}D"))->format('Y-m-d');
-    $row = $pvMap[$d] ?? null;
-    // Hónapot átívelő idősor → "hó.nap" felirat (pl. 7.10)
+    // Hónapot átívelő idősor → "hó.nap" felirat (pl. 7.10.)
     $pvCats[]  = (int) substr($d, 5, 2) . '.' . (int) substr($d, 8, 2) . '.';
     $pvDates[] = substr($d, 5); // MM-DD (tooltip)
-    $sPvUniq[] = $row ? (int) $row['uniq'] : 0;
+    $sPvUniq[] = isset($pvMap[$d]) ? (int) $pvMap[$d]['uniq'] : 0;
+    $sCw[]     = isset($dailyMap[$d]) ? (int) $dailyMap[$d]['cw'] : 0;
 }
-$pvHasData = array_sum($sPvUniq) > 0;
+$pvHasData     = array_sum($sPvUniq) > 0;
+$clicksHasData = array_sum($sCw) > 0;
 
 // Legnézettebb események (a sáv-diagramhoz): top 8 megtekintés szerint.
 $rowsByViews = $rows;
@@ -440,68 +427,65 @@ $cssVer = @filemtime(__DIR__ . '/../assets/style.css') ?: time();
     <section class="stat-panel" id="tab-attekintes">
       <div class="admin-stats">
         <div class="admin-stat">
-          <span class="admin-stat__num"><?= number_format($totals['view'], 0, ',', ' ') ?></span>
-          <span class="admin-stat__label">Megtekintés</span>
-          <span class="admin-stat__sub">~<?= number_format($uniq['view'], 0, ',', ' ') ?> egyedi</span>
+          <span class="admin-stat__num"><?= number_format($pv['opens'], 0, ',', ' ') ?></span>
+          <span class="admin-stat__label">Oldalmegnyitás</span>
+          <span class="admin-stat__sub">ebből főoldal: <?= number_format($pv['home'], 0, ',', ' ') ?></span>
+        </div>
+        <div class="admin-stat">
+          <span class="admin-stat__num">~<?= number_format($pv['unique'], 0, ',', ' ') ?></span>
+          <span class="admin-stat__label">Egyedi látogató</span>
+          <span class="admin-stat__sub">különböző böngésző (becslés)</span>
         </div>
         <div class="admin-stat">
           <span class="admin-stat__num"><?= number_format($totals['click_website'], 0, ',', ' ') ?></span>
           <span class="admin-stat__label">Honlap-kattintás</span>
-          <span class="admin-stat__sub">~<?= number_format($uniq['click_website'], 0, ',', ' ') ?> egyedi</span>
-        </div>
-        <div class="admin-stat">
-          <span class="admin-stat__num"><?= number_format($totals['click_ticket'], 0, ',', ' ') ?></span>
-          <span class="admin-stat__label">Jegy-kattintás</span>
-          <span class="admin-stat__sub">~<?= number_format($uniq['click_ticket'], 0, ',', ' ') ?> egyedi</span>
-        </div>
-        <div class="admin-stat">
-          <span class="admin-stat__num"><?= ctr($clicksTotal, $totals['view']) ?></span>
-          <span class="admin-stat__label">CTR (kattintás / megtekintés)</span>
-          <span class="admin-stat__sub"><?= number_format($clicksTotal, 0, ',', ' ') ?> kattintás összesen</span>
+          <span class="admin-stat__sub">~<?= number_format($uniq['click_website'], 0, ',', ' ') ?> egyedi — kimenő, a szervező oldalára</span>
         </div>
       </div>
 
-      <?php if ($dailyHasData): ?>
+      <?php if ($pvHasData): ?>
         <div class="chart-card">
-          <h3 class="chart-card__title">Napi megtekintések</h3>
-          <p class="chart-card__sub">Utolsó 14 nap — vidd az egeret egy oszlop fölé a részletekért</p>
-          <div class="chart__wrap"><?= renderDailyChart($dailyCats, $dailyDates, [['label' => 'Megtekintés', 'color' => '#722f37', 'values' => $sViews]]) ?></div>
-        </div>
-        <div class="chart-card">
-          <h3 class="chart-card__title">Napi kattintások</h3>
-          <p class="chart-card__sub">Utolsó 14 nap — kimenő kattintások a szervezők oldalára</p>
-          <div class="chart-legend">
-            <span><i style="background:#b23a4a"></i> Honlap</span>
-            <span><i style="background:#b5892f"></i> Jegy</span>
-          </div>
-          <div class="chart__wrap"><?= renderDailyChart($dailyCats, $dailyDates, [['label' => 'Honlap', 'color' => '#b23a4a', 'values' => $sCw], ['label' => 'Jegy', 'color' => '#b5892f', 'values' => $sCt]]) ?></div>
+          <h3 class="chart-card__title">Napi látogatók</h3>
+          <p class="chart-card__sub">Utolsó <?= $pvDays ?> nap — naponta ennyi különböző látogató járt a
+            honlapon (botok és a saját forgalmad nélkül); vidd az egeret egy oszlop fölé a pontos számért</p>
+          <div class="chart__wrap"><?= renderDailyChart($pvCats, $pvDates, [['label' => 'Látogató', 'color' => '#722f37', 'values' => $sPvUniq]]) ?></div>
         </div>
       <?php else: ?>
-        <div class="admin-empty">Az elmúlt 14 napban még nincs rögzített interakció a grafikonokhoz.</div>
+        <div class="admin-empty">Ebben az időszakban még nincs rögzített látogatás a grafikonhoz.</div>
+      <?php endif; ?>
+      <?php if ($clicksHasData): ?>
+        <div class="chart-card">
+          <h3 class="chart-card__title">Napi honlap-kattintások</h3>
+          <p class="chart-card__sub">Utolsó <?= $pvDays ?> nap — kimenő kattintások a szervezők oldalára</p>
+          <div class="chart__wrap"><?= renderDailyChart($pvCats, $pvDates, [['label' => 'Honlap-kattintás', 'color' => '#b5892f', 'values' => $sCw]]) ?></div>
+        </div>
       <?php endif; ?>
 
-      <h2 class="admin-h2">Napi bontás <span class="admin-stat__sub">(táblázatos nézet — utolsó 14 nap)</span></h2>
-      <?php if (!$daily): ?>
-        <div class="admin-empty">Az elmúlt 14 napban még nincs rögzített interakció.</div>
+      <h2 class="admin-h2">Napi bontás <span class="admin-stat__sub">(táblázatos nézet — utolsó <?= min(14, $pvDays) ?> nap)</span></h2>
+      <?php if (!$pvHasData && !$clicksHasData): ?>
+        <div class="admin-empty">Ebben az időszakban még nincs rögzített látogatás vagy kattintás.</div>
       <?php else: ?>
         <table class="admin-table admin-table--narrow">
           <thead>
             <tr>
               <th>Nap</th>
-              <th class="admin-num">Megtekintés</th>
+              <th class="admin-num">Látogató</th>
+              <th class="admin-num">Oldalmegnyitás</th>
               <th class="admin-num">Honlap katt.</th>
-              <th class="admin-num">Jegy katt.</th>
             </tr>
           </thead>
           <tbody>
-            <?php foreach ($daily as $r): ?>
+            <?php for ($i = 0; $i < min(14, $pvDays); $i++):
+                $d = $today0->sub(new DateInterval("P{$i}D"))->format('Y-m-d');
+                $p = $pvMap[$d] ?? null;
+                $c = $dailyMap[$d] ?? null; ?>
               <tr>
-                <td><?= h($r['d']) ?></td>
-                <td class="admin-num"><?= number_format((int) $r['v'], 0, ',', ' ') ?></td>
-                <td class="admin-num"><?= number_format((int) $r['cw'], 0, ',', ' ') ?></td>
-                <td class="admin-num"><?= number_format((int) $r['ct'], 0, ',', ' ') ?></td>
+                <td><?= h($d) ?></td>
+                <td class="admin-num"><?= number_format($p ? (int) $p['uniq'] : 0, 0, ',', ' ') ?></td>
+                <td class="admin-num"><?= number_format($p ? (int) $p['opens'] : 0, 0, ',', ' ') ?></td>
+                <td class="admin-num"><?= number_format($c ? (int) $c['cw'] : 0, 0, ',', ' ') ?></td>
               </tr>
-            <?php endforeach; ?>
+            <?php endfor; ?>
           </tbody>
         </table>
       <?php endif; ?>
@@ -791,41 +775,6 @@ $cssVer = @filemtime(__DIR__ . '/../assets/style.css') ?: time();
           <span class="admin-stat__sub">nem fogadta el (IP-becslés)</span>
         </div>
       </div>
-      <?php if ($pvHasData): ?>
-        <div class="chart-card">
-          <h3 class="chart-card__title">Napi látogatók</h3>
-          <p class="chart-card__sub">Utolsó <?= $pvDays ?> nap — naponta ennyi különböző látogató járt az
-            oldalon (botok és a saját forgalmad nélkül); vidd az egeret egy oszlop fölé a pontos számért</p>
-          <div class="chart__wrap"><?= renderDailyChart($pvCats, $pvDates, [['label' => 'Látogató', 'color' => '#722f37', 'values' => $sPvUniq]]) ?></div>
-        </div>
-      <?php else: ?>
-        <div class="admin-empty">Ebben az időszakban még nincs rögzített oldalmegnyitás a napi diagramhoz.</div>
-      <?php endif; ?>
-
-      <?php if ($pvHasData): ?>
-        <h2 class="admin-h2">Napi látogatottság <span class="admin-stat__sub">(táblázatos nézet — utolsó 14 nap)</span></h2>
-        <table class="admin-table admin-table--narrow">
-          <thead>
-            <tr>
-              <th>Nap</th>
-              <th class="admin-num">Látogató</th>
-              <th class="admin-num">Oldalmegnyitás</th>
-            </tr>
-          </thead>
-          <tbody>
-            <?php
-            $pvTable = array_slice($pvDaily, -14);
-            foreach (array_reverse($pvTable) as $r): ?>
-              <tr>
-                <td><?= h($r['d']) ?></td>
-                <td class="admin-num"><?= number_format((int) $r['uniq'], 0, ',', ' ') ?></td>
-                <td class="admin-num"><?= number_format((int) $r['opens'], 0, ',', ' ') ?></td>
-              </tr>
-            <?php endforeach; ?>
-          </tbody>
-        </table>
-      <?php endif; ?>
-
       <p class="admin-note">Ez azt méri, <strong>hányszor nyitották meg a honlapot</strong> (bármely aloldalt),
         a botokat és a saját (admin) forgalmadat kihagyva. A „Sütivel mért" pontos, napokon átívelő; a
         „Süti nélkül" a napi sóval hashelt IP alapján becslés (több napos időszakon a napi egyediek összege).
