@@ -34,6 +34,11 @@ $uniq   = ['view' => 0, 'click_website' => 0, 'click_ticket' => 0];
 $visitor = ['sessions' => 0, 'returning' => 0, 'viewers' => 0, 'clickers' => 0, 'avg_events' => 0.0];
 $rows = [];
 $daily = [];
+// Kiemelt vs. nem kiemelt események összesítője (a kiemelés-árazás bizonyítéka)
+$featCmp = [
+    1 => ['events' => 0, 'views' => 0, 'clicks' => 0],
+    0 => ['events' => 0, 'views' => 0, 'clicks' => 0],
+];
 $referrers = [];
 $aiTotals = ['interactions' => 0, 'unique' => 0, 'clicks' => 0];
 $aiRows = [];
@@ -90,7 +95,7 @@ try {
 
     // Eseményenkénti bontás (kattintás szerint csökkenő)
     $rows = $pdo->query(
-        "SELECT e.id, e.title, e.city, e.status, e.start_datetime,
+        "SELECT e.id, e.title, e.city, e.status, e.start_datetime, e.is_featured,
                 SUM(i.type = 'view')          AS views,
                 COUNT(DISTINCT CASE WHEN i.type = 'view' THEN {$UID} END) AS uv,
                 SUM(i.type = 'click_website') AS cw,
@@ -103,6 +108,26 @@ try {
                   views DESC
          LIMIT 200"
     )->fetchAll();
+
+    // Kiemelt vs. nem kiemelt: átlagos megtekintés/kattintás eseményenként.
+    // A besorolás a JELENLEGI is_featured állapot szerint történik (nincs
+    // historikus kiemelés-napló) — a megjegyzés a felületen is jelzi.
+    foreach ($pdo->query(
+        "SELECT e.is_featured AS f,
+                COUNT(DISTINCT e.id) AS ev,
+                SUM(i.type = 'view') AS v,
+                SUM(i.type IN ('click_website','click_ticket')) AS c
+         FROM event_interactions i
+         JOIN events e ON e.id = i.event_id
+         {$where}
+         GROUP BY e.is_featured"
+    ) as $r) {
+        $featCmp[(int) $r['f']] = [
+            'events' => (int) $r['ev'],
+            'views'  => (int) $r['v'],
+            'clicks' => (int) $r['c'],
+        ];
+    }
 
     // Napi bontás — az utolsó 14 nap trendje (az időszak-fültől független)
     $daily = $pdo->query(
@@ -227,6 +252,18 @@ try {
 }
 
 $clicksTotal = $totals['click_website'] + $totals['click_ticket'];
+
+// Kiemelt-összehasonlítás származtatott értékei: eseményenkénti átlagok + kattintás-szorzó.
+$fF = $featCmp[1];
+$fN = $featCmp[0];
+$featMult = null;
+if ($fF['events'] > 0 && $fN['events'] > 0 && $fN['clicks'] > 0) {
+    $perF = $fF['clicks'] / $fF['events'];
+    $perN = $fN['clicks'] / $fN['events'];
+    if ($perF > 0) {
+        $featMult = $perF / $perN;
+    }
+}
 
 // --- Diagram-adatok előkészítése ---
 // Napi sorozat: 14 nap kronológikus sorrendben, a hiányzó napok 0-val feltöltve.
@@ -472,6 +509,64 @@ $cssVer = @filemtime(__DIR__ . '/../assets/style.css') ?: time();
 
     <!-- ===== ESEMÉNYEK ===== -->
     <section class="stat-panel" id="tab-esemenyek">
+      <h2 class="admin-h2">⭐ Kiemelt vs. nem kiemelt <span class="admin-stat__sub">(a kiemelés értékének bizonyítéka — eseményenkénti átlagok)</span></h2>
+      <?php if ($fF['events'] === 0 || $fN['events'] === 0): ?>
+        <div class="admin-empty">Az összehasonlításhoz az kell, hogy az időszakban kiemelt ÉS nem
+          kiemelt eseményre is legyen rögzített interakció. Ahogy lesz kiemelt esemény forgalommal,
+          itt jelenik meg, mennyivel teljesít jobban.</div>
+      <?php else: ?>
+        <?php if ($featMult !== null): ?>
+          <div class="admin-stats">
+            <div class="admin-stat">
+              <span class="admin-stat__num"><?= number_format($featMult, 1, ',', ' ') ?>×</span>
+              <span class="admin-stat__label">Kattintás-szorzó</span>
+              <span class="admin-stat__sub">ennyiszer több kattintás jut egy kiemelt eseményre</span>
+            </div>
+            <div class="admin-stat">
+              <span class="admin-stat__num"><?= ctr($fF['clicks'], $fF['views']) ?></span>
+              <span class="admin-stat__label">Kiemelt CTR</span>
+              <span class="admin-stat__sub">nem kiemelt: <?= ctr($fN['clicks'], $fN['views']) ?></span>
+            </div>
+          </div>
+        <?php endif; ?>
+        <table class="admin-table admin-table--narrow">
+          <thead>
+            <tr>
+              <th></th>
+              <th class="admin-num">⭐ Kiemelt</th>
+              <th class="admin-num">Nem kiemelt</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Esemény (interakcióval)</td>
+              <td class="admin-num"><?= number_format($fF['events'], 0, ',', ' ') ?></td>
+              <td class="admin-num"><?= number_format($fN['events'], 0, ',', ' ') ?></td>
+            </tr>
+            <tr>
+              <td>Megtekintés / esemény</td>
+              <td class="admin-num"><?= number_format($fF['views'] / max(1, $fF['events']), 1, ',', ' ') ?></td>
+              <td class="admin-num"><?= number_format($fN['views'] / max(1, $fN['events']), 1, ',', ' ') ?></td>
+            </tr>
+            <tr>
+              <td>Kattintás / esemény</td>
+              <td class="admin-num"><?= number_format($fF['clicks'] / max(1, $fF['events']), 1, ',', ' ') ?></td>
+              <td class="admin-num"><?= number_format($fN['clicks'] / max(1, $fN['events']), 1, ',', ' ') ?></td>
+            </tr>
+            <tr>
+              <td>CTR (kattintás / megtekintés)</td>
+              <td class="admin-num"><?= ctr($fF['clicks'], $fF['views']) ?></td>
+              <td class="admin-num"><?= ctr($fN['clicks'], $fN['views']) ?></td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="admin-note">A besorolás az esemény <strong>jelenlegi</strong> kiemelt-státusza
+          szerint történik (nincs historikus kiemelés-napló) — ha egy eseményt az időszak közben
+          emeltél ki vagy vettél le, az torzíthat. Kevés esemény esetén egy-egy kiugró rendezvény
+          is elhúzhatja az átlagot; a szorzót akkor kezeld erős érvként, ha már legalább néhány
+          kiemelt eseményen alapul.</p>
+      <?php endif; ?>
+
       <?php if ($rowsByViews): ?>
         <div class="chart-card">
           <h3 class="chart-card__title">Legnézettebb események</h3>
@@ -508,7 +603,7 @@ $cssVer = @filemtime(__DIR__ . '/../assets/style.css') ?: time();
                 $cw = (int) $r['cw']; $ct = (int) $r['ct']; ?>
               <tr>
                 <td>
-                  <strong><?= h($r['title']) ?></strong>
+                  <?php if (!empty($r['is_featured'])): ?>⭐ <?php endif; ?><strong><?= h($r['title']) ?></strong>
                   <?php if (($r['status'] ?? '') !== 'published'): ?>
                     <span class="admin-pill admin-pill--draft"><?= h($STATUS_PILL[$r['status']] ?? $r['status']) ?></span>
                   <?php endif; ?>
