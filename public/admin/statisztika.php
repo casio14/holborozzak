@@ -40,6 +40,9 @@ $aiRows = [];
 $searchTotals = ['interactions' => 0, 'unique' => 0, 'clicks' => 0];
 $searchRows = [];
 $pv = ['opens' => 0, 'home' => 0, 'unique' => 0, 'cookie' => 0, 'nocookie' => 0];
+$pvDaily = [];
+// A napi látogató-diagram ablaka az időszak-fület követi (teljes időszaknál 90 nap).
+$pvDays = $days > 0 ? $days : 90;
 $dbError = false;
 
 // AI-ajánlások forrása: az ai_referrals tábla (a fő oldalak logAiReferral() hívása
@@ -205,6 +208,19 @@ try {
             'nocookie' => (int) $pvr['nock'],
         ];
     }
+
+    // Napi látogatottság: naponta hány KÜLÖNBÖZŐ látogató járt az oldalon.
+    // A napi sózott ip_hash napon belül pontosan dedupál, így a napi egyedi
+    // szám a sütit el nem fogadóknál is megbízható.
+    $pvDaily = $pdo->query(
+        "SELECT DATE(created_at) AS d,
+                COUNT(*) AS opens,
+                COUNT(DISTINCT COALESCE(session_id, ip_hash)) AS uniq
+         FROM page_views
+         WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL " . ($pvDays - 1) . " DAY)
+         GROUP BY DATE(created_at)
+         ORDER BY d"
+    )->fetchAll();
 } catch (Throwable $e) {
     error_log('admin statisztika DB hiba: ' . $e->getMessage());
     $dbError = true;
@@ -230,6 +246,22 @@ for ($i = 13; $i >= 0; $i--) {
     $sCt[]    = $row ? (int) $row['ct'] : 0;
 }
 $dailyHasData = (array_sum($sViews) + array_sum($sCw) + array_sum($sCt)) > 0;
+
+// Napi látogató-sorozat: az időszak minden napja kronológikusan, hiányzók 0-val.
+$pvMap = [];
+foreach ($pvDaily as $r) {
+    $pvMap[$r['d']] = $r;
+}
+$pvCats = $pvDates = $sPvUniq = [];
+for ($i = $pvDays - 1; $i >= 0; $i--) {
+    $d = $today0->sub(new DateInterval("P{$i}D"))->format('Y-m-d');
+    $row = $pvMap[$d] ?? null;
+    // Hónapot átívelő idősor → "hó.nap" felirat (pl. 7.10)
+    $pvCats[]  = (int) substr($d, 5, 2) . '.' . (int) substr($d, 8, 2) . '.';
+    $pvDates[] = substr($d, 5); // MM-DD (tooltip)
+    $sPvUniq[] = $row ? (int) $row['uniq'] : 0;
+}
+$pvHasData = array_sum($sPvUniq) > 0;
 
 // Legnézettebb események (a sáv-diagramhoz): top 8 megtekintés szerint.
 $rowsByViews = $rows;
@@ -296,6 +328,10 @@ function renderDailyChart(array $cats, array $dates, array $series): string
     $groupW = $plotW / $n;
     $inner  = $groupW * 0.76;
     $barW   = max(3.0, ($inner - ($ns - 1) * 2) / $ns);
+    $rx = min(2.5, $barW / 2);
+    // Hosszú idősornál (30-90 nap) csak minden k. nap kap tengelyfeliratot,
+    // úgy, hogy a legutolsó (mai) nap mindig feliratozott legyen.
+    $labelStep = max(1, (int) ceil($n / 16));
     $muted = '#9a8b7c'; $grid = '#e7ddcb';
 
     $svg = '<svg class="chart__svg" viewBox="0 0 ' . $W . ' ' . $H . '" role="img" aria-label="Napi oszlopdiagram">';
@@ -307,7 +343,9 @@ function renderDailyChart(array $cats, array $dates, array $series): string
     for ($g = 0; $g < $n; $g++) {
         $gx0 = $padL + $g * $groupW + ($groupW - $inner) / 2;
         $cx  = $padL + $g * $groupW + $groupW / 2;
-        $svg .= '<text x="' . round($cx, 1) . '" y="' . ($baseY + 13) . '" text-anchor="middle" font-size="9" fill="' . $muted . '">' . (int) $cats[$g] . '</text>';
+        if (($n - 1 - $g) % $labelStep === 0) {
+            $svg .= '<text x="' . round($cx, 1) . '" y="' . ($baseY + 13) . '" text-anchor="middle" font-size="9" fill="' . $muted . '">' . h((string) $cats[$g]) . '</text>';
+        }
         foreach ($series as $k => $s) {
             $v = (int) ($s['values'][$g] ?? 0);
             if ($v <= 0) {
@@ -317,7 +355,7 @@ function renderDailyChart(array $cats, array $dates, array $series): string
             $x  = round($gx0 + $k * ($barW + 2), 1);
             $y  = round($baseY - $bh, 1);
             $svg .= '<rect x="' . $x . '" y="' . $y . '" width="' . round($barW, 1) . '" height="' . round($bh, 1)
-                . '" rx="2.5" fill="' . $s['color'] . '"><title>' . h($dates[$g] . ' · ' . $s['label'] . ': ' . $v) . '</title></rect>';
+                . '" rx="' . round($rx, 1) . '" fill="' . $s['color'] . '"><title>' . h($dates[$g] . ' · ' . $s['label'] . ': ' . $v) . '</title></rect>';
         }
     }
     $svg .= '<line x1="' . $padL . '" y1="' . $baseY . '" x2="' . ($W - $padR) . '" y2="' . $baseY . '" stroke="#c9bba9" stroke-width="1"/>';
@@ -658,9 +696,46 @@ $cssVer = @filemtime(__DIR__ . '/../assets/style.css') ?: time();
           <span class="admin-stat__sub">nem fogadta el (IP-becslés)</span>
         </div>
       </div>
+      <?php if ($pvHasData): ?>
+        <div class="chart-card">
+          <h3 class="chart-card__title">Napi látogatók</h3>
+          <p class="chart-card__sub">Utolsó <?= $pvDays ?> nap — naponta ennyi különböző látogató járt az
+            oldalon (botok és a saját forgalmad nélkül); vidd az egeret egy oszlop fölé a pontos számért</p>
+          <div class="chart__wrap"><?= renderDailyChart($pvCats, $pvDates, [['label' => 'Látogató', 'color' => '#722f37', 'values' => $sPvUniq]]) ?></div>
+        </div>
+      <?php else: ?>
+        <div class="admin-empty">Ebben az időszakban még nincs rögzített oldalmegnyitás a napi diagramhoz.</div>
+      <?php endif; ?>
+
+      <?php if ($pvHasData): ?>
+        <h2 class="admin-h2">Napi látogatottság <span class="admin-stat__sub">(táblázatos nézet — utolsó 14 nap)</span></h2>
+        <table class="admin-table admin-table--narrow">
+          <thead>
+            <tr>
+              <th>Nap</th>
+              <th class="admin-num">Látogató</th>
+              <th class="admin-num">Oldalmegnyitás</th>
+            </tr>
+          </thead>
+          <tbody>
+            <?php
+            $pvTable = array_slice($pvDaily, -14);
+            foreach (array_reverse($pvTable) as $r): ?>
+              <tr>
+                <td><?= h($r['d']) ?></td>
+                <td class="admin-num"><?= number_format((int) $r['uniq'], 0, ',', ' ') ?></td>
+                <td class="admin-num"><?= number_format((int) $r['opens'], 0, ',', ' ') ?></td>
+              </tr>
+            <?php endforeach; ?>
+          </tbody>
+        </table>
+      <?php endif; ?>
+
       <p class="admin-note">Ez azt méri, <strong>hányszor nyitották meg a honlapot</strong> (bármely aloldalt),
         a botokat és a saját (admin) forgalmadat kihagyva. A „Sütivel mért" pontos, napokon átívelő; a
-        „Süti nélkül" a napi sóval hashelt IP alapján becslés (több napos időszakon a napi egyediek összege).</p>
+        „Süti nélkül" a napi sóval hashelt IP alapján becslés (több napos időszakon a napi egyediek összege).
+        A napi diagram <strong>napon belül</strong> mindenkit pontosan dedupál (a napi sózott IP-hash miatt),
+        így a napi látogatószám a sütit el nem fogadóknál is megbízható.</p>
 
       <h2 class="admin-h2">Sütis látogató-mérés <span class="admin-stat__sub">(csak a mérési sütit elfogadó látogatók — napokon átívelően pontos)</span></h2>
       <div class="admin-stats">
