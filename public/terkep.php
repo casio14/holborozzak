@@ -71,6 +71,7 @@ require __DIR__ . '/partials/header.php';
         <a class="map-item" href="<?= h($p['url']) ?>" data-i="<?= $i ?>">
           <img class="map-item__img" src="<?= h($p['img']) ?>" alt="" loading="lazy">
           <span class="map-item__main">
+            <?php if ($p['feat']): ?><span class="map-item__pill">★ Kiemelt</span><?php endif; ?>
             <span class="map-item__t"><?= h($p['title']) ?></span>
             <span class="map-item__d"><?= h($p['date']) ?></span>
             <span class="map-item__s"><?= h(trim(($p['venue'] ? $p['venue'] . ', ' : '') . ($p['city'] ?? ''))) ?></span>
