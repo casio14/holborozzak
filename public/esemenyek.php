@@ -192,6 +192,7 @@ require __DIR__ . '/partials/header.php';
               <span class="event-row__main">
                 <span class="event-row__title">
                   <?= h($e['title']) ?>
+                  <?php if ((int) $e['is_featured'] === 1): ?><span class="status is-featured">★ Kiemelt</span><?php endif; ?>
                   <?php if ($st): ?><span class="status <?= h($st['class']) ?>"><?= h($st['label']) ?></span><?php endif; ?>
                   <?php if ((int) $e['is_free'] === 1): ?><span class="status is-free">Ingyenes</span><?php endif; ?>
                 </span>
