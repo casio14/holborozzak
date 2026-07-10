@@ -183,9 +183,16 @@ require __DIR__ . '/partials/header.php';
     if (typeof L === 'undefined') { return; }
     var lat = <?= json_encode((float) $event['latitude']) ?>, lng = <?= json_encode((float) $event['longitude']) ?>;
     var map = L.map('event-map', { scrollWheelZoom: false }).setView([lat, lng], 13);
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+    // Téma-követő csempék: sötét módban sötét CARTO-alaptérkép
+    function tileUrl(theme) {
+      return 'https://{s}.basemaps.cartocdn.com/' + (theme === 'dark' ? 'dark_all' : 'light_all') + '/{z}/{x}/{y}{r}.png';
+    }
+    var tiles = L.tileLayer(tileUrl(document.documentElement.getAttribute('data-theme')), {
       maxZoom: 19, subdomains: 'abcd', attribution: '&copy; OpenStreetMap, &copy; CARTO'
     }).addTo(map);
+    document.addEventListener('hb-theme-change', function (ev) {
+      tiles.setUrl(tileUrl(ev.detail));
+    });
     var dot = L.divIcon({ className: 'grape-dot', html: '', iconSize: [18, 18], iconAnchor: [9, 9] });
     L.marker([lat, lng], { icon: dot }).addTo(map);
   })();

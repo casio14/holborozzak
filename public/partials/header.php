@@ -75,7 +75,24 @@ $jsVer  = @filemtime(__DIR__ . '/../assets/app.js') ?: time();
   <meta name="description" content="<?= htmlspecialchars($pageDescription, ENT_QUOTES) ?>">
   <meta name="robots" content="<?= htmlspecialchars($robots, ENT_QUOTES) ?>">
   <link rel="canonical" href="<?= htmlspecialchars($canonicalUrl, ENT_QUOTES) ?>">
-  <meta name="theme-color" content="#722f37">
+  <meta name="theme-color" content="#722f37" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#1e1114" media="(prefers-color-scheme: dark)">
+
+  <!-- Téma (világos/sötét) beállítása MÉG a stíluslap előtt, hogy ne villanjon:
+       mentett választás (localStorage) > ?theme= paraméter > rendszerbeállítás -->
+  <script>
+    (function () {
+      var t = null;
+      try { t = localStorage.getItem('hb_theme'); } catch (e) {}
+      var q = null;
+      try { q = new URLSearchParams(location.search).get('theme'); } catch (e) {}
+      if (q === 'dark' || q === 'light') { t = q; }
+      if (t !== 'dark' && t !== 'light') {
+        t = (window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+      }
+      document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
 
   <!-- Open Graph -->
   <meta property="og:type" content="<?= htmlspecialchars($ogType, ENT_QUOTES) ?>">
@@ -184,6 +201,18 @@ $jsVer  = @filemtime(__DIR__ . '/../assets/app.js') ?: time();
       </nav>
 
       <div class="site-header__actions">
+        <button type="button" class="theme-toggle" id="themeToggle" aria-label="Váltás sötét és világos mód között">
+          <svg class="theme-toggle__sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="4.2"/>
+            <line x1="12" y1="2.5" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="21.5"/>
+            <line x1="2.5" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="21.5" y2="12"/>
+            <line x1="5.3" y1="5.3" x2="7" y2="7"/><line x1="17" y1="17" x2="18.7" y2="18.7"/>
+            <line x1="5.3" y1="18.7" x2="7" y2="17"/><line x1="17" y1="7" x2="18.7" y2="5.3"/>
+          </svg>
+          <svg class="theme-toggle__moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>
+          </svg>
+        </button>
         <a class="site-cta" href="esemeny-bekuldes">Esemény beküldése</a>
         <label class="nav-burger" for="nav-toggle" aria-label="Menü">
           <svg class="nav-burger__open" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">

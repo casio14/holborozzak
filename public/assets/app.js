@@ -9,6 +9,19 @@
   'use strict';
   document.documentElement.classList.add('js');
 
+  // ----- Témaváltó (sötét/világos) — a kezdeti témát a header inline scriptje
+  // állítja be még a stíluslap előtt; itt csak a kapcsoló + mentés él. -----
+  var themeBtn = document.getElementById('themeToggle');
+  if (themeBtn) {
+    themeBtn.addEventListener('click', function () {
+      var next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      try { localStorage.setItem('hb_theme', next); } catch (e) {}
+      // A térképek (Leaflet-csempék) erre váltanak sötét/világos csempére
+      document.dispatchEvent(new CustomEvent('hb-theme-change', { detail: next }));
+    });
+  }
+
   var REGION = 'esemenyek-region';
   var lastUrl = null;
 

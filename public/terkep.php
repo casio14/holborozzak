@@ -127,10 +127,17 @@ require __DIR__ . '/partials/header.php';
       if (Date.now() - popupOpenedAt < 500) { return; }
       map.closePopup();
     });
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+    // Téma-követő csempék: sötét módban sötét CARTO-alaptérkép
+    function tileUrl(theme) {
+      return 'https://{s}.basemaps.cartocdn.com/' + (theme === 'dark' ? 'dark_all' : 'light_all') + '/{z}/{x}/{y}{r}.png';
+    }
+    var tiles = L.tileLayer(tileUrl(document.documentElement.getAttribute('data-theme')), {
       maxZoom: 19, subdomains: 'abcd',
       attribution: '&copy; OpenStreetMap, &copy; CARTO'
     }).addTo(map);
+    document.addEventListener('hb-theme-change', function (ev) {
+      tiles.setUrl(tileUrl(ev.detail));
+    });
 
     // Zoom-alapú összevonás: kicsinyítve aggregál, ráközelítve szétválik
     var cluster = L.markerClusterGroup({
