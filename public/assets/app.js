@@ -88,6 +88,11 @@
     var form = d.closest('form.facets');
     if (!form) { return; }
     if (d.open) {
+      // Csak egy szűrő legyen nyitva egyszerre: a többit zárjuk be.
+      var others = document.querySelectorAll('#' + REGION + ' details[data-facet][open]');
+      Array.prototype.forEach.call(others, function (o) {
+        if (o !== d) { o.removeAttribute('open'); }
+      });
       d._snapshot = buildQuery(form);
     } else if (d._snapshot !== undefined && buildQuery(form) !== d._snapshot) {
       load(buildQuery(form), true);
