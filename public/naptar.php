@@ -108,6 +108,7 @@ foreach ($bars as $bar) {
         'd' => formatDateRange($e['start_datetime'], $e['end_datetime']),
         'l' => $loc,
         'f' => (int) $e['is_free'] === 1 ? 1 : 0,
+        'ft' => (int) $e['is_featured'] === 1 ? 1 : 0,
     ];
     for ($d = $bar['sd']; $d <= $bar['ed']; $d++) {
         $daysMap[$d][] = $item;
@@ -226,7 +227,7 @@ require __DIR__ . '/partials/header.php';
             <a class="cal-agenda__ev" href="<?= h(eventUrl($e)) ?>">
               <span class="cal-agenda__stripe" style="background: <?= h($bg) ?>"></span>
               <span class="cal-agenda__body">
-                <span class="cal-agenda__t"><?= h($e['title']) ?><?php if ((int) $e['is_free'] === 1): ?><span class="cal-agenda__free">Ingyenes</span><?php endif; ?></span>
+                <span class="cal-agenda__t"><?php if ((int) $e['is_featured'] === 1): ?><span class="cal-agenda__star">★</span> <?php endif; ?><?= h($e['title']) ?><?php if ((int) $e['is_free'] === 1): ?><span class="cal-agenda__free">Ingyenes</span><?php endif; ?></span>
                 <span class="cal-agenda__sub"><?= h(formatDateRange($e['start_datetime'], $e['end_datetime'])) ?><?php if ($loc !== ''): ?> · <?= h($loc) ?><?php endif; ?></span>
               </span>
             </a>
@@ -265,7 +266,7 @@ require __DIR__ . '/partials/header.php';
             <a class="cal__bar<?= $contL ? ' cal__bar--cont-l' : '' ?><?= $contR ? ' cal__bar--cont-r' : '' ?>"
                style="grid-column: <?= $col ?> / span <?= $span ?>; background: <?= h($bg) ?>; color: <?= h($fg) ?>"
                href="<?= h(eventUrl($e)) ?>">
-              <span class="cal__bar-t"><?= h($e['title']) ?></span>
+              <span class="cal__bar-t"><?php if ((int) $e['is_featured'] === 1): ?><span class="cal__star" style="color: <?= $fg === '#ffffff' ? '#f4d98c' : '#ffffff' ?>">★</span> <?php endif; ?><?= h($e['title']) ?></span>
               <span class="cal-tip<?= $tipRight ? ' cal-tip--r' : '' ?>">
                 <img class="cal-tip__img" src="<?= h(eventImage($e)) ?>" alt="" loading="lazy">
                 <span class="cal-tip__body">

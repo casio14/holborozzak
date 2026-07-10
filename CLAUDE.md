@@ -99,7 +99,9 @@ JSON-LD vázat (alap `WebSite`+`Organization`); `$jsonLd`-vel bővíthető oldal
     gyűrű), a térkép melletti listában pedig arany „★ Kiemelt" pirulát
     (`.map-item__pill`). SEO: szerveroldali lista + `Event`/`ItemList` JSON-LD.
   - `naptar.php` — **Eseménynaptár**: havi naptárrács (hét-első nézet), eseményekkel a
-    napjukon, hónaplépegetéssel (`?ev=&ho=`). A Naptár menüpont ide mutat.
+    napjukon, hónaplépegetéssel (`?ev=&ho=`). A Naptár menüpont ide mutat. **Kiemelt
+    esemény: arany ★ a cím előtt** mindhárom nézetben (rács-sáv — a csillag színe inline,
+    arany sávon fehér; mobil agenda; mobil nap-lap a `daysMap` `ft` flagjéből, app.js).
   - `esemeny.php` — esemény **részletoldal**, szép URL-lel: **`/esemeny/<slug>`**
     (`.htaccess` rewrite; a régi `esemeny.php?slug=…` 301-gyel ide irányít; a
     `partials/header.php` `<base>` tagje miatt a relatív linkek a mélyebb útvonalon is

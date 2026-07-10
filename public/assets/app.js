@@ -175,7 +175,13 @@
 
       var name = document.createElement('span');
       name.className = 'day-sheet__name';
-      name.textContent = it.t;
+      if (it.ft) { // kiemelt esemény: arany csillag a cím előtt
+        var star = document.createElement('span');
+        star.className = 'day-sheet__star';
+        star.textContent = '★ ';
+        name.appendChild(star);
+      }
+      name.appendChild(document.createTextNode(it.t));
       if (it.f) {
         var free = document.createElement('span');
         free.className = 'day-sheet__free';

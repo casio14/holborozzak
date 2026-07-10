@@ -824,6 +824,12 @@ main { flex: 1 0 auto; }
   background: #cfe0c0; padding: .05em .5em; border-radius: 999px; margin-left: .4rem; vertical-align: middle;
 }
 
+/* Kiemelt esemény a naptárban: arany csillag a cím előtt (rács-sáv, agenda, nap-lap).
+   A rács-sávon a csillag színét a PHP adja inline (halványarany, arany sávon fehér). */
+.cal__star { font-size: .85em; }
+.cal-agenda__star,
+.day-sheet__star { color: var(--gold); }
+
 /* Hover-kártya csak hoverképes eszközön (touch-on koppintás = navigáció) */
 @media (hover: none) {
   .cal__bar:hover .cal-tip { display: none; }
