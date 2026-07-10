@@ -58,8 +58,11 @@ A weboldal címe: **holborozzak.hu**
   - Adatbázis neve: `c105746holborozzak`
   - Felhasználónév: `c105746patrik`
   - Jelszó: **GitHub repository secret**-ben (`DB_PASSWORD`), NEM a kódban.
-  - Port: 3306 (alapértelmezett, ellenőrizni)
-  - **Kívülről is elérhető** → migrációkat futtathatunk helyi gépről / CI-ből is.
+  - Port: 3306
+  - **Kívülről NEM érhető el** (2026-07: a 3306-os port kívülről azonnal elutasít) →
+    migráció/egyszeri DB-művelet útjai: (1) Rackhost phpMyAdmin kézzel, vagy
+    (2) ideiglenes token-védett PHP végpont a `public/`-ban (deploy → HTTPS POST
+    a tokennel a POST-törzsben → a fájl azonnali törlése + redeploy).
 - **Fejlesztési mód:** inkrementálisan haladunk, kis lépésekben.
 
 ## Funkciók (frontend)
