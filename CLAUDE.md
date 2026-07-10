@@ -243,8 +243,13 @@ CSAK `hb_consent=1` + formátum-valid `hb_sid` esetén tölti a `session_id` osz
 ez adja a napokon átívelő pontos egyedi/visszatérő mérést; elutasítóknál marad az
 `ip_hash`-becslés. Az adatvédelmi tájékoztató (`adatvedelem.php`) sütik szakasza
 ehhez igazítva. **`view`-mérés kész:** az `esemeny.php` részletoldal-megtekintéskor
-naplóz (ugyanazzal a `logInteraction()`-nel). Az impresszió-mérés (lista-megjelenések,
-`event_impressions_daily`) még nincs bekötve.
+naplóz (ugyanazzal a `logInteraction()`-nel). **Impresszió-mérés kész:** a
+`logEventImpressions()` (lib/events.php) a ténylegesen kirajzolt eseményekre naponta
+összesít az `event_impressions_daily`-be (bot/admin-szűrt, renderenkénti dedup);
+hívja: `index.php`, `esemenyek.php` (AJAX-os részleges renderkor is), `borvidek.php`.
+A térkép és a naptár szándékosan NEM számít impressziónak (ott mindig minden esemény
+látszik, csak hígítaná az adatot). Admin statisztika: eseményenkénti „Lista-megj."
+oszlop + kiemelt-összehasonlításban lista-megjelenés és megnyitási arány.
 **Admin/saját forgalom kizárva:** admin belépéskor + minden admin-oldalon (`require_admin`)
 tartós `hb_notrack=1` süti áll be; a három naplózó (`logInteraction`/`logSearchReferral`/
 `logAiReferral`) a `trackingOptedOut()`-tal ezt kihagyja — a fejlesztői/teszt böngészés nem

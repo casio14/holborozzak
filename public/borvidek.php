@@ -69,6 +69,9 @@ try {
     error_log('borvidek.php esemény-lekérdezés hiba: ' . $e->getMessage());
 }
 
+// Lista-megjelenés (impresszió): a borvidék-oldalon kirajzolt események
+logEventImpressions($regionEvents);
+
 $info = require __DIR__ . '/lib/regions_info.php';
 $ri   = $info[$region['slug']] ?? [];
 $intro = $ri['intro'] ?? ('A(z) ' . $region['name'] . ' borvidék közelgő borrendezvényei egy helyen — fesztiválok, bornapok, kóstolók, szüreti programok.');

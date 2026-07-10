@@ -52,6 +52,10 @@ $featured = $showFeatured
     ? array_values(array_filter($events, static fn($e) => (int) $e['is_featured'] === 1))
     : [];
 
+// Lista-megjelenés (impresszió): a ténylegesen kirajzolt események (a részleges,
+// AJAX-os újrarendereléskor is — az is valódi megjelenés)
+logEventImpressions(array_merge($featured, $displayEvents));
+
 $groups = groupEventsForList($displayEvents, $sort);
 $listHeading = $q !== ''
     ? ('Találatok: „' . $q . '”')

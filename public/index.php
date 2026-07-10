@@ -28,6 +28,9 @@ try {
 $featured = array_values(array_filter($events, static fn($e) => (int) $e['is_featured'] === 1));
 $preview  = array_slice($events, 0, 6);
 
+// Lista-megjelenés (impresszió): a nyitóoldalon ténylegesen kirajzolt események
+logEventImpressions(array_merge($featured, $preview));
+
 $hirlevel = $_GET['hirlevel'] ?? '';
 
 $ld = eventsItemListJsonLd($events, $base, $dir);

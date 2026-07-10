@@ -824,6 +824,45 @@ function logPageView(): void
 }
 
 /**
+ * Lista-megjelenés (impresszió) naplózása: a ténylegesen kirajzolt események napi
+ * számlálóját növeli (event_impressions_daily, napi összesítés — nem soronkénti napló).
+ * Bot- és admin-szűrt; személyes adatot NEM tárol (csak esemény + nap + darabszám).
+ * Sosem dob kivételt.
+ */
+function logEventImpressions(array $events): void
+{
+    if (!$events || trackingOptedOut()) {
+        return;
+    }
+    if (isLikelyBot(substr((string) ($_SERVER['HTTP_USER_AGENT'] ?? ''), 0, 255))) {
+        return;
+    }
+    $ids = [];
+    foreach ($events as $e) {
+        $id = (int) (is_array($e) ? ($e['id'] ?? 0) : $e);
+        if ($id > 0) {
+            $ids[$id] = true; // dedup: egy renderben egy esemény egyszer számít
+        }
+    }
+    if (!$ids) {
+        return;
+    }
+    try {
+        $values = implode(',', array_map(
+            static fn(int $id): string => "({$id}, CURDATE(), 1)",
+            array_keys($ids)
+        ));
+        db()->exec(
+            "INSERT INTO event_impressions_daily (event_id, stat_date, impressions)
+             VALUES {$values}
+             ON DUPLICATE KEY UPDATE impressions = impressions + 1"
+        );
+    } catch (Throwable $e) {
+        error_log('logEventImpressions hiba: ' . $e->getMessage());
+    }
+}
+
+/**
  * Interakció (view/kattintás) naplózása. GDPR: nyers IP-t NEM tárolunk, csak napi
  * sóval hashelt értéket (napon belüli dedup-hoz, napok közt nem összeköthető).
  * Ha a látogató hozzájárult a mérési sütihez (hb_consent=1), az anonim

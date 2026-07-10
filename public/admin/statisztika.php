@@ -39,6 +39,9 @@ $featCmp = [
     1 => ['events' => 0, 'views' => 0, 'clicks' => 0],
     0 => ['events' => 0, 'views' => 0, 'clicks' => 0],
 ];
+// Lista-megjelenések (impressziók) eseményenként + kiemelt-bontásban
+$impByEvent = [];
+$impCmp = [1 => 0, 0 => 0];
 $referrers = [];
 $aiTotals = ['interactions' => 0, 'unique' => 0, 'clicks' => 0];
 $aiRows = [];
@@ -108,6 +111,32 @@ try {
                   views DESC
          LIMIT 200"
     )->fetchAll();
+
+    // Lista-megjelenések (event_impressions_daily, napi összesítés — stat_date szerint szűrve)
+    $whereImp = $days > 0 ? "WHERE d.stat_date >= DATE_SUB(CURDATE(), INTERVAL {$days} DAY)" : '';
+    foreach ($pdo->query(
+        "SELECT d.event_id, e.is_featured AS f, SUM(d.impressions) AS imp
+         FROM event_impressions_daily d
+         JOIN events e ON e.id = d.event_id
+         {$whereImp}
+         GROUP BY d.event_id, e.is_featured"
+    ) as $r) {
+        $impByEvent[(int) $r['event_id']] = (int) $r['imp'];
+        $impCmp[(int) $r['f']] += (int) $r['imp'];
+    }
+
+    // Események, amelyek megjelentek a listákban, de interakció (még) nincs rajtuk
+    // → nullás sorként kerüljenek be az eseményenkénti táblázatba.
+    $missing = array_diff(array_keys($impByEvent), array_map('intval', array_column($rows, 'id')));
+    if ($missing) {
+        $in = implode(',', array_map('intval', $missing));
+        foreach ($pdo->query(
+            "SELECT id, title, city, status, start_datetime, is_featured
+             FROM events WHERE id IN ({$in})"
+        ) as $e) {
+            $rows[] = $e + ['views' => 0, 'uv' => 0, 'cw' => 0, 'ct' => 0];
+        }
+    }
 
     // Kiemelt vs. nem kiemelt: átlagos megtekintés/kattintás eseményenként.
     // A besorolás a JELENLEGI is_featured állapot szerint történik (nincs
@@ -528,6 +557,16 @@ $cssVer = @filemtime(__DIR__ . '/../assets/style.css') ?: time();
               <td class="admin-num"><?= number_format($fN['events'], 0, ',', ' ') ?></td>
             </tr>
             <tr>
+              <td>Lista-megjelenés</td>
+              <td class="admin-num"><?= number_format($impCmp[1], 0, ',', ' ') ?></td>
+              <td class="admin-num"><?= number_format($impCmp[0], 0, ',', ' ') ?></td>
+            </tr>
+            <tr>
+              <td>Megnyitási arány (megtekintés / megjelenés)</td>
+              <td class="admin-num"><?= ctr($fF['views'], $impCmp[1]) ?></td>
+              <td class="admin-num"><?= ctr($fN['views'], $impCmp[0]) ?></td>
+            </tr>
+            <tr>
               <td>Megtekintés / esemény</td>
               <td class="admin-num"><?= number_format($fF['views'] / max(1, $fF['events']), 1, ',', ' ') ?></td>
               <td class="admin-num"><?= number_format($fN['views'] / max(1, $fN['events']), 1, ',', ' ') ?></td>
@@ -574,6 +613,7 @@ $cssVer = @filemtime(__DIR__ . '/../assets/style.css') ?: time();
           <thead>
             <tr>
               <th>Esemény</th>
+              <th class="admin-num" title="Hányszor jelent meg kártyaként/sorként a nyitóoldalon, az Események listában vagy egy borvidék-oldalon">Lista-megj.</th>
               <th class="admin-num">Megtekintés</th>
               <th class="admin-num">Egyedi látogató</th>
               <th class="admin-num">Honlap katt.</th>
@@ -594,6 +634,7 @@ $cssVer = @filemtime(__DIR__ . '/../assets/style.css') ?: time();
                   <br><span class="admin-stat__sub"><?= h(trim(($r['city'] ? $r['city'] . ' · ' : '') . formatDateRange($r['start_datetime'], null))) ?>
                     &nbsp;·&nbsp; <a class="admin-link" href="esemeny-preview.php?id=<?= (int) $r['id'] ?>" target="_blank" rel="noopener">Előnézet ↗</a></span>
                 </td>
+                <td class="admin-num"><?= number_format($impByEvent[(int) $r['id']] ?? 0, 0, ',', ' ') ?></td>
                 <td class="admin-num"><?= number_format($views, 0, ',', ' ') ?></td>
                 <td class="admin-num">~<?= number_format($uv, 0, ',', ' ') ?></td>
                 <td class="admin-num"><?= number_format($cw, 0, ',', ' ') ?></td>
@@ -603,6 +644,12 @@ $cssVer = @filemtime(__DIR__ . '/../assets/style.css') ?: time();
             <?php endforeach; ?>
           </tbody>
         </table>
+        <p class="admin-note"><strong>Lista-megj.</strong> = hányszor jelent meg az esemény
+          kártyaként/sorként a nyitóoldalon, az Események listában vagy egy borvidék-oldalon
+          (botok és a saját forgalmad nélkül; naponta összesítve). A teljes tölcsér:
+          lista-megjelenés → megtekintés (részletoldal) → kattintás (a szervezőhöz). A megnyitási
+          arány 100% fölé is mehet, mert a részletoldalra közvetlen linkről, keresőből vagy
+          AI-ajánlásból is lehet érkezni, lista-megjelenés nélkül.</p>
       <?php endif; ?>
     </section>
 
@@ -808,7 +855,7 @@ $cssVer = @filemtime(__DIR__ . '/../assets/style.css') ?: time();
         elfogadó látogatóknál a süti anonim azonosítója számít (napokon átívelően pontos);
         a többieknél a napi sóval hashelt IP a becslés (napok között nem összeköthető, ezért
         több napos időszakon a napi egyediek összege). A „Sütis látogató-mérés" blokk csak a
-        sütit elfogadókat tartalmazza. Az impresszió-mérés (lista-megjelenések) még nincs bekötve.</p>
+        sütit elfogadókat tartalmazza.</p>
     </section>
 
     <script>
