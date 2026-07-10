@@ -41,6 +41,7 @@ foreach ($events as $e) {
             'img'    => eventImage($e),
             'status' => eventStatus($e['start_datetime'], $e['end_datetime']),
             'cats'   => categoryNames($e),
+            'feat'   => (int) $e['is_featured'] === 1,
         ];
     }
 }
@@ -108,6 +109,8 @@ require __DIR__ . '/partials/header.php';
       });
     }
     var dotIcon = L.divIcon({ className: 'grape-dot', html: '', iconSize: [18, 18], iconAnchor: [9, 9], popupAnchor: [0, -10] });
+    // Kiemelt esemény: ugyanaz a pötty + pulzáló arany fénygyűrű (CSS-animáció)
+    var featIcon = L.divIcon({ className: 'grape-dot grape-dot--featured', html: '', iconSize: [18, 18], iconAnchor: [9, 9], popupAnchor: [0, -10] });
 
     // closePopupOnClick: false — mobilon a nagy popup auto-pan-je után az érintés
     // „szellem-kattintásként" a térképre érkezne, és azonnal bezárná a kártyát.
@@ -168,7 +171,8 @@ require __DIR__ . '/partials/header.php';
     var bounds = [];
     var markers = [];
     pts.forEach(function (p) {
-      var m = L.marker([p.lat, p.lng], { icon: dotIcon })
+      // Kiemelt: pulzáló ikon + magasabb z-index, hogy a gyűrű ne bújjon szomszéd pötty alá
+      var m = L.marker([p.lat, p.lng], { icon: p.feat ? featIcon : dotIcon, zIndexOffset: p.feat ? 1000 : 0 })
         .bindPopup(popupHtml(p), { maxWidth: POPUP_W, minWidth: POPUP_W, maxHeight: POPUP_MAX_H, className: 'event-popup' });
       cluster.addLayer(m);
       markers.push(m);

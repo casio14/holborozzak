@@ -1578,6 +1578,31 @@ main { flex: 1 0 auto; }
   box-shadow: 0 1px 4px rgba(0, 0, 0, .35);
 }
 
+/* Kiemelt esemény a térképen: a pöttyből 2,4 mp-enként arany fénygyűrű fut ki
+   (két, félperiódussal eltolt gyűrű → folyamatos hullámzás). */
+.grape-dot--featured::before,
+.grape-dot--featured::after {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 2px solid var(--gold);
+  animation: featured-ring 2.4s ease-out infinite;
+  pointer-events: none;
+}
+.grape-dot--featured::after { animation-delay: 1.2s; }
+@keyframes featured-ring {
+  0%   { transform: scale(.55); opacity: .95; }
+  70%  { opacity: .3; }
+  100% { transform: scale(2.4); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .grape-dot--featured::before,
+  .grape-dot--featured::after { animation: none; }
+  .grape-dot--featured::before { transform: scale(1.5); opacity: .55; }
+  .grape-dot--featured::after  { transform: scale(2);   opacity: .3; }
+}
+
 /* Lekerekített térkép-vezérlők (+/- és „helyzetem”) */
 .leaflet-control-zoom,
 .locate-control {
