@@ -313,7 +313,7 @@ function eventJsonLd(array $e, string $base, string $dir, ?string $url = null): 
 
     // Szervező + fellépő (ajánlott mezők) — a rendelkezésre álló adatból, legjobb tudásunk szerint.
     $orgName = ($e['venue_name'] ?? '') ?: (($e['city'] ?? '') ?: ($e['title'] ?? 'Szervező'));
-    $orgUrl  = ($e['website_url'] ?? '') ?: ($e['facebook_url'] ?? '');
+    $orgUrl  = ($e['website_url'] ?? '') ?: (($e['facebook_url'] ?? '') ?: ($url ?? ''));
     $organizer = ['@type' => 'Organization', 'name' => $orgName];
     if ($orgUrl !== '') { $organizer['url'] = $orgUrl; }
     $event['organizer'] = $organizer;
