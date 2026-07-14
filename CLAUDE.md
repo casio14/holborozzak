@@ -94,10 +94,11 @@ JSON-LD vázat (alap `WebSite`+`Organization`); `$jsonLd`-vel bővíthető oldal
   - `version.php` — generált verziófájl (CI).
   - `terkep.php` — **Eseménytérkép**: Leaflet + CARTO világos csempék, **szőlőfürt
     jelölők darabszám-jelvénnyel**, **markercluster** (zoom-alapú összevonás/szétválás),
-    popup részletlinkkel. **Kiemelt esemény pöttye pulzáló arany fénygyűrűt kap**
-    (`.grape-dot--featured`, CSS-animáció; `prefers-reduced-motion`-nél statikus dupla
-    gyűrű), a térkép melletti listában pedig arany „★ Kiemelt" pirulát
-    (`.map-item__pill`). SEO: szerveroldali lista + `Event`/`ItemList` JSON-LD.
+    popup részletlinkkel. **Kiemelt esemény jelölője arany borérem** (`.feat-medal`:
+    26 px arany korong finom belső gyűrűvonallal + borvörös mini szőlőfürt, statikus —
+    nincs animáció); **kiemeltet tartalmazó fürt jobb felső vállán 17 px mini érem**
+    (`.grape-pin__feat`, a marker `feat` optionje alapján az `iconCreateFunction`-ben).
+    A térkép melletti listában arany „★ Kiemelt" pirula (`.map-item__pill`). SEO: szerveroldali lista + `Event`/`ItemList` JSON-LD.
   - `naptar.php` — **Eseménynaptár**: havi naptárrács (hét-első nézet), eseményekkel a
     napjukon, hónaplépegetéssel (`?ev=&ho=`). A Naptár menüpont ide mutat. **Kiemelt
     esemény: arany ★ a cím előtt** mindhárom nézetben (rács-sáv — a csillag színe inline,

@@ -101,17 +101,26 @@ require __DIR__ . '/partials/header.php';
       + '<circle cx="8" cy="12.5" r="1.7"/><circle cx="12" cy="12.5" r="1.7"/><circle cx="16" cy="12.5" r="1.7"/>'
       + '<circle cx="10" cy="16" r="1.7"/><circle cx="14" cy="16" r="1.7"/><circle cx="12" cy="19.2" r="1.5"/></svg></span>';
 
-    // Fürt: szőlőfürt + darabszám; egyetlen esemény: egyszerű pont
-    function clusterIcon(count) {
+    // Kiemelt esemény: arany borérem — korong belső gyűrűvonallal + mini szőlőfürt
+    var medal = '<svg viewBox="0 0 24 24" aria-hidden="true">'
+      + '<circle cx="12" cy="12" r="10.2" class="feat-medal__disc"/>'
+      + '<circle cx="12" cy="12" r="7.6" class="feat-medal__ring"/>'
+      + '<circle cx="12" cy="9.4" r="1.35"/><circle cx="10.4" cy="11.9" r="1.35"/>'
+      + '<circle cx="13.6" cy="11.9" r="1.35"/><circle cx="12" cy="14.4" r="1.35"/>'
+      + '</svg>';
+
+    // Fürt: szőlőfürt + darabszám; ha kiemelt is van alatta: mini érem a vállán
+    function clusterIcon(count, hasFeat) {
       return L.divIcon({
         className: 'grape-pin',
-        html: grape + '<span class="grape-pin__count">' + count + '</span>',
+        html: grape
+          + (hasFeat ? '<span class="grape-pin__feat">' + medal + '</span>' : '')
+          + '<span class="grape-pin__count">' + count + '</span>',
         iconSize: [46, 46], iconAnchor: [23, 23]
       });
     }
     var dotIcon = L.divIcon({ className: 'grape-dot', html: '', iconSize: [18, 18], iconAnchor: [9, 9], popupAnchor: [0, -10] });
-    // Kiemelt esemény: ugyanaz a pötty + pulzáló arany fénygyűrű (CSS-animáció)
-    var featIcon = L.divIcon({ className: 'grape-dot grape-dot--featured', html: '', iconSize: [18, 18], iconAnchor: [9, 9], popupAnchor: [0, -10] });
+    var featIcon = L.divIcon({ className: 'feat-medal', html: medal, iconSize: [26, 26], iconAnchor: [13, 13], popupAnchor: [0, -14] });
 
     // closePopupOnClick: false — mobilon a nagy popup auto-pan-je után az érintés
     // „szellem-kattintásként" a térképre érkezne, és azonnal bezárná a kártyát.
@@ -146,7 +155,10 @@ require __DIR__ . '/partials/header.php';
       // A nagy kártya auto-pan-je a jelölőt a látótérből kitolhatja; alapból a
       // cluster ilyenkor eltávolítja a jelölőt, ami azonnal bezárja a popupját.
       removeOutsideVisibleBounds: false,
-      iconCreateFunction: function (c) { return clusterIcon(c.getChildCount()); }
+      iconCreateFunction: function (c) {
+        var hasFeat = c.getAllChildMarkers().some(function (m) { return m.options.feat; });
+        return clusterIcon(c.getChildCount(), hasFeat);
+      }
     });
 
     function popupHtml(p) {
@@ -179,8 +191,9 @@ require __DIR__ . '/partials/header.php';
     var bounds = [];
     var markers = [];
     pts.forEach(function (p) {
-      // Kiemelt: pulzáló ikon + magasabb z-index, hogy a gyűrű ne bújjon szomszéd pötty alá
-      var m = L.marker([p.lat, p.lng], { icon: p.feat ? featIcon : dotIcon, zIndexOffset: p.feat ? 1000 : 0 })
+      // Kiemelt: érem-ikon + magasabb z-index, hogy ne bújjon szomszéd pötty alá;
+      // a feat flag a marker optionsben marad — a fürt-ikon ebből tudja a jelvényt
+      var m = L.marker([p.lat, p.lng], { icon: p.feat ? featIcon : dotIcon, feat: p.feat, zIndexOffset: p.feat ? 1000 : 0 })
         .bindPopup(popupHtml(p), { maxWidth: POPUP_W, minWidth: POPUP_W, maxHeight: POPUP_MAX_H, className: 'event-popup' });
       cluster.addLayer(m);
       markers.push(m);

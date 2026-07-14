@@ -1634,29 +1634,27 @@ main { flex: 1 0 auto; }
   box-shadow: 0 1px 4px rgba(0, 0, 0, .35);
 }
 
-/* Kiemelt esemény a térképen: a pöttyből 2,4 mp-enként arany fénygyűrű fut ki
-   (két, félperiódussal eltolt gyűrű → folyamatos hullámzás). */
-.grape-dot--featured::before,
-.grape-dot--featured::after {
-  content: "";
+/* Kiemelt esemény a térképen: arany borérem-jelölő — korong finom belső
+   gyűrűvonallal + borvörös mini szőlőfürt (mint a borversenyek érmei).
+   Kiemeltet tartalmazó fürt: mini érem a jobb felső vállon. */
+.feat-medal svg,
+.grape-pin__feat svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  fill: var(--wine-900);
+  filter: drop-shadow(0 1.5px 3px rgba(0, 0, 0, .4));
+}
+.feat-medal .feat-medal__disc,
+.grape-pin__feat .feat-medal__disc { fill: var(--gold); stroke: var(--paper); stroke-width: 1.6; }
+.feat-medal .feat-medal__ring,
+.grape-pin__feat .feat-medal__ring { fill: none; stroke: var(--wine-900); stroke-width: 1; opacity: .35; }
+.grape-pin__feat {
   position: absolute;
-  inset: -4px;
-  border-radius: 50%;
-  border: 2px solid var(--gold);
-  animation: featured-ring 2.4s ease-out infinite;
-  pointer-events: none;
-}
-.grape-dot--featured::after { animation-delay: 1.2s; }
-@keyframes featured-ring {
-  0%   { transform: scale(.55); opacity: .95; }
-  70%  { opacity: .3; }
-  100% { transform: scale(2.4); opacity: 0; }
-}
-@media (prefers-reduced-motion: reduce) {
-  .grape-dot--featured::before,
-  .grape-dot--featured::after { animation: none; }
-  .grape-dot--featured::before { transform: scale(1.5); opacity: .55; }
-  .grape-dot--featured::after  { transform: scale(2);   opacity: .3; }
+  top: -10px;
+  right: -7px;
+  width: 17px;
+  height: 17px;
 }
 
 /* Lekerekített térkép-vezérlők (+/- és „helyzetem”) */
