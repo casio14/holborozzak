@@ -214,8 +214,11 @@ mély URL-eken is jó). Újrageneráláshoz GDI+ script kell (nem a repóban).
   `collect_events.php`, heti `import-sources.yml` + `import_sources.php`) **eltávolítottuk**
   (nem kell automata gyűjtés). Az események kézzel kerülnek fel: admin → **+ Új esemény**, vagy
   admin → Jelöltek → **„Import URL-ből"** (a `lib/ai.php` Claude-hívásával — `ANTHROPIC_API_KEY`
-  kell hozzá). A `public/collect-ingest.php` token-védett fogadó végpont megmaradt, de jelenleg
-  nem használt.
+  kell hozzá). A `public/collect-ingest.php` token-védett fogadó végpont megmaradt —
+  ezt használja az **`/esemeny-gyujtes` Claude Code skill** (`.claude/skills/esemeny-gyujtes/`):
+  a `docs/esemeny-forrasok.md` honlaplistáját végigjárva kigyűjti az új eseményeket, és
+  jelöltként beküldi az admin → Jelöltek oldalra (token lokálisan a gitignore-olt
+  `public/config.php` `collect_token`-jéből — ugyanaz az érték, mint a `COLLECT_TOKEN` secret).
 - `db/` — adatbázis séma (`schema.sql`), `seed.sql` (minta események), migrációk. NEM kerül a webszerverre.
 - `docs/` — tervdokumentumok (pl. `adatmodell.md`). NEM kerül a webszerverre.
 - `.github/workflows/` — CI/CD (deploy).

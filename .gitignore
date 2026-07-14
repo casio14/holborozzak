@@ -12,8 +12,10 @@ build/
 public/version.php
 public/config.php
 
-# Claude Code helyi munkakönyvtár (worktree-k, helyi beállítások) — nem a repóé
-.claude/
+# Claude Code helyi munkakönyvtár (worktree-k, helyi beállítások) — nem a repóé,
+# KIVÉVE a projekt-skilleket (.claude/skills/), azok verziózva vannak
+.claude/*
+!.claude/skills/
 
 # OS / editor
 .DS_Store
