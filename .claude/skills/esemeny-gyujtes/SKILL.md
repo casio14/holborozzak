@@ -1,25 +1,23 @@
 ---
 name: esemeny-gyujtes
-description: Végigmegy a docs/esemeny-forrasok.md-ben felsorolt honlapokon, kigyűjti a borhoz köthető eseményeket, kiszűri a holborozzak.hu-n már meglévőket, és az újakat jelöltként beküldi az admin Jelöltek oldalára (collect-ingest.php). Használd, ha a felhasználó esemény-gyűjtést, forrás-honlapok átnézését vagy új események importálását kéri.
+description: Végigmegy a docs/esemeny-forrasok.md-ben felsorolt honlapokon, kigyűjti a borhoz köthető eseményeket, kiszűri a holborozzak.hu-n már meglévőket, és az újakat a public/admin/jelolt-import.json fájlba írva (commit + push → auto-deploy) az admin Jelöltek oldalára juttatja. Használd, ha a felhasználó esemény-gyűjtést, forrás-honlapok átnézését vagy új események importálását kéri.
 ---
 
 # Esemény-gyűjtés a forrás-honlapokról
 
 A cél: a forráslistában szereplő honlapokról kigyűjteni azokat a **jövőbeni, magyarországi,
-borhoz köthető eseményeket**, amelyek még nincsenek fent a holborozzak.hu-n, és beküldeni
-őket **jelöltként** — az admin → Jelöltek oldalon jelennek meg kitöltött adatlappal,
-ott kézi jóváhagyás után lesznek `draft` események. SOHA ne írj közvetlenül az
-`events` táblába — mindig a jelölt-folyamaton át.
+borhoz köthető eseményeket**, amelyek még nincsenek fent a holborozzak.hu-n, és eljuttatni
+őket **jelöltként** az admin → Jelöltek oldalra, ahol kézi jóváhagyás után lesznek `draft`
+események. SOHA ne írj közvetlenül az `events` táblába — mindig a jelölt-folyamaton át.
 
-## 0. Előfeltételek
+**Nincs token, nincs API-kulcs, nincs automatikus futás** — ezt a skillt csak a felhasználó
+indítja kézzel; a kinyerést te (a session-beli Claude) végzed; az átadás a git push →
+auto-deploy útján történik.
 
-1. **Token:** olvasd ki a `public/config.php`-ból a `collect_token` értékét (gitignore-olt
-   lokális fájl). Ha a fájl vagy az érték hiányzik, ÁLLJ MEG, és kérd meg a felhasználót:
-   másolja le a `public/config.example.php`-t `public/config.php` néven, és a
-   `collect_token`-be írja be UGYANAZT az értéket, ami a GitHub `COLLECT_TOKEN`
-   secretben van. (A többi mező üresen maradhat.) A tokent SOHA ne írd ki a válaszban.
-2. **Forráslista:** olvasd be a `docs/esemeny-forrasok.md`-t. Ha üres vagy nem létezik,
-   kérj forrás URL-eket a felhasználótól.
+## 0. Előfeltétel
+
+Olvasd be a `docs/esemeny-forrasok.md`-t. Ha üres vagy nem létezik, kérj forrás
+URL-eket a felhasználótól, és vedd fel őket a fájlba.
 
 ## 1. Meglévő események lekérése (elő-szűréshez)
 
@@ -38,43 +36,48 @@ Minden forrás URL-re:
 2. Gyűjtsd ki eseményenként az alábbi mezőket (amit az oldal nem ad meg, maradjon üres):
    - `title` — az esemény neve (kötelező)
    - `short_description` — 1–2 mondatos magyar összefoglaló (te írod, a forrás alapján)
+   - `description` — hosszabb leírás, ha a forrás ad hozzá anyagot (sima szöveg)
    - `start_datetime` / `end_datetime` — `YYYY-MM-DD HH:MM:SS`; ha csak nap ismert,
      idő `00:00:00` (az admin pontosítja jóváhagyáskor)
    - `venue_name`, `city`
    - `region_name` — a 22 magyar borvidék egyike, CSAK ha egyértelmű (pl. Tokaj, Villány,
      Eger, Badacsony, Szekszárd…); ha bizonytalan, hagyd üresen
    - `website_url` — az esemény hivatalos oldala (a részletoldal URL-je)
+   - `facebook_url`, `ticket_url` — ha van
+   - `is_free` (true/false) és `price_info` — ha az oldal egyértelműen közli
    - `image_url` — abszolút kép-URL, ha van értelmes borító
    - `source_url` — melyik forrásoldalról találtad
 3. Szűrés: CSAK jövőbeni, konkrét dátumú, magyarországi, borhoz köthető esemény
    (borfesztivál, bornap, kóstoló, szüreti rendezvény, pincetúra stb.). Múltbeli,
    dátum nélküli, külföldi vagy nem boros programot hagyj ki.
 
-## 3. Beküldés a jelöltek közé
+## 3. Átadás az admin Jelöltek oldalnak
 
-A kigyűjtött ÚJ eseményeket egyetlen JSON-ban POST-old (a payloadot a scratchpadbe írd,
-ne a repóba):
+Írd a kigyűjtött ÚJ eseményeket a **`public/admin/jelolt-import.json`** fájlba
+(FELÜLÍRVA a korábbi tartalmat — mindig csak az aktuális futás eredménye legyen benne):
 
+```json
+{
+  "generated_at": "2026-07-14T12:00:00+02:00",
+  "events": [ { "title": "…", "start_datetime": "…", … } ]
+}
 ```
-POST https://holborozzak.hu/collect-ingest.php
-Content-Type: application/json
 
-{ "token": "<collect_token>", "events": [ { ...mezők a 2. pont szerint... } ] }
-```
+Majd **commit + push a main-re** (auto-deploy). A deploy után (~1–2 perc) az
+**admin → Jelöltek** oldal megnyitáskor automatikusan beolvassa a fájlt, és a még
+nem ismert tételeket felveszi jelöltnek (a dedup miatt idempotens — a fájl nyugodtan
+a repóban maradhat, újratöltéskor nem duplikál).
 
-FONTOS: a token a KÉRÉS TÖRZSÉBEN menjen — a Rackhost proxy az egyéni HTTP-fejléceket
-(X-Collect-Token) eldobja. `curl -sS -X POST -H "Content-Type: application/json"
---data @payload.json https://holborozzak.hu/collect-ingest.php`
-
-A válasz: `{"received": n, "added": n, "skipped": n}` — a `skipped` a szerveroldali
-dedup által kiszűrt duplikátum.
+Megjegyzés: a fájl webről elérhető (`/admin/jelolt-import.json`), de csak nyilvános
+eseményadatokat tartalmazhat — SOHA ne kerüljön bele semmilyen titok vagy személyes adat.
 
 ## 4. Összefoglaló a felhasználónak
 
-Táblázatban: forrás → hány eseményt találtál → hány újat küldtél be → szerver
-added/skipped. Említsd meg a kihagyott kéteseket (és miért). Zárásként emlékeztesd:
-a jelöltek az **admin → Jelöltek** oldalon várnak jóváhagyásra
-(`https://holborozzak.hu/admin/jeloltek.php`).
+Táblázatban: forrás → hány eseményt találtál → hány újat tettél a fájlba.
+Említsd meg a kihagyott kéteseket (és miért). Zárásként emlékeztesd a felhasználót:
+deploy után nyissa meg az **admin → Jelöltek** oldalt
+(`https://holborozzak.hu/admin/jeloltek.php`) — ott jelennek meg a jelöltek
+jóváhagyásra, kitöltött adatlappal.
 
 ## Korlátok
 

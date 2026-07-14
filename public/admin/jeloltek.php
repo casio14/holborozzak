@@ -181,6 +181,73 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
+// --- Automatikus import az /esemeny-gyujtes skill által deployolt fájlból ---
+// A skill a public/admin/jelolt-import.json-t írja (commit → auto-deploy), az
+// oldal megnyitásakor beolvassuk. A dedup-kulcs miatt idempotens: a már látott
+// tételt (akár elvetett jelöltként) nem veszi fel újra — a fájlt nem kell törölni.
+$importMsg = '';
+$importFile = __DIR__ . '/jelolt-import.json';
+if (is_file($importFile)) {
+    try {
+        $pdo = db();
+        $data = json_decode((string) file_get_contents($importFile), true);
+        $items = is_array($data['events'] ?? null) ? $data['events'] : [];
+        $impAdded = 0;
+        $impSkipped = 0;
+        $ins = $pdo->prepare(
+            "INSERT INTO event_candidates
+               (source_url, title, short_description, description, start_datetime, end_datetime,
+                venue_name, city, region_name, website_url, facebook_url, ticket_url,
+                is_free, price_info, image_url, dedup_key, status)
+             VALUES
+               (:src, :title, :short, :desc, :start, :end,
+                :venue, :city, :region, :web, :fb, :ticket,
+                :free, :price, :img, :dedup, 'new')"
+        );
+        foreach ($items as $d) {
+            if (!is_array($d)) {
+                continue;
+            }
+            $title = trim((string) ($d['title'] ?? ''));
+            if ($title === '') {
+                continue;
+            }
+            $start = toMysqlDatetime((string) ($d['start_datetime'] ?? ''));
+            $city  = trim((string) ($d['city'] ?? ''));
+            $dedup = candidateDedupKey($title, $start, $city);
+            if (candidateDuplicate($pdo, $dedup) || eventDuplicate($pdo, $title, $start, $city)) {
+                $impSkipped++;
+                continue;
+            }
+            $ins->execute([
+                ':src'    => ($d['source_url'] ?? '') ?: null,
+                ':title'  => $title,
+                ':short'  => ($d['short_description'] ?? '') ?: null,
+                ':desc'   => ($d['description'] ?? '') ?: null,
+                ':start'  => $start,
+                ':end'    => toMysqlDatetime((string) ($d['end_datetime'] ?? '')),
+                ':venue'  => ($d['venue_name'] ?? '') ?: null,
+                ':city'   => $city !== '' ? $city : null,
+                ':region' => ($d['region_name'] ?? '') ?: null,
+                ':web'    => ($d['website_url'] ?? '') ?: null,
+                ':fb'     => ($d['facebook_url'] ?? '') ?: null,
+                ':ticket' => ($d['ticket_url'] ?? '') ?: null,
+                ':free'   => !empty($d['is_free']) ? 1 : 0,
+                ':price'  => ($d['price_info'] ?? '') ?: null,
+                ':img'    => ($d['image_url'] ?? '') ?: null,
+                ':dedup'  => $dedup,
+            ]);
+            $impAdded++;
+        }
+        if ($impAdded > 0) {
+            $importMsg = $impAdded . ' új jelölt érkezett a gyűjtő-fájlból'
+                . ($impSkipped ? ' (' . $impSkipped . ' már ismert tételt kihagytunk)' : '') . '.';
+        }
+    } catch (Throwable $e) {
+        error_log('admin/jeloltek.php import hiba: ' . $e->getMessage());
+    }
+}
+
 // Jóváhagyásra váró jelöltek
 $rows = [];
 $counts = ['new' => 0, 'approved' => 0, 'rejected' => 0, 'duplicate' => 0];
@@ -227,6 +294,7 @@ $cssVer = @filemtime(__DIR__ . '/../assets/style.css') ?: time();
         <?php endif; ?>
       </div>
     <?php endif; ?>
+    <?php if ($importMsg !== ''): ?><div class="admin-msg"><?= h($importMsg) ?></div><?php endif; ?>
     <?php if ($err !== ''): ?><div class="admin-error"><?= h($err) ?></div><?php endif; ?>
 
     <form method="post" action="jeloltek.php" class="admin-import">
