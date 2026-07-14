@@ -78,6 +78,12 @@ $jsVer  = @filemtime(__DIR__ . '/../assets/app.js') ?: time();
   <meta name="theme-color" content="#722f37" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#1e1114" media="(prefers-color-scheme: dark)">
 
+  <!-- Favicon (Google-találatokhoz is: min. 48px, robots által elérhető) -->
+  <link rel="icon" href="favicon.ico" sizes="48x48">
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+
   <!-- Téma (világos/sötét) beállítása MÉG a stíluslap előtt, hogy ne villanjon:
        mentett választás (localStorage) > ?theme= paraméter > rendszerbeállítás -->
   <script>

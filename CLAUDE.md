@@ -83,6 +83,10 @@ egyedi title/description/canonical, slug-URL-ek, **Schema.org JSON-LD** (esemén
 **dinamikus `sitemap.php`** (DB-ből, csak published; a `robots.txt` ide hivatkozik), `llms.txt`
 (GEO áttekintés), egyedi **`404.php`** (`.htaccess` ErrorDocument), és AI-crawlereket engedő `robots.txt`. A `partials/header.php` már tartalmazza a meta/canonical/OG/
 JSON-LD vázat (alap `WebSite`+`Organization`); `$jsonLd`-vel bővíthető oldalanként.
+**Favicon kész** (Google-találati ikonhoz is): borvörös korong + arany szőlőfürt —
+`public/favicon.ico` (16/32/48), `assets/favicon.svg`, `assets/icon-192.png`,
+`assets/apple-touch-icon.png`; a `header.php` hivatkozza (a `<base>` után, így a
+mély URL-eken is jó). Újrageneráláshoz GDI+ script kell (nem a repóban).
 
 ## Projekt szerkezet
 
