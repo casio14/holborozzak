@@ -242,13 +242,22 @@ function eventUrl(array $e, string $base = '', string $dir = ''): string
 }
 
 /** Egy esemény Schema.org Event objektuma (@context nélkül; ItemList-be vagy önállóan). */
-/** Ár kinyerése a szabad szöveges price_info-ból (első számsorozat) — HUF egész, vagy null. */
+/**
+ * Ár kinyerése a szabad szöveges price_info-ból — HUF egész, vagy null, ha nem
+ * állapítható meg. Elsődlegesen Ft/HUF/forint utótagú számot keres (így egy
+ * telefonszám vagy évszám nem lesz „ár"); ha a mező csak egy puszta szám, azt veszi.
+ */
 function parsePriceHuf(string $info): ?int
 {
-    if (trim($info) === '') {
+    $info = trim($info);
+    if ($info === '') {
         return null;
     }
-    if (preg_match('/(\d[\d\s.\x{00A0}]*)/u', $info, $m)) {
+    if (preg_match('/\b(?:ingyenes|díjtalan|dijtalan|belépődíj nélkül)\b/iu', $info)) {
+        return 0;
+    }
+    if (preg_match('/(\d[\d\s.\x{00A0}]*)\s*(?:Ft|HUF|forint)/iu', $info, $m)
+        || preg_match('/^(\d[\d\s.\x{00A0}]*)$/u', $info, $m)) {
         $digits = preg_replace('/\D/', '', $m[1]);
         if ($digits !== '' && (int) $digits > 0) {
             return (int) $digits;
@@ -292,24 +301,22 @@ function eventJsonLd(array $e, string $base, string $dir, ?string $url = null): 
 
     // Offers (jegy/ár) — a Google „Event" rich-resulthoz ajánlott mezők:
     // url (hol kaphatók jegyek), validFrom (mikortól érvényes), availability, ár.
-    $offerUrl = ($e['ticket_url'] ?? '') ?: (($e['website_url'] ?? '') ?: ($url ?? ''));
-    $offer = [
-        '@type'        => 'Offer',
-        'availability' => 'https://schema.org/InStock',
-        'validFrom'    => !empty($e['created_at']) ? isoDate($e['created_at']) : date('c'),
-    ];
-    if ($offerUrl !== '') { $offer['url'] = $offerUrl; }
-    if ((int) $e['is_free'] === 1) {
-        $offer['price'] = '0';
-        $offer['priceCurrency'] = 'HUF';
-    } else {
-        $p = parsePriceHuf((string) ($e['price_info'] ?? ''));
-        if ($p !== null) {
-            $offer['price'] = (string) $p;
-            $offer['priceCurrency'] = 'HUF';
-        }
+    // A Google a price + priceCurrency párost együtt várja: ha az árat nem ismerjük
+    // (nem ingyenes, és a price_info-ból nem nyerhető ki), inkább nem adunk offers-t,
+    // mint egy hiányos Offer-t — az utóbbi „Hiányzó mező" figyelmeztetést kap.
+    $price = (int) $e['is_free'] === 1 ? 0 : parsePriceHuf((string) ($e['price_info'] ?? ''));
+    if ($price !== null) {
+        $offerUrl = ($e['ticket_url'] ?? '') ?: (($e['website_url'] ?? '') ?: ($url ?? ''));
+        $offer = [
+            '@type'         => 'Offer',
+            'price'         => (string) $price,
+            'priceCurrency' => 'HUF',
+            'availability'  => 'https://schema.org/InStock',
+            'validFrom'     => !empty($e['created_at']) ? isoDate($e['created_at']) : date('c'),
+        ];
+        if ($offerUrl !== '') { $offer['url'] = $offerUrl; }
+        $event['offers'] = $offer;
     }
-    $event['offers'] = $offer;
 
     // Szervező + fellépő (ajánlott mezők) — a rendelkezésre álló adatból, legjobb tudásunk szerint.
     $orgName = ($e['venue_name'] ?? '') ?: (($e['city'] ?? '') ?: ($e['title'] ?? 'Szervező'));
