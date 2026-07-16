@@ -9,26 +9,31 @@
   'use strict';
   document.documentElement.classList.add('js');
 
-  // ----- Megtekintés-naplózó beacon (esemény részletoldal) -----
-  // A 'view'-t CSAK valódi böngészőből számoljuk, a lap betöltése után (nem
-  // szerveroldalon), így egy JS-t nem futtató, IP-forgató flood-script nem tudja
-  // felpumpálni a látogatószámot. A cél: view-beacon.php (same-origin POST).
+  // ----- Látogatottság-naplózó beacon (MINDEN oldal) -----
+  // Az oldalmegnyitást (page_views) és — részletoldalon — az esemény-megtekintést
+  // CSAK valódi böngészőből számoljuk, a lap betöltése után (nem szerveroldalon),
+  // így egy JS-t nem futtató, IP-forgató flood-script nem tudja felpumpálni a
+  // látogató-/megnyitásszámot. A cél: view-beacon.php (same-origin POST). A valós
+  // útvonalat (p) és hivatkozót (r) is elküldjük, mert a beacon kérés saját URL-je
+  // maga a view-beacon.php lenne.
   (function () {
     var el = document.querySelector('[data-eview]');
-    var id = el && el.getAttribute('data-eview');
-    if (!id) { return; }
+    var id = (el && el.getAttribute('data-eview')) || '';
     var fire = function () {
       try {
+        var body = 'p=' + encodeURIComponent(location.pathname)
+                 + '&r=' + encodeURIComponent(document.referrer || '');
+        if (id) { body += '&e=' + encodeURIComponent(id); }
         fetch('view-beacon.php', {
           method: 'POST',
           headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          body: 'e=' + encodeURIComponent(id),
+          body: body,
           keepalive: true,
           credentials: 'same-origin'
         }).catch(function () {});
       } catch (e) { /* a mérés sose törje az oldalt */ }
     };
-    // Kis késleltetés: a puszta prefetch/azonnali bezárás ne számítson megtekintésnek.
+    // Kis késleltetés: a puszta prefetch/azonnali bezárás ne számítson megnyitásnak.
     if ('requestIdleCallback' in window) { requestIdleCallback(fire, { timeout: 2500 }); }
     else { setTimeout(fire, 900); }
   })();

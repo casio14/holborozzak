@@ -7,13 +7,12 @@
  */
 $siteName = 'holborozzak.hu';
 
-// Látogatottság-mérés: MINDEN publikus oldalmegnyitás naplózása (bot- és admin-szűrt,
-// GDPR-barát). Idempotens require: a legtöbb oldal már betöltötte ezeket.
+// Látogatottság-mérés: az oldalmegnyitást NEM itt (szerveroldalon) naplózzuk, hanem
+// a view-beacon.php-ból, amit az app.js hív a lap betöltése után. Ok: egy JS-t nem
+// futtató, IP-forgató flood-script így nem tudja felpumpálni az oldalmegnyitás- és
+// látogatószámot (a page_views táblát). A require-ök az oldal többi része miatt kellenek.
 require_once __DIR__ . '/../db.php';
 require_once __DIR__ . '/../lib/events.php';
-if (function_exists('logPageView')) {
-    logPageView();
-}
 
 $pageTitle = $pageTitle
     ?? 'holborozzak.hu — Magyarország borhoz köthető eseményei';

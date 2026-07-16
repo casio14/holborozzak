@@ -806,8 +806,14 @@ function ensurePageViewsTable(PDO $pdo): void
  * Oldalmegnyitás naplózása MINDEN publikus oldalon (általános látogatottság —
  * „hányan tekintették meg a honlapot"). Bot- és admin-szűrt; GDPR: nyers IP helyett
  * napi sóval hashelt ip_hash, session_id csak hozzájárulással. Sosem dob kivételt.
+ *
+ * A hívás a view-beacon.php-ból jön (JS után), NEM szerveroldalról, hogy egy JS-t
+ * nem futtató flood-script ne pumpálhassa fel az oldalmegnyitás/látogató számot.
+ * Ezért a valódi oldal útvonalát és hivatkozóját a JS küldi (a beacon saját
+ * REQUEST_URI/Referer-je a view-beacon.php lenne) — ezek a paraméterek. Ha nincs
+ * felülírás (null), a $_SERVER-re esik vissza.
  */
-function logPageView(): void
+function logPageView(?string $pathOverride = null, ?string $referrerOverride = null): void
 {
     if (trackingOptedOut()) {
         return; // saját (admin) forgalom — nem mérjük
@@ -829,8 +835,10 @@ function logPageView(): void
         }
         $ip = clientIp();
         $ipHash = $ip !== '' ? hash('sha256', $ip . '|' . appSalt() . '|' . date('Y-m-d')) : null;
-        $path = substr((string) strtok((string) ($_SERVER['REQUEST_URI'] ?? '/'), '?'), 0, 255);
-        $ref  = isset($_SERVER['HTTP_REFERER']) ? substr((string) $_SERVER['HTTP_REFERER'], 0, 255) : null;
+        $pathRaw = $pathOverride !== null ? $pathOverride : (string) ($_SERVER['REQUEST_URI'] ?? '/');
+        $path = substr((string) strtok($pathRaw, '?'), 0, 255);
+        $refRaw = $referrerOverride !== null ? $referrerOverride : (string) ($_SERVER['HTTP_REFERER'] ?? '');
+        $ref = $refRaw !== '' ? substr($refRaw, 0, 255) : null;
 
         $st = $pdo->prepare(
             'INSERT INTO page_views (path, session_id, ip_hash, referrer, user_agent)
