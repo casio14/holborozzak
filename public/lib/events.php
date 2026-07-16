@@ -743,6 +743,24 @@ function appSalt(): string
     return $salt;
 }
 
+/**
+ * A látogató valódi IP-je a naplózáshoz/hasheléshez.
+ *
+ * FONTOS: szándékosan NEM bízunk a kliens által küldhető X-Forwarded-For /
+ * CF-Connecting-IP fejlécekben. A Rackhost sima hostingnál nincs előttünk
+ * megbízható proxy, ezért ezek a fejlécek hamisíthatók: aki minden kéréshez más
+ * (véletlen) X-Forwarded-For-t küld, az minden találatnál új ip_hash-t kapna →
+ * felpumpált „látogatószám" (ténylegesen előfordult flood 2026-07-16-án). A
+ * REMOTE_ADDR a TCP-partner címe, amit a kliens nem hamisíthat; a normál böngészők
+ * amúgy sem küldenek XFF-et, tehát a valódi látogatók IP-je eddig is innen jött.
+ * Ha a jövőben megbízható proxy (pl. Cloudflare) kerül elé, csak ezt az egy helyet
+ * kell módosítani (a megbízható proxy IP ellenőrzésével).
+ */
+function clientIp(): string
+{
+    return trim((string) ($_SERVER['REMOTE_ADDR'] ?? ''));
+}
+
 /** Egyszerű bot-szűrő: ismert crawler/eszköz user agent vagy üres UA → ne számoljuk. */
 function isLikelyBot(string $ua): bool
 {
@@ -809,13 +827,7 @@ function logPageView(): void
                 $sid = $c;
             }
         }
-        $ip = (string) ($_SERVER['HTTP_CF_CONNECTING_IP']
-            ?? $_SERVER['HTTP_X_FORWARDED_FOR']
-            ?? $_SERVER['REMOTE_ADDR']
-            ?? '');
-        if (strpos($ip, ',') !== false) {
-            $ip = trim(explode(',', $ip)[0]);
-        }
+        $ip = clientIp();
         $ipHash = $ip !== '' ? hash('sha256', $ip . '|' . appSalt() . '|' . date('Y-m-d')) : null;
         $path = substr((string) strtok((string) ($_SERVER['REQUEST_URI'] ?? '/'), '?'), 0, 255);
         $ref  = isset($_SERVER['HTTP_REFERER']) ? substr((string) $_SERVER['HTTP_REFERER'], 0, 255) : null;
@@ -896,18 +908,28 @@ function logInteraction(PDO $pdo, int $eventId, string $type): void
         }
     }
 
-    $ip = (string) ($_SERVER['HTTP_CF_CONNECTING_IP']
-        ?? $_SERVER['HTTP_X_FORWARDED_FOR']
-        ?? $_SERVER['REMOTE_ADDR']
-        ?? '');
-    if (strpos($ip, ',') !== false) {           // X-Forwarded-For: első a valódi kliens
-        $ip = trim(explode(',', $ip)[0]);
-    }
-
+    $ip = clientIp();
     $ipHash = $ip !== '' ? hash('sha256', $ip . '|' . appSalt() . '|' . date('Y-m-d')) : null;
     $referrer = isset($_SERVER['HTTP_REFERER'])
         ? substr((string) $_SERVER['HTTP_REFERER'], 0, 255)
         : null;
+
+    // Dedup / flood-védelem: ugyanaz az IP egy eseményre adott típusból naponta
+    // egyszer számít. Az ip_hash már napi sóval készül (aznap ugyanaz az IP → azonos
+    // hash, más napon más), így a CURDATE()-szűrés a napi egyediséget adja. Ez fogja
+    // meg a felpumpálást; a valódi statisztikát alig érinti (egy látogató amúgy is
+    // ~1-nek számít naponta). Ha nincs IP (ipHash null), nem dedupálunk.
+    if ($ipHash !== null) {
+        $dup = $pdo->prepare(
+            'SELECT 1 FROM event_interactions
+             WHERE event_id = ? AND type = ? AND ip_hash = ? AND created_at >= CURDATE()
+             LIMIT 1'
+        );
+        $dup->execute([$eventId, $type, $ipHash]);
+        if ($dup->fetchColumn()) {
+            return; // ma ettől az IP-től ezt a típust már számoltuk
+        }
+    }
 
     $st = $pdo->prepare(
         'INSERT INTO event_interactions (event_id, type, session_id, referrer, ip_hash, user_agent)
@@ -1035,13 +1057,7 @@ function logSearchReferral(): void
             }
         }
 
-        $ip = (string) ($_SERVER['HTTP_CF_CONNECTING_IP']
-            ?? $_SERVER['HTTP_X_FORWARDED_FOR']
-            ?? $_SERVER['REMOTE_ADDR']
-            ?? '');
-        if (strpos($ip, ',') !== false) {
-            $ip = trim(explode(',', $ip)[0]);
-        }
+        $ip = clientIp();
         $ipHash = $ip !== '' ? hash('sha256', $ip . '|' . appSalt() . '|' . date('Y-m-d')) : null;
 
         $path = substr((string) strtok((string) ($_SERVER['REQUEST_URI'] ?? '/'), '?'), 0, 255);
@@ -1122,13 +1138,7 @@ function logAiReferral(): void
             }
         }
 
-        $ip = (string) ($_SERVER['HTTP_CF_CONNECTING_IP']
-            ?? $_SERVER['HTTP_X_FORWARDED_FOR']
-            ?? $_SERVER['REMOTE_ADDR']
-            ?? '');
-        if (strpos($ip, ',') !== false) {
-            $ip = trim(explode(',', $ip)[0]);
-        }
+        $ip = clientIp();
         $ipHash = $ip !== '' ? hash('sha256', $ip . '|' . appSalt() . '|' . date('Y-m-d')) : null;
 
         $path = substr((string) strtok((string) ($_SERVER['REQUEST_URI'] ?? '/'), '?'), 0, 255);
