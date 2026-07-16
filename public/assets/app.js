@@ -9,6 +9,30 @@
   'use strict';
   document.documentElement.classList.add('js');
 
+  // ----- Megtekintés-naplózó beacon (esemény részletoldal) -----
+  // A 'view'-t CSAK valódi böngészőből számoljuk, a lap betöltése után (nem
+  // szerveroldalon), így egy JS-t nem futtató, IP-forgató flood-script nem tudja
+  // felpumpálni a látogatószámot. A cél: view-beacon.php (same-origin POST).
+  (function () {
+    var el = document.querySelector('[data-eview]');
+    var id = el && el.getAttribute('data-eview');
+    if (!id) { return; }
+    var fire = function () {
+      try {
+        fetch('view-beacon.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: 'e=' + encodeURIComponent(id),
+          keepalive: true,
+          credentials: 'same-origin'
+        }).catch(function () {});
+      } catch (e) { /* a mérés sose törje az oldalt */ }
+    };
+    // Kis késleltetés: a puszta prefetch/azonnali bezárás ne számítson megtekintésnek.
+    if ('requestIdleCallback' in window) { requestIdleCallback(fire, { timeout: 2500 }); }
+    else { setTimeout(fire, 900); }
+  })();
+
   // ----- Témaváltó (sötét/világos) — a kezdeti témát a header inline scriptje
   // állítja be még a stíluslap előtt; itt csak a kapcsoló + mentés él. -----
   var themeBtn = document.getElementById('themeToggle');

@@ -57,13 +57,11 @@ if (strpos((string) ($_SERVER['REQUEST_URI'] ?? ''), 'esemeny.php') !== false) {
     exit;
 }
 
-// Megtekintés naplózása (analitika): bot-szűrt, hashelt IP-vel; hibája nem
-// akadályozhatja az oldal kiszolgálását.
-try {
-    logInteraction(db(), (int) $event['id'], 'view');
-} catch (Throwable $e) {
-    error_log('esemeny.php view naplózás hiba: ' . $e->getMessage());
-}
+// Megtekintés naplózása: szándékosan NEM itt (szerveroldalon, betöltéskor), hanem
+// egy JS-beacon-nel (view-beacon.php), amit az app.js hív a lap betöltése után.
+// Ok: egy elosztott, IP-forgató flood-script JS nélkül is „megnézne" minden oldalt
+// szerveroldalon; a JS-beacon csak a valódi böngészőt számolja. A data-eview
+// attribútum viszi az esemény id-jét a JS-hez (lentebb, az <article>-en).
 
 $canonicalUrl = eventUrl($event, $base, $dir);
 $pageTitle = $event['title'] . ' — holborozzak.hu';
@@ -100,7 +98,7 @@ $priceText = (int) $event['is_free'] === 1 ? 'Ingyenes' : (!empty($event['price_
 
 require __DIR__ . '/partials/header.php';
 ?>
-  <article class="edh-detail">
+  <article class="edh-detail" data-eview="<?= (int) $event['id'] ?>">
     <div class="edh">
       <div class="edh__img">
         <img src="<?= h(eventImage($event)) ?>" alt="<?= h($event['image_alt'] ?: $event['title']) ?>">

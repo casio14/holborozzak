@@ -5,6 +5,8 @@ User-agent: *
 Allow: /
 # Kimenő kattintás-átirányító (tracker) — ne indexeljék, ne kövessék
 Disallow: /go.php
+# Megtekintés-naplózó JS-beacon (POST) — ne indexeljék, ne kövessék
+Disallow: /view-beacon.php
 # Admin felület
 Disallow: /admin/
 # Naptár-letöltés (.ics)
