@@ -1757,6 +1757,7 @@ main { flex: 1 0 auto; }
 .event-detail__tags { display: flex; flex-wrap: wrap; gap: .4rem; margin-bottom: 1.2rem; }
 .event-detail__lead { font-size: 1.15rem; color: #4a3b36; }
 .event-detail__desc { color: #4a3b36; line-height: 1.8; }
+:root[data-theme="dark"] .event-detail__desc { color: var(--ink); }
 .event-detail__desc p { margin: 0 0 .9rem; }
 .event-detail__desc ul, .event-detail__desc ol { margin: 0 0 .9rem 1.5rem; padding: 0; }
 .event-detail__desc li { margin: .2rem 0; }
